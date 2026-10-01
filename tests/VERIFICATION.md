@@ -57,3 +57,24 @@ The screenshots in this handoff are generated from a test-funded showcase, not a
 Initial implementations span roadmap phases 1–8 and a first phase-9 polish pass. Commercial completion is **not** claimed. Remaining gates include the user's first-roll/art-direction review, long-session balancing, final audio/music, export/platform qualification, sustained render profiling, broader accessibility/localization and Steam integration. Future machines, crafting and minigames remain deliberately outside this pass.
 
 The project TODO.md distinguishes implemented systems from these release requirements.
+
+## Follow-up: controlled rendering baseline
+The 1 October performance follow-up reproduced neither the earlier 29 FPS result nor the large reported monitor spikes. No runtime optimization was made in this follow-up because the controlled measurements did not establish a gameplay/rendering bottleneck.
+
+A new `tests/render_benchmark.gd` warms up for two seconds, samples actual frame intervals and gameplay tick duration, and separates blank, static, full, silent and hidden scenes. The older stress runner now measures frame intervals instead of treating the periodically updated TIME_PROCESS monitor as a per-frame CPU sample. Both runners refuse to run without `--test`.
+
+Sequential six-second probes on the same Windows / Intel Iris Xe / Compatibility configuration:
+
+| Scenario | VSync | FPS | Frame interval p95 |
+|---|---|---:|---:|
+| Blank scene | On | 59.99 | 17.75 ms |
+| Blank scene | Off | 7,678.71 | 0.20 ms |
+| 100 automatic D6 + 8 helpers | On | 59.85 | 17.74 ms |
+| 100 automatic D6 + 8 helpers | Off | 868.90 | 1.74 ms |
+| Static 100-die table | On | 59.83 | 17.99 ms |
+
+A separate **60-second full-scene run** completed **6,000 rolls**, earned **20,869**, and recorded **59.97 FPS** across 3,598 sampled frames. Frame interval median / p95 / p99: **16.66 / 17.83 / 18.18 ms**; maximum **33.40 ms**, one frame above 33.333 ms. Gameplay tick median / p95: **0.96 / 1.87 ms**. Godot static memory increased from **76.28 to 76.72 MB**, including benchmark samples; this is not a leak assessment.
+
+These are real Windows-renderer debug processes launched with WindowStyle Hidden, not a visible interactive play session or GPU completion benchmark. Uncapped results are diagnostic frame-loop rates, not an achievable display refresh rate. Frame intervals include presentation waits; draw counts are final snapshots. Prior results are preserved above as historical evidence, not directly comparable per-frame CPU measurements. The cause of the earlier slowdown remains unknown. Longer visible sessions, exported builds, mixed special-die builds and additional hardware remain release gates.
+
+After the instrumentation changes, all **64 regression checks passed again**, including save and payout coverage; the million-roll sampler took **2,061 ms**. Player saves were disabled throughout via `--test`.

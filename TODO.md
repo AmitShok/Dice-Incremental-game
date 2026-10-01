@@ -19,7 +19,8 @@
 - [ ] More intentional helper interaction/celebration timing and priorities.
 - [ ] Keyboard remapping, gamepad navigation, screen-reader support and localization.
 - [ ] Extended save soak/power-interruption/platform testing, profile management and cloud conflict design.
-- [ ] Longer 100-die performance capture, profiling frame spikes and export-hardware coverage.
+- [x] Controlled 60-second 100-die/eight-helper rendering baseline with real frame intervals and active payout verification.
+- [ ] Longer visible mixed-build performance soak, investigate any recurring spikes and qualify exported builds on additional hardware.
 - [ ] Export presets/release packaging, licenses/credits, Steam achievements and Steam Cloud.
 - [ ] Expand talent content only after early progression is tuned.
 - [ ] Replace finite float money with mantissa/exponent representation if the target economy exceeds 1e100.

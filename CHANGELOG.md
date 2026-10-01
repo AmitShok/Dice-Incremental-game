@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-01 — Controlled performance verification
+
+- Added isolated rendering scenarios, warmup, actual frame interval percentiles, activity checks and memory reporting.
+- Corrected stress timing labels/sampling and required the isolated test flag.
+- Measured a 60-second, 100-die/eight-helper run at 59.97 FPS with 6,000 completed payouts; 64 regression checks passed.
+- Earlier slowdown did not reproduce; visible export/hardware qualification remains open. No speculative runtime changes.
 ## 2026-10-01 — First complete playable progression pass
 
 - Preserved original project in Git before editing; no replacement project.

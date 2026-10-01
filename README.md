@@ -18,10 +18,13 @@ GODOT --headless --path . --editor --import --quit
 GODOT --headless --path . --script res://tests/test_runner.gd -- --test
 GODOT --path . --script res://tests/visual_runner.gd -- --test
 GODOT --path . --script res://tests/stress_runner.gd -- --test
+GODOT --path . --script res://tests/render_benchmark.gd -- --test --mode=full --seconds=60
 GODOT --headless --path . --script res://tools/balance.gd -- --test
 ```
 
 Set DICE_TEST_OUTPUT to an existing directory to capture visual test PNGs. --test disables player-save access, not gameplay. Tests never overwrite progress.json. Native desktop click/drag behavior is additionally a manual QA item.
+
+The render benchmark warms up for two seconds, then reports actual frame intervals, gameplay tick times, roll/payout activity and memory. Compare `--mode=blank`, `static`, `full`, `silent` or `hidden`; add `--vsync=off` only for a diagnostic uncapped run. Run scenarios sequentially with the same window/environment conditions. Frame intervals include presentation waits and are not CPU execution times. Draw counts are a final monitor snapshot. The benchmark and stress scripts enforce `--test`; keep this flag on every test command.
 
 For isolated developer play, use `GODOT --path . -- --test --dev` then F3. Debug controls require both a debug build and --dev. Ordinary launches do not show them.
 
