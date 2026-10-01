@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-02 — Editable scene composition
+
+- Replaced runtime construction of the main layout with authored tabletop, HUD, shop, settings and debug scenes.
+- Added reusable purchase-card and Moss scenes; the generic die now owns its face, shadow and marker in its scene.
+- Serialized the shared theme and exposed die/helper scene references in the Inspector.
+- Preserved existing state, services, art and save format. Added scene-edit persistence and actual button-wiring checks to rendered integration.
+
 ## 2026-10-01 — Controlled performance verification
 
 - Added isolated rendering scenarios, warmup, actual frame interval percentiles, activity checks and memory reporting.

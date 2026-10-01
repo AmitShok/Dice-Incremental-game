@@ -7,6 +7,10 @@ func _initialize() -> void:
 	call_deferred("run")
 
 func run() -> void:
+	if not OS.get_cmdline_user_args().has("--test"):
+		push_error("Visual integration requires --test")
+		quit(1)
+		return
 	var game: GameSession = root.get_node("GameManager").session
 	game.state.money = 90000
 	game.state.run_earned = 100000
@@ -18,9 +22,18 @@ func run() -> void:
 	for index in game.state.dice.size():
 		game.state.dice[index].position = Vector2(150 + index % 5 * 116, 245 + int(index / 5) * 135)
 	var main: Control = load("res://scenes/main.tscn").instantiate()
+	# Scene-authored layout and extra editor nodes must survive _ready().
+	var editor_marker := Node.new()
+	editor_marker.name = "EditorAddedNode"
+	main.add_child(editor_marker)
+	main.get_node("HUD/Wallet").position.x += 3
 	root.add_child(main)
 	await process_frame
 	await process_frame
+	confirm_not_reset(is_instance_valid(editor_marker) and editor_marker.get_parent() == main)
+	confirm_not_reset(is_equal_approx(main.wallet.position.x, 457.0))
+	main.wallet.position.x -= 3
+	confirm_not_reset(main.shop.position.is_equal_approx(Vector2(792, 94)))
 	var first: DiceVisual = main.visuals[game.state.dice[0].id]
 	var start: Vector2 = game.state.dice[0].position
 	var press := InputEventMouseButton.new()
@@ -39,9 +52,16 @@ func run() -> void:
 	confirm_not_reset(game.state.dice[0].position.is_equal_approx(start + Vector2(40, 30)) and not game.state.dice[0].busy)
 	print("DRAG: movement committed without rolling")
 	for title in ["Dice", "Upgrades", "Helpers", "Fate", "Ledger", "Settings"]:
-		main.shop.show_page(title)
+		var group: String = "Footer" if title in ["Ledger", "Settings"] else "Tabs"
+		main.shop.get_node(group + "/" + title).pressed.emit()
 		await process_frame
+		confirm_not_reset(main.shop.page == title)
 		checks += 1
+	var old_sound: bool = game.state.settings.sound
+	main.shop.body.get_node("SettingsPage/sound").pressed.emit()
+	confirm_not_reset(game.state.settings.sound != old_sound)
+	main.shop.body.get_node("SettingsPage/sound").pressed.emit()
+	confirm_not_reset(game.state.settings.sound == old_sound)
 	main.shop.show_page("Dice")
 	await create_timer(0.6).timeout
 	await RenderingServer.frame_post_draw
@@ -56,7 +76,8 @@ func run() -> void:
 	var ids: Array = []
 	for die in game.state.dice:
 		ids.append(die.id)
-	game.request_roll(ids)
+	main.get_node("HUD/RollButton").pressed.emit()
+	confirm_not_reset(not game.pending.is_empty())
 	await create_timer(1.4).timeout
 	if not folder.is_empty():
 		await RenderingServer.frame_post_draw

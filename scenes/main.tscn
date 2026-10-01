@@ -1,6 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://b6najufqn2bf7"]
+[gd_scene load_steps=9 format=3 uid="uid://b6najufqn2bf7"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/tabletop.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/ui/shop_panel.tscn" id="4"]
+[ext_resource type="Script" path="res://effects/feedback_manager.gd" id="5"]
+[ext_resource type="Script" path="res://audio/audio_service.gd" id="6"]
+[ext_resource type="Theme" path="res://ui/game_theme.tres" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/ui/debug_panel.tscn" id="8"]
 
 [node name="DiceIncremental" type="Control"]
 layout_mode = 3
@@ -9,4 +16,25 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture_filter = 1
+theme = ExtResource("7")
 script = ExtResource("1")
+
+[node name="Tabletop" parent="." instance=ExtResource("2")]
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+layout_mode = 1
+
+[node name="Feedback" type="Node2D" parent="."]
+script = ExtResource("5")
+
+[node name="Audio" type="Node" parent="."]
+script = ExtResource("6")
+
+[node name="ShopPanel" parent="." instance=ExtResource("4")]
+
+[node name="Confirm" type="ConfirmationDialog" parent="."]
+title = "A fresh beginning"
+min_size = Vector2i(480, 180)
+
+[node name="DebugPanel" parent="." instance=ExtResource("8")]

@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[node name="DebugPanel" type="PanelContainer"]
+layout_mode = 0
+visible = false
+offset_left = 40.0
+offset_top = 145.0
+offset_right = 255.0
+offset_bottom = 515.0
+z_index = 90
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Action0" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "+1K"
+
+[node name="Action1" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "+1M"
+
+[node name="Action2" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Force max"
+
+[node name="Action3" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Force min"
+
+[node name="Action4" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Normal RNG"
+
+[node name="Action5" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Hire helper"
+
+[node name="Action6" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Speed x1"
+
+[node name="Action7" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Speed x2"
+
+[node name="Action8" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Speed x10"
+
+[node name="Action9" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Pause / resume"

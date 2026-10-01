@@ -1,70 +1,38 @@
 extends Control
 
+@export var die_scene: PackedScene = preload("res://scenes/d_6.tscn")
+@export var helper_scene: PackedScene = preload("res://scenes/helpers/moss.tscn")
+
 var session: GameSession
-var table := Node2D.new()
+@onready var table: Node2D = $Tabletop/Dice
+@onready var helper_layer: Node2D = $Tabletop/Helpers
 var visuals: Dictionary = {}
 var workers: Array[Sprite2D] = []
-var wallet: Label
-var income: Label
-var fate: Label
-var hint: Label
-var toast: Label
-var combo: Label
-var shop: ShopPanel
-var feedback: FeedbackManager
-var audio: AudioService
+@onready var wallet: Label = $HUD/Wallet
+@onready var income: Label = $HUD/Income
+@onready var fate: Label = $HUD/Fate
+@onready var hint: Label = $HUD/Hint
+@onready var toast: Label = $HUD/Toast
+@onready var combo: Label = $HUD/Combo
+@onready var shop: ShopPanel = $ShopPanel
+@onready var feedback: FeedbackManager = $Feedback
+@onready var audio: AudioService = $Audio
 var elapsed: float = 0.0
 var toast_time: float = 0.0
 var combo_time: float = 0.0
 var debug_panel: PanelContainer
-var confirm := ConfirmationDialog.new()
+@onready var confirm: ConfirmationDialog = $Confirm
 var hud_dirty: bool = false
 var wallet_tween: Tween
 
 func _ready() -> void:
-	for child in get_children():
-		child.queue_free()
 	session = GameManager.session
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	theme = GameTheme.build()
-	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	var room := Sprite2D.new()
-	room.texture = preload("res://assets/exported/environment/room.png")
-	room.centered = false
-	room.scale = Vector2(2, 2)
-	add_child(room)
-	add_child(table)
-	_label("DICE / INCREMENTAL", Vector2(32, 12), 26, Color("#f4deaf"))
-	_label("A SMALL TABLE.  IMPOSSIBLE POSSIBILITIES.", Vector2(33, 49), 11, Color("#b29979"))
-	wallet = _label("$0", Vector2(454, 9), 29, Color("#f6d68f"))
-	income = _label("Your first throw awaits", Vector2(455, 50), 12, Color("#b0b9aa"))
-	fate = _label("FATE  0", Vector2(797, 17), 25, Color("#c5b4df"))
-	_label("THE HOUSE OF POSSIBILITY", Vector2(798, 54), 11, Color("#aa9d90"))
-	hint = _label("", Vector2(90, 96), 14, Color("#f1d6a4"))
-	combo = _label("", Vector2(150, 430), 26, Color("#f8d383"))
-	combo.size.x = 470
-	combo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var roll := Button.new()
-	roll.text = "ROLL THE TABLE   [SPACE]"
-	roll.position = Vector2(235, 536)
-	roll.size = Vector2(310, 43)
-	roll.pressed.connect(GameManager.roll_all_dice)
-	roll.focus_mode = Control.FOCUS_NONE
-	add_child(roll)
-	_label("Click to roll  ·  Drag to arrange  ·  Hover to inspect", Vector2(198, 589), 13, Color("#b6b8a7"))
-	toast = _label("", Vector2(32, 615), 13, Color("#d6c49c"))
-	toast.size.x = 1060
-	feedback = FeedbackManager.new()
+	$HUD/RollButton.pressed.connect(GameManager.roll_all_dice)
 	feedback.settings = session.state.settings
-	add_child(feedback)
-	audio = AudioService.new()
 	audio.settings = session.state.settings
-	add_child(audio)
-	shop = ShopPanel.new()
 	shop.on_notice = notify
 	shop.on_prestige = ask_prestige
 	shop.on_reset = ask_reset
-	add_child(shop)
 	shop.setup(session)
 	session.events.changed.connect(func(): hud_dirty = true)
 	session.events.die_roll_started.connect(on_roll)
@@ -73,9 +41,6 @@ func _ready() -> void:
 	session.events.purchased.connect(on_purchase)
 	session.events.achievement_unlocked.connect(func(id: String): notify("Milestone unlocked · " + id))
 	session.events.prestige_completed.connect(on_prestige)
-	add_child(confirm)
-	confirm.title = "A fresh beginning"
-	confirm.min_size = Vector2i(480, 180)
 	refresh()
 	if SaveManager.offline_amount > 0:
 		notify("Welcome back. Your table earned $" + NumberFormat.compact(SaveManager.offline_amount) + " while you were away.")
@@ -88,16 +53,6 @@ func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--screenshot"):
 		_capture_later()
 
-func _label(text: String, at: Vector2, font_size: int, color: Color) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.position = at
-	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", color)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(label)
-	return label
-
 func refresh() -> void:
 	wallet.text = "$" + NumberFormat.compact(session.state.money)
 	fate.text = "FATE  %d" % session.state.prestige_points
@@ -107,7 +62,7 @@ func refresh() -> void:
 	hint.text = "Click your die to begin." if session.state.tutorial_step == 0 else ("Save $20 for your second D6, or try an Amber D4." if session.state.dice.size() == 1 else ("Roll together: doubles, triples and straights!" if session.economy.modifier("combos") > 1 else "Your table is growing. Table harmony unlocks combinations."))
 	for die in session.state.dice:
 		if not visuals.has(die.id):
-			var visual: DiceVisual = preload("res://scenes/d_6.tscn").instantiate()
+			var visual: DiceVisual = die_scene.instantiate()
 			table.add_child(visual)
 			visual.setup(die, session.registry.dice[die.definition_id])
 			visual.selected.connect(func(id: int): session.request_roll([id]))
@@ -181,11 +136,8 @@ func _process(delta: float) -> void:
 
 func _update_helpers() -> void:
 	while workers.size() < session.automation.workers.size():
-		var sprite := Sprite2D.new()
-		sprite.texture = preload("res://assets/exported/helpers/moss.png")
-		sprite.hframes = 12
-		sprite.scale = Vector2(2, 2)
-		table.add_child(sprite)
+		var sprite: Sprite2D = helper_scene.instantiate()
+		helper_layer.add_child(sprite)
 		workers.append(sprite)
 	while workers.size() > session.automation.workers.size():
 		workers.pop_back().queue_free()
@@ -236,16 +188,9 @@ func _disconnect_confirmation() -> void:
 		confirm.confirmed.disconnect(connection.callable)
 
 func _build_debug() -> void:
-	debug_panel = PanelContainer.new()
-	debug_panel.position = Vector2(40, 145)
-	debug_panel.size = Vector2(215, 370)
-	debug_panel.z_index = 90
-	add_child(debug_panel)
-	var box := VBoxContainer.new()
-	debug_panel.add_child(box)
-	for title in ["+1K", "+1M", "Force max", "Force min", "Normal RNG", "Hire helper", "Speed x1", "Speed x2", "Speed x10", "Pause / resume"]:
-		var button := Button.new()
-		button.text = title
+	debug_panel = $DebugPanel
+	for button in debug_panel.get_node("Buttons").get_children():
+		var title: String = button.text
 		button.pressed.connect(func():
 			match title:
 				"+1K": session.economy.credit(1000)
@@ -260,7 +205,6 @@ func _build_debug() -> void:
 				"Pause / resume": session.paused = not session.paused
 			refresh()
 		)
-		box.add_child(button)
 	debug_panel.visible = false
 
 func _capture_later() -> void:

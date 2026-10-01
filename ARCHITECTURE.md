@@ -9,6 +9,8 @@ EconomyService validates spending and resolves modifiers. ProgressionService own
 
 Presentation consists of the main tabletop controller, ShopPanel, reusable scenes/d_6.tscn (now a generic DiceVisual), AudioService and pooled FeedbackManager. UI sends commands; it never writes arbitrary payout/currency values except explicitly gated developer controls.
 
+The main scene composes authored tabletop, HUD, shop and debug scenes, plus confirmation, feedback and audio nodes. Scripts bind existing nodes with @onready; they never clear editor-authored main-scene children. Dice and helpers instantiate PackedScenes exposed on the main controller. Shop cards and settings use separate PackedScenes, and the shared theme is a serialized .tres visible in the Inspector. Dynamic catalog text, instance counts and pooled effects remain runtime work. See SCENES.md for ownership and editing boundaries.
+
 ## Roll transaction
 request_roll validates each ID, reserves idle instances, samples faces and constructs a uniquely identified pending outcome with payout snapshotted at request time. Batch combinations are computed only for that request. Events start visual animation. A central session tick commits the outcome after its duration, exactly once. Rendering does not choose results or award money. settle() commits pending rolls without creating new chains for save/exit/prestige.
 

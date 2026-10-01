@@ -4,8 +4,8 @@ extends VBoxContainer
 var session: GameSession
 var page: String = "Dice"
 var rows: Array[Dictionary] = []
-var body := VBoxContainer.new()
-var scroll := ScrollContainer.new()
+@onready var body: VBoxContainer = $Scroll/Body
+@onready var scroll: ScrollContainer = $Scroll
 var stats_label: Label
 var on_notice: Callable
 var on_prestige: Callable
@@ -13,30 +13,9 @@ var on_reset: Callable
 
 func setup(game: GameSession) -> void:
 	session = game
-	position = Vector2(792, 94)
-	size = Vector2(310, 486)
-	var tabs := HBoxContainer.new()
-	for title in ["Dice", "Upgrades", "Helpers", "Fate"]:
-		var button := Button.new()
-		button.text = title
-		button.add_theme_font_size_override("font_size", 13)
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.pressed.connect(func(): show_page(title))
-		tabs.add_child(button)
-	add_child(tabs)
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(scroll)
-	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(body)
-	var footer := HBoxContainer.new()
-	for title in ["Ledger", "Settings"]:
-		var button := Button.new()
-		button.text = title
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.pressed.connect(func(): show_page(title))
-		footer.add_child(button)
-	add_child(footer)
+	for group in [$Tabs, $Footer]:
+		for button in group.get_children():
+			button.pressed.connect(func(): show_page(button.name))
 	show_page("Dice")
 
 func label_text(text: String, font_size: int = 14) -> Label:
@@ -49,26 +28,21 @@ func label_text(text: String, font_size: int = 14) -> Label:
 	return label
 
 func card(title: String, description: String) -> VBoxContainer:
-	var panel := PanelContainer.new()
+	var panel: PanelContainer = preload("res://scenes/ui/shop_card.tscn").instantiate()
 	body.add_child(panel)
-	var box := VBoxContainer.new()
-	panel.add_child(box)
-	box.add_child(label_text(title, 17))
-	var text := label_text(description, 13)
-	text.modulate = Color("#b2bfaf")
-	box.add_child(text)
+	var box: VBoxContainer = panel.get_node("Content")
+	box.get_node("Title").text = title
+	box.get_node("Description").text = description
 	return box
 
 func purchase_button(box: VBoxContainer, callback: Callable, kind: String, id: String) -> void:
-	var button := Button.new()
-	button.add_theme_font_size_override("font_size", 14)
+	var button: Button = box.get_node("Purchase")
 	button.pressed.connect(func():
 		if callback.call():
 			show_page(page)
 		else:
 			on_notice.call("Not enough currency, or this purchase is locked.")
 	)
-	box.add_child(button)
 	rows.append({"button": button, "kind": kind, "id": id})
 
 func show_page(which: String) -> void:
@@ -102,9 +76,8 @@ func show_page(which: String) -> void:
 				purchase_button(auto_box, func(): return session.progression.buy_automatic(id), "automatic", id)
 		"Fate":
 			var box: VBoxContainer = card("Begin again, luckier", "At $%s earned this run, trade the table for Fate. Each Fate earned adds +10%% income permanently. Dice, money, helpers and ordinary upgrades reset. Talents, settings and lifetime statistics stay." % NumberFormat.compact(ProgressionService.PRESTIGE_THRESHOLD))
-			var button := Button.new()
+			var button: Button = box.get_node("Purchase")
 			button.pressed.connect(func(): on_prestige.call())
-			box.add_child(button)
 			rows.append({"button": button, "kind": "prestige", "id": ""})
 			body.add_child(label_text("Permanent talents", 19))
 			for id in session.registry.talents:
@@ -115,36 +88,24 @@ func show_page(which: String) -> void:
 			stats_label = label_text("", 15)
 			body.add_child(stats_label)
 		"Settings":
-			body.add_child(label_text("Make yourself comfortable.", 19))
-			for pair in [["sound", "Sound effects"], ["motion", "Motion & bounce"], ["flashes", "Counter flashes"], ["numbers", "Floating payouts"], ["particles", "Celebration sparks"]]:
-				var key: String = pair[0]
-				var button := Button.new()
-				button.text = pair[1] + (" · ON" if session.state.settings[key] else " · OFF")
+			var settings: VBoxContainer = preload("res://scenes/ui/settings_page.tscn").instantiate()
+			body.add_child(settings)
+			for key in ["sound", "motion", "flashes", "numbers", "particles"]:
+				var button: Button = settings.get_node(key)
+				button.text += " · ON" if session.state.settings[key] else " · OFF"
 				button.pressed.connect(func():
 					session.state.settings[key] = not session.state.settings[key]
 					show_page("Settings")
 				)
-				body.add_child(button)
-			body.add_child(label_text("Volume", 14))
-			var volume := HSlider.new()
-			volume.min_value = 0.0
-			volume.max_value = 1.0
-			volume.step = 0.05
+			var volume: HSlider = settings.get_node("Volume")
 			volume.value = session.state.settings.volume
 			volume.value_changed.connect(func(value: float): session.state.settings.volume = value)
-			body.add_child(volume)
-			var save := Button.new()
-			save.text = "Save now"
-			save.pressed.connect(func():
+			settings.get_node("Save").pressed.connect(func():
 				SaveManager.save_game()
 				on_notice.call(SaveManager.status)
 			)
-			body.add_child(save)
-			body.add_child(label_text("Autosaves every 30 seconds and on exit. Offline earnings: 50% of estimated production, up to four hours.", 13))
-			var reset := Button.new()
-			reset.text = "Reset all progress..."
-			reset.pressed.connect(func(): on_reset.call())
-			body.add_child(reset)
+			settings.get_node("Reset").pressed.connect(func(): on_reset.call())
+
 	update_rows()
 
 func update_rows() -> void:

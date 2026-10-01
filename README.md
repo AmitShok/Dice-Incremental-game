@@ -6,6 +6,8 @@ A cozy tabletop incremental about turning a handful of dice into a probability e
 Open this existing project in Godot 4.7.2 and press F6 on main.tscn or F5. The renderer is Compatibility. No external runtime packages are required. Start with one Ivory D6; click it or press Space to roll, drag to arrange, and use the right-hand shop. Buy helpers after earning $150 in the run. Fate becomes available after $100,000 earned.
 
 ## Current playable release
+
+The presentation is composed from editable Godot scenes. Start with `scenes/main.tscn`; open its tabletop, HUD and shop instances to arrange their children in the editor. See [SCENES.md](SCENES.md) for the scene map and editing workflow.
 Ten dice definitions (D4, D6, D8, D10, D12, D20, Golden, Lucky, Ember, Prism); seven ordinary upgrades; walking helpers and per-family automation; doubles/triples/straights; spatial auras and bounded rerolls; Fate prestige and four permanent talents; statistics, eight local milestones, offline income, settings and versioned saves.
 
 Art is created/exported in Aseprite with editable masters in assets/source/aseprite. No downloaded or ImageGen sprites. Sound cues are original synthesized waveforms. This is a playable development build, not a certified commercial release; see TODO.md for the remaining quality gates.

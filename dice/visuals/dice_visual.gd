@@ -5,15 +5,18 @@ signal selected(id: int)
 signal moved(id: int, position: Vector2)
 var die: DiceInstance
 var definition: DiceDefinition
-var sprite := Sprite2D.new()
-var shadow := Sprite2D.new()
-var marker := Label.new()
+@onready var sprite: Sprite2D = $Face
+@onready var shadow: Sprite2D = $Shadow
+@onready var marker: Label = $Marker
 var animation: Tween
 var dragging: bool = false
 var press_position: Vector2
 var original_position: Vector2
 var age: float = 0
 var rolling: bool = false
+
+func _ready() -> void:
+	set_process(false)
 
 func set_density(count: int) -> void:
 	var factor: float = 0.5 if count > 30 else 1.0
@@ -27,34 +30,19 @@ func set_density(count: int) -> void:
 func setup(instance: DiceInstance, content: DiceDefinition) -> void:
 	die = instance
 	definition = content
-	size = Vector2(64, 64)
-	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	mouse_filter = Control.MOUSE_FILTER_STOP
 	tooltip_text = "%s\n%s\nClick to roll · drag to arrange" % [definition.display_name, definition.description]
-	shadow.texture = preload("res://assets/exported/effects/shadow.png")
-	shadow.position = Vector2(32, 55)
-	shadow.scale = Vector2(1.5, 1.5)
-	add_child(shadow)
 	sprite.texture = definition.texture
 	sprite.hframes = definition.sides
 	sprite.frame = die.face - 1
-	sprite.scale = Vector2(2, 2)
-	sprite.position = Vector2(32, 28)
-	add_child(sprite)
 	marker.text = "D%d" % definition.sides
-	marker.add_theme_font_size_override("font_size", 11)
-	marker.modulate = Color("#b9c5ae")
-	marker.position = Vector2(0, 58)
-	marker.size = Vector2(64, 15)
-	marker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(marker)
 	position = die.position - Vector2(32, 32)
 	mouse_entered.connect(func(): if not rolling: sprite.modulate = Color(1.15, 1.12, 1.05))
 	mouse_exited.connect(func(): sprite.modulate = Color.WHITE)
 	set_process(false)
 
 func _gui_input(event: InputEvent) -> void:
+	if die == null:
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed and not die.busy:
 			dragging = true
