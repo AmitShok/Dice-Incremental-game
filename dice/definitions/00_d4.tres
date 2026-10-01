@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/dice/d4.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "d4"
+display_name = "Amber D4"
+description = "A small wager. Fast throws, modest returns."
+sides = 4
+base_cost = 7.0
+base_payout = 1
+unlock_earned = 0.0
+auto_cost = 450.0
+duration = 0.65
+behavior = ""
+texture = ExtResource("2")

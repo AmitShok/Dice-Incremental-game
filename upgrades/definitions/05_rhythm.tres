@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "rhythm"
+display_name = "Rolling rhythm"
+description = "Throws resolve 15% faster. Three levels."
+cost = 250.0
+growth = 2.5
+max_level = 3
+stat = "roll_speed"
+operation = "multiply"
+value = 1.15
+condition = ""
+target = ""
+unlock_earned = 100.0
+permanent = false
+prerequisite = ""

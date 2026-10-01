@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/dice/d6.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "d6"
+display_name = "Ivory D6"
+description = "The beginning of every good story."
+sides = 6
+base_cost = 10.0
+base_payout = 1
+unlock_earned = 0.0
+auto_cost = 1000.0
+duration = 0.85
+behavior = ""
+texture = ExtResource("2")

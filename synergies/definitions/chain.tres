@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EffectDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://synergies/effect_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+trigger = "landed"
+condition = "maximum"
+target = "nearest"
+action = "reroll"
+radius = 140.0

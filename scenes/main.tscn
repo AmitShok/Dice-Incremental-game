@@ -1,28 +1,12 @@
-[gd_scene format=3 uid="uid://b6najufqn2bf7"]
+[gd_scene load_steps=2 format=3 uid="uid://b6najufqn2bf7"]
 
-[ext_resource type="Script" uid="uid://co4ojbafsitey" path="res://scripts/main.gd" id="1_o5qli"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 
-[node name="main" type="Control" unique_id=1970511567]
+[node name="DiceIncremental" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-script = ExtResource("1_o5qli")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1128106780]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="MoneyLabel" type="Label" parent="VBoxContainer" unique_id=545844036]
-layout_mode = 2
-
-[node name="RollButton" type="Button" parent="VBoxContainer" unique_id=224893174]
-layout_mode = 2
-text = "roll"
-
-[node name="ShopContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=880568178]
-layout_mode = 2
-
-[node name="IncomeLabel" type="Label" parent="VBoxContainer" unique_id=173968677]
-layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")

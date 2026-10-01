@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/dice/d10.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "d10"
+display_name = "Azure D10"
+description = "Cool hands. Higher stakes."
+sides = 10
+base_cost = 280.0
+base_payout = 1.6
+unlock_earned = 350.0
+auto_cost = 4000.0
+duration = 0.9
+behavior = ""
+texture = ExtResource("2")

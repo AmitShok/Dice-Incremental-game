@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="DiceData" format=3 uid="uid://bbvra3v50k2da"]
-
-[ext_resource type="Script" uid="uid://dgqs4rolcxmet" path="res://scripts/dice_data.gd" id="1_n4evi"]
-
-[resource]
-script = ExtResource("1_n4evi")
-dice_name = "D6"
-auto_roll_cost = 1000.0
-metadata/_custom_type_script = "uid://dgqs4rolcxmet"

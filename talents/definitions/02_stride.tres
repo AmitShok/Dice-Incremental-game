@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "stride"
+display_name = "Fleet of foot"
+description = "Helpers are permanently 35% faster."
+cost = 2.0
+growth = 1
+max_level = 1
+stat = "helper_speed"
+operation = "multiply"
+value = 1.35
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "fortune"

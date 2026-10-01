@@ -12,7 +12,7 @@ config_version=5
 
 config/name="DiceIncremental"
 run/main_scene="uid://b6najufqn2bf7"
-config/features=PackedStringArray("4.7", "Forward Plus")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -20,10 +20,22 @@ config/icon="res://icon.svg"
 GameManager="*uid://bwr8iqa5a78a8"
 SaveManager="*uid://ulqxk3gqun4a"
 
+[display]
+
+window/size/viewport_width=1120
+window/size/viewport_height=640
+window/size/window_width_override=1120
+window/size/window_height_override=640
+window/stretch/mode="canvas_items"
+window/stretch/scale_mode="integer"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
 
 [rendering]
 
-rendering_device/driver.windows="d3d12"
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.09, 0.1, 0.13, 1)

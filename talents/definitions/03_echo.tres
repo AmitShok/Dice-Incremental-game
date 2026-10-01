@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[ext_resource type="Resource" path="res://synergies/definitions/chain.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "echo"
+display_name = "Resonance"
+description = "Maximums permanently trigger neighboring dice."
+cost = 3.0
+growth = 1
+max_level = 1
+stat = "chain"
+operation = "add"
+value = 1
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "fortune"
+effects = Array[Resource]([ExtResource("2")])

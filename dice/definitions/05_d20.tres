@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/dice/d20.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "d20"
+display_name = "Crimson D20"
+description = "Twenty ways to tempt fate."
+sides = 20
+base_cost = 700.0
+base_payout = 1
+unlock_earned = 0.0
+auto_cost = 10000.0
+duration = 1.05
+behavior = ""
+texture = ExtResource("2")

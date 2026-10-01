@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "heavy"
+display_name = "Heavy dice"
+description = "+25% to every payout. Five levels."
+cost = 50.0
+growth = 2
+max_level = 5
+stat = "payout"
+operation = "multiply"
+value = 1.25
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = false
+prerequisite = ""

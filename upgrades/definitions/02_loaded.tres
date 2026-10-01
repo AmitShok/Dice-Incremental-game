@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "loaded"
+display_name = "Loaded corners"
+description = "D6 faces 4–6 gain double probability weight."
+cost = 300.0
+growth = 1
+max_level = 1
+stat = "luck"
+operation = "multiply"
+value = 2
+condition = ""
+target = "d6"
+unlock_earned = 100.0
+permanent = false
+prerequisite = ""
