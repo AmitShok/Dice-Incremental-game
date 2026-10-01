@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://djo2p43vfw4ps"]
+
+[sub_resource type="GDScript" id="GDScript_0m0ih"]
+script/source = "extends Node2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3vpph"]
+
+[node name="D6" type="Node2D" unique_id=973402280]
+script = SubResource("GDScript_0m0ih")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1373966634]
+sprite_frames = SubResource("SpriteFrames_3vpph")
