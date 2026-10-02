@@ -196,10 +196,8 @@ func open_developer_tools() -> void:
 
 func _build_debug() -> void:
 	debug_panel = $DebugPanel
-	debug_panel.get_node("Buttons/Close").pressed.connect(func(): debug_panel.hide())
-	for button in debug_panel.get_node("Buttons").get_children():
-		if button.name == "Close":
-			continue
+	debug_panel.get_node("Layout/Close").pressed.connect(func(): debug_panel.hide())
+	for button in debug_panel.get_node("Layout/Scroll/Buttons").get_children():
 		var title: String = button.text
 		button.pressed.connect(func():
 			match title:

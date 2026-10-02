@@ -62,9 +62,33 @@ func run() -> void:
 	main.shop.body.get_node("SettingsPage/DeveloperTools").pressed.emit()
 	confirm_not_reset(main.debug_panel.visible)
 	var before_debug_credit: float = game.state.money
-	main.debug_panel.get_node("Buttons/Action0").pressed.emit()
+	main.debug_panel.get_node("Layout/Scroll/Buttons/Action0").pressed.emit()
 	confirm_not_reset(game.state.money == before_debug_credit + 1000)
-	main.debug_panel.get_node("Buttons/Close").pressed.emit()
+	await process_frame
+	await process_frame
+	var developer_scroll: ScrollContainer = main.debug_panel.get_node("Layout/Scroll")
+	developer_scroll.scroll_vertical = 10000
+	await process_frame
+	await process_frame
+	var last_tool: Button = developer_scroll.get_node("Buttons/Action9")
+	confirm_not_reset(developer_scroll.scroll_vertical > 0)
+	confirm_not_reset(developer_scroll.get_global_rect().encloses(last_tool.get_global_rect()))
+	confirm_not_reset(main.debug_panel.get_global_rect().end.y <= 640)
+	var tool_point: Vector2 = root.get_final_transform() * last_tool.get_global_rect().get_center()
+	for expected_pause in [true, false]:
+		for pressed in [true, false]:
+			var click := InputEventMouseButton.new()
+			click.button_index = MOUSE_BUTTON_LEFT
+			click.pressed = pressed
+			click.position = tool_point
+			click.global_position = tool_point
+			root.push_input(click, false)
+		confirm_not_reset(game.paused == expected_pause)
+	var developer_capture: String = OS.get_environment("DICE_TEST_OUTPUT")
+	if not developer_capture.is_empty():
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(developer_capture.path_join("developer-tools-scrolled.png"))
+	main.debug_panel.get_node("Layout/Close").pressed.emit()
 	confirm_not_reset(not main.debug_panel.visible)
 	main.shop.body.get_node("SettingsPage/sound").pressed.emit()
 	confirm_not_reset(game.state.settings.sound != old_sound)

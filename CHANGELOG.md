@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-02 — Scrollable developer tools
+
+- Kept the developer panel inside its existing bounds with a vertically scrollable action list and a fixed Close button.
+- Enabled scrolling to keyboard-focused controls. Rendered integration verifies that the last action is visible and clickable after scrolling.
+
 ## 2026-10-02 — Tumbling dice animation
 
 - Replaced full-circle flat sprite spins with 24-frame shaded, multi-face Aseprite tumble animations for all ten dice.
