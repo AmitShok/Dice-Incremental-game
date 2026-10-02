@@ -10,6 +10,8 @@ var stats_label: Label
 var on_notice: Callable
 var on_prestige: Callable
 var on_reset: Callable
+var on_developer_tools: Callable
+var developer_tools_enabled: bool = false
 
 func setup(game: GameSession) -> void:
 	session = game
@@ -90,6 +92,8 @@ func show_page(which: String) -> void:
 		"Settings":
 			var settings: VBoxContainer = preload("res://scenes/ui/settings_page.tscn").instantiate()
 			body.add_child(settings)
+			settings.get_node("DeveloperTools").visible = developer_tools_enabled
+			settings.get_node("DeveloperTools").pressed.connect(func(): on_developer_tools.call())
 			for key in ["sound", "motion", "flashes", "numbers", "particles"]:
 				var button: Button = settings.get_node(key)
 				button.text += " · ON" if session.state.settings[key] else " · OFF"

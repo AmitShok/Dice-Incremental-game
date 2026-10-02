@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" path="res://assets/exported/dice/d6.png" id="3"]
 
 [node name="DieVisual" type="Control"]
+scale = Vector2(0.65, 0.65)
 offset_right = 64.0
 offset_bottom = 64.0
 mouse_default_cursor_shape = 2

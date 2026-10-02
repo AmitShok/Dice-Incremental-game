@@ -221,6 +221,35 @@ func run() -> void:
 	invalid_effect.max_depth = 99
 	check(not invalid_effect.valid(), "Unbounded effect definition rejected")
 	var started: int = Time.get_ticks_msec()
+	var moving_game: GameSession = fresh()
+	var still_game: GameSession = fresh()
+	moving_game.roller.rng.seed = 234
+	still_game.roller.rng.seed = 234
+	still_game.state.settings.motion = false
+	var origin: Vector2 = moving_game.state.dice[0].position
+	moving_game.request_roll([1])
+	still_game.request_roll([1])
+	var moving_outcome: Dictionary = moving_game.pending.values()[0]
+	var still_outcome: Dictionary = still_game.pending.values()[0]
+	check(moving_outcome.landing_position.distance_to(origin) >= 11.9 and moving_outcome.landing_position.distance_to(origin) <= 32.1, "Roll travels a small distance")
+	check(moving_game.state.dice[0].position == origin, "Position commits only on landing")
+	check(moving_outcome.face == still_outcome.face and moving_outcome.payout == still_outcome.payout and moving_game.roller.rng.state == still_game.roller.rng.state, "Scatter does not consume payout RNG")
+	moving_game.settle()
+	still_game.settle()
+	check(moving_game.state.dice[0].position == moving_outcome.landing_position and still_game.state.dice[0].position == origin, "Landing persists and reduced motion stays still")
+	var moved_save: GameState = GameState.restore(moving_game.state.snapshot(), registry)
+	check(moved_save != null and moved_save.dice[0].position == moving_game.state.dice[0].position, "Save retains rolled landing position")
+	var bounded: bool = true
+	for edge in [Vector2(65,150), Vector2(725,150), Vector2(65,500), Vector2(725,500)]:
+		for attempt in 20:
+			moving_game.state.dice[0].position = edge
+			moving_game.state.dice[0].cooldown = 0
+			moving_game.request_roll([1])
+			moving_game.settle()
+			var landed: Vector2 = moving_game.state.dice[0].position
+			bounded = bounded and landed.x >= 65 and landed.x <= 725 and landed.y >= 150 and landed.y <= 500
+	check(bounded, "Roll destinations stay on table at all four edges")
+	started = Time.get_ticks_msec()
 	var result: Dictionary = rng_a.simulate_rolls(definition, 1000000)
 	print("SIMULATION 1,000,000 rolls: ", Time.get_ticks_msec() - started, " ms; histogram=", result.histogram)
 	print("TEST RESULT: ", passed, " passed; ", failed, " failed")

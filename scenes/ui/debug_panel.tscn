@@ -12,6 +12,10 @@ z_index = 90
 [node name="Buttons" type="VBoxContainer" parent="."]
 layout_mode = 2
 
+[node name="Close" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Close developer tools"
+
 [node name="Action0" type="Button" parent="Buttons"]
 layout_mode = 2
 text = "+1K"

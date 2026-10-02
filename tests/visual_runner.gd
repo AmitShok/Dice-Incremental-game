@@ -35,6 +35,7 @@ func run() -> void:
 	main.wallet.position.x -= 3
 	confirm_not_reset(main.shop.position.is_equal_approx(Vector2(792, 94)))
 	var first: DiceVisual = main.visuals[game.state.dice[0].id]
+	confirm_not_reset(first.scale.is_equal_approx(Vector2(0.65, 0.65)))
 	var start: Vector2 = game.state.dice[0].position
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
@@ -58,6 +59,13 @@ func run() -> void:
 		confirm_not_reset(main.shop.page == title)
 		checks += 1
 	var old_sound: bool = game.state.settings.sound
+	main.shop.body.get_node("SettingsPage/DeveloperTools").pressed.emit()
+	confirm_not_reset(main.debug_panel.visible)
+	var before_debug_credit: float = game.state.money
+	main.debug_panel.get_node("Buttons/Action0").pressed.emit()
+	confirm_not_reset(game.state.money == before_debug_credit + 1000)
+	main.debug_panel.get_node("Buttons/Close").pressed.emit()
+	confirm_not_reset(not main.debug_panel.visible)
 	main.shop.body.get_node("SettingsPage/sound").pressed.emit()
 	confirm_not_reset(game.state.settings.sound != old_sound)
 	main.shop.body.get_node("SettingsPage/sound").pressed.emit()
@@ -101,6 +109,24 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(folder.path_join("settings.png"))
 	print("VISUAL SMOKE: ", checks, " pages/confirmation checks; prestige and talent purchase passed")
+	var rolling_die: DiceInstance = game.state.dice[0]
+	var rolling_visual: DiceVisual = main.visuals[rolling_die.id]
+	var roll_origin: Vector2 = rolling_visual.position
+	rolling_die.cooldown = 0
+	game.request_roll([rolling_die.id])
+	await create_timer(0.15).timeout
+	confirm_not_reset(rolling_visual.position.distance_to(roll_origin) > 0.1)
+	await create_timer(1.5).timeout
+	confirm_not_reset((rolling_visual.position + Vector2(32,32) * rolling_visual.scale).is_equal_approx(rolling_die.position))
+	print("SCATTER: visible travel and saved landing match")
+	main.queue_free()
+	await process_frame
+	var disabled_main: Control = load("res://scenes/main.tscn").instantiate()
+	disabled_main.developer_tools_enabled = false
+	root.add_child(disabled_main)
+	disabled_main.shop.show_page("Settings")
+	confirm_not_reset(disabled_main.debug_panel == null and not disabled_main.shop.body.get_node("SettingsPage/DeveloperTools").visible)
+	print("DEVELOPER TOOLS: settings open/close and credit tested; release switch hides access")
 	quit()
 
 func confirm_not_reset(condition: bool) -> void:

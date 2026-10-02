@@ -9,6 +9,7 @@ var definition: DiceDefinition
 @onready var shadow: Sprite2D = $Shadow
 @onready var marker: Label = $Marker
 var animation: Tween
+var travel: Tween
 var dragging: bool = false
 var press_position: Vector2
 var original_position: Vector2
@@ -19,7 +20,7 @@ func _ready() -> void:
 	set_process(false)
 
 func set_density(count: int) -> void:
-	var factor: float = 0.5 if count > 30 else 1.0
+	var factor: float = 0.5 if count > 30 else 0.65
 	scale = Vector2.ONE * factor
 	# Faces already carry a contact shadow; dense tables do not need a second shadow or tiny labels.
 	shadow.visible = count <= 30
@@ -35,7 +36,7 @@ func setup(instance: DiceInstance, content: DiceDefinition) -> void:
 	sprite.hframes = definition.sides
 	sprite.frame = die.face - 1
 	marker.text = "D%d" % definition.sides
-	position = die.position - Vector2(32, 32)
+	position = die.position - Vector2(32, 32) * scale
 	mouse_entered.connect(func(): if not rolling: sprite.modulate = Color(1.15, 1.12, 1.05))
 	mouse_exited.connect(func(): sprite.modulate = Color.WHITE)
 	set_process(false)
@@ -56,7 +57,8 @@ func _gui_input(event: InputEvent) -> void:
 				moved.emit(die.id, position + Vector2(32, 32) * scale)
 			accept_event()
 	elif event is InputEventMouseMotion and dragging and not die.busy:
-		position = (original_position + event.global_position - press_position).clamp(Vector2(33, 118), Vector2(693, 468))
+		var center: Vector2 = original_position + event.global_position - press_position + Vector2(32, 32) * scale
+		position = center.clamp(Vector2(65, 150), Vector2(725, 500)) - Vector2(32, 32) * scale
 
 func start(outcome: Dictionary, settings: Dictionary) -> void:
 	rolling = true
@@ -64,12 +66,17 @@ func start(outcome: Dictionary, settings: Dictionary) -> void:
 	age = 0.0
 	if animation != null:
 		animation.kill()
+	if travel != null:
+		travel.kill()
 	position = die.position - Vector2(32, 32) * scale
 	marker.text = "..."
 	set_process(true)
 	var duration: float = outcome.duration
+	if settings.motion:
+		travel = create_tween()
+		travel.tween_property(self, "position", (outcome.landing_position as Vector2) - Vector2(32, 32) * scale, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	animation = create_tween()
-	if settings.motion and scale.x < 1:
+	if settings.motion and scale.x <= 0.5:
 		animation.tween_property(sprite, "position:y", 12.0, duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		animation.tween_property(sprite, "position:y", 28.0, duration * 0.6).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	elif settings.motion:
@@ -94,6 +101,9 @@ func land(outcome: Dictionary, settings: Dictionary) -> void:
 	set_process(false)
 	if animation != null:
 		animation.kill()
+	if travel != null:
+		travel.kill()
+	position = die.position - Vector2(32, 32) * scale
 	sprite.frame = outcome.face - 1
 	sprite.rotation = 0
 	sprite.position = Vector2(32, 28)
@@ -102,7 +112,7 @@ func land(outcome: Dictionary, settings: Dictionary) -> void:
 	shadow.modulate.a = 1.0
 	marker.text = "CRIT!" if outcome.critical else ("MAX!" if outcome.face == outcome.sides else "D%d" % definition.sides)
 	marker.modulate = Color("#f4ce83") if outcome.face == outcome.sides else Color("#b9c5ae")
-	if settings.motion and scale.x >= 1:
+	if settings.motion and scale.x > 0.5:
 		var bounce := create_tween()
 		sprite.scale = Vector2(2.25, 1.7)
 		bounce.tween_property(sprite, "scale", Vector2(2, 2), 0.2).set_trans(Tween.TRANS_BACK)

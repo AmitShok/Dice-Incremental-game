@@ -8,6 +8,10 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 19
 text = "Make yourself comfortable."
 
+[node name="DeveloperTools" type="Button" parent="."]
+layout_mode = 2
+text = "Open developer tools"
+
 [node name="sound" type="Button" parent="."]
 layout_mode = 2
 text = "Sound effects"

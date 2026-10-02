@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-02 — Smaller dice and rolling travel
+
+- Reduced normal dice to 65% size while retaining the dense-table size.
+- Added short random travel, bounded and saved landing positions, and stationary reduced-motion rolls.
+- Added Settings access and a Close button for developer tools, with an Inspector release switch and non-debug export gate.
+- Verified 70 regression checks and rendered movement/developer-tool integration.
 ## 2026-10-02 — Editable scene composition
 
 - Replaced runtime construction of the main layout with authored tabletop, HUD, shop, settings and debug scenes.

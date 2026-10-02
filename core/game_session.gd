@@ -42,6 +42,13 @@ func request_roll(ids: Array, source: String = "manual", depth: int = 0) -> bool
 			"face": face, "sides": definition.sides, "source": source, "depth": depth,
 			"critical": critical, "duration": duration, "remaining": duration,
 			"position": die.position, "payout": 0.0, "combo": 1.0, "label": ""}
+		outcome.landing_position = die.position
+		if state.settings.get("motion", true):
+			# A separate deterministic stream keeps movement from consuming payout RNG.
+			var scatter := RandomNumberGenerator.new()
+			scatter.seed = hash("%d:%d:%d" % [next_roll, die.id, face])
+			var offset: Vector2 = Vector2.from_angle(scatter.randf_range(0, TAU)) * scatter.randf_range(12, 32)
+			outcome.landing_position = (die.position + offset).clamp(Vector2(65, 150), Vector2(725, 500))
 		next_roll += 1
 		die.busy = true
 		outcomes.append(outcome)
@@ -78,6 +85,8 @@ func finish_roll(roll_id: int, allow_chains: bool = true) -> bool:
 	die.busy = false
 	die.cooldown = 0.15
 	die.face = outcome.face
+	die.position = outcome.landing_position
+	outcome.position = die.position
 	economy.credit(outcome.payout)
 	StatisticsService.resolved(state, outcome)
 	if outcome.face == 20 and outcome.sides == 20:

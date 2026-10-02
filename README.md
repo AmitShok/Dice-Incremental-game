@@ -28,7 +28,7 @@ Set DICE_TEST_OUTPUT to an existing directory to capture visual test PNGs. --tes
 
 The render benchmark warms up for two seconds, then reports actual frame intervals, gameplay tick times, roll/payout activity and memory. Compare `--mode=blank`, `static`, `full`, `silent` or `hidden`; add `--vsync=off` only for a diagnostic uncapped run. Run scenarios sequentially with the same window/environment conditions. Frame intervals include presentation waits and are not CPU execution times. Draw counts are a final monitor snapshot. The benchmark and stress scripts enforce `--test`; keep this flag on every test command.
 
-For isolated developer play, use `GODOT --path . -- --test --dev` then F3. Debug controls require both a debug build and --dev. Ordinary launches do not show them.
+In this development build, open Settings → Open developer tools (or press F3). The panel has a Close button. For isolated developer play use `GODOT --path . -- --test`. Before public release, disable `developer_tools_enabled` on the main scene; non-debug exports also hide the tools automatically.
 
 ## Artwork
 Normal export: `ASEPRITE -b --script-param root=PROJECT_PATH --script tools/export_art.lua`. This reads .aseprite masters and exports PNG/JSON; it never regenerates originals. tools/create_art.lua is the initial artwork construction script and may overwrite original art: do not run it on edited masters without a backup.

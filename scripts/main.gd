@@ -2,6 +2,7 @@ extends Control
 
 @export var die_scene: PackedScene = preload("res://scenes/d_6.tscn")
 @export var helper_scene: PackedScene = preload("res://scenes/helpers/moss.tscn")
+@export var developer_tools_enabled: bool = true
 
 var session: GameSession
 @onready var table: Node2D = $Tabletop/Dice
@@ -33,6 +34,8 @@ func _ready() -> void:
 	shop.on_notice = notify
 	shop.on_prestige = ask_prestige
 	shop.on_reset = ask_reset
+	shop.on_developer_tools = open_developer_tools
+	shop.developer_tools_enabled = developer_tools_enabled and OS.is_debug_build()
 	shop.setup(session)
 	session.events.changed.connect(func(): hud_dirty = true)
 	session.events.die_roll_started.connect(on_roll)
@@ -48,7 +51,7 @@ func _ready() -> void:
 		notify(SaveManager.status)
 	if not session.registry.errors.is_empty():
 		notify("Some content could not load. Check the Godot error log.")
-	if OS.is_debug_build() and OS.get_cmdline_user_args().has("--dev"):
+	if shop.developer_tools_enabled:
 		_build_debug()
 	if OS.get_cmdline_user_args().has("--screenshot"):
 		_capture_later()
@@ -187,9 +190,16 @@ func _disconnect_confirmation() -> void:
 	for connection in confirm.confirmed.get_connections():
 		confirm.confirmed.disconnect(connection.callable)
 
+func open_developer_tools() -> void:
+	if debug_panel != null:
+		debug_panel.show()
+
 func _build_debug() -> void:
 	debug_panel = $DebugPanel
+	debug_panel.get_node("Buttons/Close").pressed.connect(func(): debug_panel.hide())
 	for button in debug_panel.get_node("Buttons").get_children():
+		if button.name == "Close":
+			continue
 		var title: String = button.text
 		button.pressed.connect(func():
 			match title:

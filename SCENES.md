@@ -10,7 +10,7 @@ Open `scenes/main.tscn` in the 2D editor. The main scene now contains the game's
 | `scenes/ui/shop_panel.tscn` | Sidebar position/size, navigation buttons, scrolling content and footer |
 | `scenes/ui/shop_card.tscn` | Shared purchase card layout, title, description and purchase button |
 | `scenes/ui/settings_page.tscn` | Settings buttons, volume slider, save/reset buttons and help text |
-| `scenes/ui/debug_panel.tscn` | Development controls; connected only with `--dev` in a debug build |
+| `scenes/ui/debug_panel.tscn` | Development controls; opened from Settings or F3 in debug builds when the main scene developer_tools_enabled switch is on |
 | `scenes/d_6.tscn` | Generic die with editable Face, Shadow and Marker nodes; D6 is its editor preview |
 | `scenes/helpers/moss.tscn` | Moss sprite, texture, frame count and scale |
 | `ui/game_theme.tres` | Shared fonts, colors, spacing and textured button/panel styles |
