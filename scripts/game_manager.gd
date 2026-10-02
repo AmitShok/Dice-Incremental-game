@@ -6,6 +6,10 @@ var last_tick_usec: int = 0
 
 func _ready() -> void:
 	testing = OS.get_cmdline_user_args().has("--test")
+	if testing:
+		# Test windows may be hidden, but their audio otherwise reaches the speakers.
+		# Mute the whole test process, including future music/UI audio sources.
+		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true)
 	registry = ContentRegistry.new()
 	if not registry.errors.is_empty():
 		push_error("Invalid content: " + str(registry.errors))

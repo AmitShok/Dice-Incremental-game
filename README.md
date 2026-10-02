@@ -13,6 +13,8 @@ Ten dice definitions (D4, D6, D8, D10, D12, D20, Golden, Lucky, Ember, Prism); s
 Art is created/exported in Aseprite with editable masters in assets/source/aseprite. No downloaded or ImageGen sprites. Sound cues are original synthesized waveforms. This is a playable development build, not a certified commercial release; see TODO.md for the remaining quality gates.
 
 ## Verification
+
+Automated `--test` sessions mute the Master audio bus for that process, without changing saved player sound settings. For background tool runs also pass `--audio-driver Dummy` before `--`; this prevents the test from using the computer's speakers at all.
 Replace GODOT below with your Godot executable. Run from the project directory.
 
 ```

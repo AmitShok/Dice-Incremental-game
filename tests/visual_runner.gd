@@ -12,6 +12,7 @@ func run() -> void:
 		quit(1)
 		return
 	var game: GameSession = root.get_node("GameManager").session
+	confirm_not_reset(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")))
 	game.state.money = 90000
 	game.state.run_earned = 100000
 	for id in ["d4", "d8", "d10", "d12", "d20", "golden_d6", "lucky_d6", "exploding_d6", "multiplier_d6"]:
@@ -94,6 +95,7 @@ func run() -> void:
 	confirm_not_reset(game.state.settings.sound != old_sound)
 	main.shop.body.get_node("SettingsPage/sound").pressed.emit()
 	confirm_not_reset(game.state.settings.sound == old_sound)
+	confirm_not_reset(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")))
 	main.shop.show_page("Dice")
 	await create_timer(0.6).timeout
 	await RenderingServer.frame_post_draw

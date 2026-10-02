@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-02 — Silent automated tests
+
+- Muted the Master bus automatically for every `--test` session, including hidden rendered tests. Saved sound preferences and ordinary play remain unchanged.
+- Added checks that the test bus stays muted through Settings sound toggles; background test commands use the Dummy audio driver as well.
+
 ## 2026-10-02 — Scrollable developer tools
 
 - Kept the developer panel inside its existing bounds with a vertically scrollable action list and a fixed Close button.
