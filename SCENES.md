@@ -27,3 +27,8 @@ Run the whole game with F5. The standalone die scene can be previewed without a 
 
 ## Tumbling dice
 The generic die scene exposes tumble_frames (24), tumble_cycles and bounce_height in the Inspector. Each DiceDefinition references its rolling_texture. Edit the 24-frame masters under assets/source/aseprite/rolls and use tools/export_art.lua to export changes. tools/create_roll_art.lua constructs/replaces only these rolling masters; do not run it over hand-edited masters without a backup. Face-result masters remain separate and unchanged. DiceVisual uses the atlas during airborne turnover, reveals the reserved result for the final small bounce, then settles exactly at the authoritative landing position. There is no full-circle sprite rotation. Secondary shadows are omitted above 30 dice to keep draw batching efficient.
+
+## Table ambience
+Open scenes/ambient_table.tscn to move the two flames, steam and plant sprites. The root exposes flame_fps, steam_fps and plant_fps. The scene is instanced beneath Room and before gameplay layers in tabletop.tscn. It has no input controls, audio or economy logic. Motion off uses static candle/plant frames and hides steam; developer pause freezes elapsed animation time.
+
+Editable masters live in assets/source/aseprite/ambient. Export hand edits with tools/export_art.lua. tools/create_ambient_art.lua constructs/replaces the four ambient masters, deriving room_base from the original layered environment/room.aseprite without altering it. The clean backdrop removes the baked flame/leaf pixels so animated replacements do not leave duplicate silhouettes. If the original room art changes, update the derived backdrop and sprite placement accordingly.

@@ -1,0 +1,147 @@
+{ "frames": {
+   "steam 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 1.aseprite": {
+    "frame": { "x": 28, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 2.aseprite": {
+    "frame": { "x": 56, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 3.aseprite": {
+    "frame": { "x": 84, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 4.aseprite": {
+    "frame": { "x": 112, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 5.aseprite": {
+    "frame": { "x": 140, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 6.aseprite": {
+    "frame": { "x": 168, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 7.aseprite": {
+    "frame": { "x": 196, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 8.aseprite": {
+    "frame": { "x": 224, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 9.aseprite": {
+    "frame": { "x": 252, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 10.aseprite": {
+    "frame": { "x": 280, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 11.aseprite": {
+    "frame": { "x": 308, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 12.aseprite": {
+    "frame": { "x": 336, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 13.aseprite": {
+    "frame": { "x": 364, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 14.aseprite": {
+    "frame": { "x": 392, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   },
+   "steam 15.aseprite": {
+    "frame": { "x": 420, "y": 0, "w": 28, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 32 },
+    "sourceSize": { "w": 28, "h": 32 },
+    "duration": 160
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.18.6-x64",
+  "image": "steam.png",
+  "format": "RGBA8888",
+  "size": { "w": 448, "h": 32 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Loop", "from": 0, "to": 15, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "steam", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

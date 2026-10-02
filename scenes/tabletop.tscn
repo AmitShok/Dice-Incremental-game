@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/exported/environment/room.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/exported/ambient/room_base.png" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ambient_table.tscn" id="2"]
 
 [node name="Tabletop" type="Node2D"]
 
@@ -8,6 +9,8 @@
 texture = ExtResource("1")
 centered = false
 scale = Vector2(2, 2)
+
+[node name="Ambience" parent="." instance=ExtResource("2")]
 
 [node name="Dice" type="Node2D" parent="."]
 

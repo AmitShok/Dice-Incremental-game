@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-02 — Animated table ambience
+
+- Added independently flickering candles, rising cup steam and slow plant sway in an editable ambient scene.
+- Created four Aseprite masters: a clean derived room backdrop plus flame, steam and plant loops; original room master remains untouched.
+- Motion off freezes flames/leaves and hides steam. Developer pause freezes animation time. No new audio or gameplay effects.
+- Rendered ambience and interaction checks passed; 100-die probe remained around 60 FPS.
+
 ## 2026-10-02 — Silent automated tests
 
 - Muted the Master bus automatically for every `--test` session, including hidden rendered tests. Saved sound preferences and ordinary play remain unchanged.
