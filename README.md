@@ -20,6 +20,7 @@ GODOT --headless --path . --editor --import --quit
 GODOT --headless --path . --script res://tests/test_runner.gd -- --test
 GODOT --path . --script res://tests/visual_runner.gd -- --test
 GODOT --path . --script res://tests/resize_runner.gd -- --test
+GODOT --path . --script res://tests/tumble_runner.gd -- --test
 GODOT --path . --script res://tests/stress_runner.gd -- --test
 GODOT --path . --script res://tests/render_benchmark.gd -- --test --mode=full --seconds=60
 GODOT --headless --path . --script res://tools/balance.gd -- --test

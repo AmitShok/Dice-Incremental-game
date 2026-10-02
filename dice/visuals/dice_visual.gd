@@ -8,8 +8,17 @@ var definition: DiceDefinition
 @onready var sprite: Sprite2D = $Face
 @onready var shadow: Sprite2D = $Shadow
 @onready var marker: Label = $Marker
-var animation: Tween
-var travel: Tween
+@onready var game_manager: Node = get_node("/root/GameManager")
+@export var tumble_frames: int = 24
+@export var tumble_cycles: float = 1.5
+@export var bounce_height: float = 30.0
+var roll_duration: float = 1.0
+var roll_origin: Vector2
+var roll_destination: Vector2
+var result_face: int = 0
+var tumble_offset: int = 0
+var motion_enabled: bool = true
+var dense: bool = false
 var dragging: bool = false
 var press_position: Vector2
 var original_position: Vector2
@@ -21,9 +30,10 @@ func _ready() -> void:
 
 func set_density(count: int) -> void:
 	var factor: float = 0.5 if count > 30 else 0.65
+	dense = count > 30
 	scale = Vector2.ONE * factor
 	# Faces already carry a contact shadow; dense tables do not need a second shadow or tiny labels.
-	shadow.visible = count <= 30
+	shadow.visible = not dense
 	marker.visible = count <= 30
 	if not dragging and not rolling:
 		position = die.position - Vector2(32, 32) * scale
@@ -64,55 +74,79 @@ func start(outcome: Dictionary, settings: Dictionary) -> void:
 	rolling = true
 	dragging = false
 	age = 0.0
-	if animation != null:
-		animation.kill()
-	if travel != null:
-		travel.kill()
+	roll_duration = maxf(0.01, outcome.duration)
+	roll_origin = die.position
+	roll_destination = outcome.landing_position
+	result_face = outcome.face - 1
+	tumble_offset = int(outcome.roll_id * 7) % tumble_frames
+	motion_enabled = settings.motion
 	position = die.position - Vector2(32, 32) * scale
 	marker.text = "..."
+	shadow.visible = not dense
+	sprite.modulate = Color.WHITE
 	set_process(true)
-	var duration: float = outcome.duration
-	if settings.motion:
-		travel = create_tween()
-		travel.tween_property(self, "position", (outcome.landing_position as Vector2) - Vector2(32, 32) * scale, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	animation = create_tween()
-	if settings.motion and scale.x <= 0.5:
-		animation.tween_property(sprite, "position:y", 12.0, duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		animation.tween_property(sprite, "position:y", 28.0, duration * 0.6).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-	elif settings.motion:
-		animation.tween_property(sprite, "scale", Vector2(2.2, 1.6), duration * 0.12)
-		animation.tween_property(sprite, "position", Vector2(32 + sin(outcome.roll_id * 2.4) * 22, -15), duration * 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		animation.parallel().tween_property(sprite, "scale", Vector2(1.9, 2.2), duration * 0.3)
-		animation.parallel().tween_property(sprite, "rotation", TAU * (1 if outcome.roll_id % 2 else -1), duration * 0.6)
-		animation.tween_property(sprite, "position", Vector2(32, 28), duration * 0.3).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-	else:
-		animation.tween_interval(duration * 0.8)
+	_update_roll_pose(0.0)
 
 func _process(delta: float) -> void:
+	if game_manager.session.paused:
+		return
 	age += delta
-	var next_frame: int = int(age * 19 + die.id * 3) % definition.sides
-	if sprite.frame != next_frame:
-		sprite.frame = next_frame
-	if shadow.visible:
-		shadow.modulate.a = 0.6 if sprite.position.y < 0 else 1.0
+	_update_roll_pose(clampf(age / roll_duration, 0.0, 1.0))
+
+func _update_roll_pose(t: float) -> void:
+	if not motion_enabled:
+		sprite.texture = definition.texture
+		sprite.hframes = definition.sides
+		sprite.frame = result_face if t >= 0.86 else die.face - 1
+		return
+	# Travel loses speed while the body tumbles around two axes in the Aseprite atlas.
+	var distance_progress: float = 1.0 - pow(1.0 - t, 2.0)
+	position = roll_origin.lerp(roll_destination, distance_progress) - Vector2(32,32) * scale
+	var phase: float
+	var height: float
+	if t < 0.52:
+		phase = t / 0.52
+		height = bounce_height
+	elif t < 0.86:
+		phase = (t - 0.52) / 0.34
+		height = bounce_height * 0.38
+	else:
+		phase = (t - 0.86) / 0.14
+		height = bounce_height * 0.08
+	var lift: float = sin(phase * PI) * height
+	var impact: float = pow(absf(2.0 * phase - 1.0), 12.0) * (1.0 - t)
+	sprite.position = Vector2(32, 28 - lift)
+	sprite.scale = Vector2(2.0 + impact * 0.3, 2.0 - impact * 0.36)
+	sprite.rotation = sin(t * TAU * 3.0) * 0.10 * (1.0 - t)
+	if t < 0.86 and definition.rolling_texture != null:
+		if sprite.texture != definition.rolling_texture:
+			sprite.texture = definition.rolling_texture
+			sprite.hframes = tumble_frames
+		var turnover: float = 1.0 - pow(1.0 - t / 0.86, 1.45)
+		sprite.frame = (tumble_offset + int(turnover * tumble_frames * tumble_cycles)) % tumble_frames
+	else:
+		if sprite.texture != definition.texture:
+			sprite.texture = definition.texture
+			sprite.hframes = definition.sides
+		sprite.frame = result_face
+	shadow.position = Vector2(32, 46)
+	shadow.scale = Vector2.ONE * (1.35 - lift * 0.012)
+	shadow.modulate.a = 0.85 - lift * 0.013
 
 func land(outcome: Dictionary, settings: Dictionary) -> void:
 	rolling = false
 	set_process(false)
-	if animation != null:
-		animation.kill()
-	if travel != null:
-		travel.kill()
 	position = die.position - Vector2(32, 32) * scale
+	sprite.texture = definition.texture
+	sprite.hframes = definition.sides
 	sprite.frame = outcome.face - 1
 	sprite.rotation = 0
 	sprite.position = Vector2(32, 28)
 	sprite.scale = Vector2(2, 2)
 	sprite.modulate = Color.WHITE
 	shadow.modulate.a = 1.0
+	shadow.position = Vector2(32, 55)
+	shadow.scale = Vector2(1.5, 1.5)
+	shadow.visible = not dense
 	marker.text = "CRIT!" if outcome.critical else ("MAX!" if outcome.face == outcome.sides else "D%d" % definition.sides)
 	marker.modulate = Color("#f4ce83") if outcome.face == outcome.sides else Color("#b9c5ae")
-	if settings.motion and scale.x > 0.5:
-		var bounce := create_tween()
-		sprite.scale = Vector2(2.25, 1.7)
-		bounce.tween_property(sprite, "scale", Vector2(2, 2), 0.2).set_trans(Tween.TRANS_BACK)

@@ -1,11 +1,14 @@
-[gd_resource type="Resource" script_class="DiceDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
 
 [ext_resource type="Texture2D" path="res://assets/exported/dice/lucky_d6.png" id="2"]
 
+[ext_resource type="Texture2D" path="res://assets/exported/rolls/lucky_d6.png" id="roll"]
+
 [resource]
 script = ExtResource("1")
+rolling_texture = ExtResource("roll")
 id = "lucky_d6"
 display_name = "Lucky D6"
 description = "Faces 5 and 6 are three times as likely."

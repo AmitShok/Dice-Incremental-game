@@ -1,6 +1,8 @@
 class_name DiceDefinition
 extends Resource
 
+@export var rolling_texture: Texture2D
+
 @export var id: String = ""
 @export var display_name: String = ""
 @export_multiline var description: String = ""

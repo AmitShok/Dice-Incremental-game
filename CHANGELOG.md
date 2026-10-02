@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-02 — Tumbling dice animation
+
+- Replaced full-circle flat sprite spins with 24-frame shaded, multi-face Aseprite tumble animations for all ten dice.
+- Added decelerating travel, diminishing bounces, impact squash, height-sensitive shadows and an early stable result reveal.
+- Exposed tumble cycles/frame count/bounce height on the die scene. Motion disabled skips tumbling; dense tables omit secondary shadows to preserve batching.
+- Added all-dice animation checks and retained authoritative roll outcomes and payouts.
+
 ## 2026-10-02 — Window resizing
 
 - Changed integer-only stretching to fractional scaling with the 1120×640 aspect ratio preserved. Smaller windows now fit the whole table and sidebar; other aspect ratios use letterboxing.

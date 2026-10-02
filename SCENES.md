@@ -24,3 +24,6 @@ Runtime scripts still control animation, face selection, earned amounts, afforda
 Edit `game_theme.tres` directly. `tools/bake_theme.gd` is a maintenance tool that replaces it with defaults from `GameTheme.build()`; do not run it after hand-editing the theme unless you want to restore those defaults.
 
 Run the whole game with F5. The standalone die scene can be previewed without a session, but gameplay is wired through the main scene. Economy, automation, saves and Fate remain in their existing services so layout changes do not change payout rules or save format.
+
+## Tumbling dice
+The generic die scene exposes tumble_frames (24), tumble_cycles and bounce_height in the Inspector. Each DiceDefinition references its rolling_texture. Edit the 24-frame masters under assets/source/aseprite/rolls and use tools/export_art.lua to export changes. tools/create_roll_art.lua constructs/replaces only these rolling masters; do not run it over hand-edited masters without a backup. Face-result masters remain separate and unchanged. DiceVisual uses the atlas during airborne turnover, reveals the reserved result for the final small bounce, then settles exactly at the authoritative landing position. There is no full-circle sprite rotation. Secondary shadows are omitted above 30 dice to keep draw batching efficient.

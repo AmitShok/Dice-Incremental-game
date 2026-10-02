@@ -1,11 +1,14 @@
-[gd_resource type="Resource" script_class="DiceDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
 
 [ext_resource type="Texture2D" path="res://assets/exported/dice/d6.png" id="2"]
 
+[ext_resource type="Texture2D" path="res://assets/exported/rolls/d6.png" id="roll"]
+
 [resource]
 script = ExtResource("1")
+rolling_texture = ExtResource("roll")
 id = "d6"
 display_name = "Ivory D6"
 description = "The beginning of every good story."
