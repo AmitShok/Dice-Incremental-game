@@ -27,7 +27,8 @@ window/size/viewport_height=640
 window/size/window_width_override=1120
 window/size/window_height_override=640
 window/stretch/mode="canvas_items"
-window/stretch/scale_mode="integer"
+window/stretch/aspect="keep"
+window/stretch/scale_mode="fractional"
 
 [physics]
 

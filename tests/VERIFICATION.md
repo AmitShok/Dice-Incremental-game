@@ -1,4 +1,6 @@
 # DiceIncremental — implementation and verification
+
+Latest window-resize verification (2 October): reproduced clipping at 640×360 and 800×800 with integer scaling. Fractional scaling with aspect keep passed rendered resize checks at 640×360, 800×800, 1400×700 and 1120×640. Checks cover fixed logical layout, fit within actual window dimensions, aspect-preserving scale within physical-pixel rounding and Settings clicks injected in window coordinates. Small and square-window render captures were visually inspected. No gameplay or save code changed.
 Date: 1 October 2026
 
 ## What changed

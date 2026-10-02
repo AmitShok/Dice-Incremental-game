@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-02 — Window resizing
+
+- Changed integer-only stretching to fractional scaling with the 1120×640 aspect ratio preserved. Smaller windows now fit the whole table and sidebar; other aspect ratios use letterboxing.
+- Reproduced clipping before the fix. Added a rendered resize regression checking layout, bounds, scale and physical-coordinate button clicks at four window sizes.
+
 ## 2026-10-02 — Smaller dice and rolling travel
 
 - Reduced normal dice to 65% size while retaining the dense-table size.
