@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — Shop keeps its place
+
+- Purchases update card prices and ownership in place, preserving scroll position and keyboard focus.
+- Settings toggles update their label without rebuilding the page.
+- Rendered regression verified purchases on Dice, Upgrades, Helpers and Fate, plus a Settings toggle.
+
 ## 2026-10-08 — Ordinary dice pay their face value
 
 - Removed hidden D8/D10/D12 base multipliers (1.3/1.6/1.8). All ordinary dice now pay the rolled number before progression bonuses.

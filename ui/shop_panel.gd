@@ -41,7 +41,8 @@ func purchase_button(box: VBoxContainer, callback: Callable, kind: String, id: S
 	var button: Button = box.get_node("Purchase")
 	button.pressed.connect(func():
 		if callback.call():
-			show_page(page)
+			# Refresh prices/ownership without rebuilding cards or resetting scroll/focus.
+			update_rows()
 		else:
 			on_notice.call("Not enough currency, or this purchase is locked.")
 	)
@@ -96,10 +97,11 @@ func show_page(which: String) -> void:
 			settings.get_node("DeveloperTools").pressed.connect(func(): on_developer_tools.call())
 			for key in ["sound", "motion", "flashes", "numbers", "particles"]:
 				var button: Button = settings.get_node(key)
+				var setting_title: String = button.text
 				button.text += " · ON" if session.state.settings[key] else " · OFF"
 				button.pressed.connect(func():
 					session.state.settings[key] = not session.state.settings[key]
-					show_page("Settings")
+					button.text = setting_title + (" · ON" if session.state.settings[key] else " · OFF")
 				)
 			var volume: HSlider = settings.get_node("Volume")
 			volume.value = session.state.settings.volume
