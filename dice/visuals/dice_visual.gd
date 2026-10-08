@@ -149,4 +149,5 @@ func land(outcome: Dictionary, settings: Dictionary) -> void:
 	shadow.scale = Vector2(1.5, 1.5)
 	shadow.visible = not dense
 	marker.text = "CRIT!" if outcome.critical else ("MAX!" if outcome.face == outcome.sides else "D%d" % definition.sides)
+	tooltip_text = "%s\n%s\nLast roll: %d → $%s%s\nClick to roll · drag to arrange" % [definition.display_name, definition.description, outcome.face, NumberFormat.compact(outcome.payout), " (includes bonuses)" if not is_equal_approx(outcome.payout, float(outcome.face)) else ""]
 	marker.modulate = Color("#f4ce83") if outcome.face == outcome.sides else Color("#b9c5ae")

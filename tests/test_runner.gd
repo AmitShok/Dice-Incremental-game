@@ -69,6 +69,22 @@ func run() -> void:
 	game.settle()
 	check(game.state.money == 15, "Automatic and manual payout paths match")
 
+	for id in ["d4", "d6", "d8", "d10", "d12", "d20"]:
+		for source in ["manual", "automatic", "helper"]:
+			var face_matches: bool = true
+			var plain_game: GameSession = fresh()
+			plain_game.state.dice.clear()
+			plain_game.state.counts.clear()
+			var plain_die: DiceInstance = plain_game.state.add_die(id, Vector2(300,300))
+			for face in range(1, registry.dice[id].sides + 1):
+				plain_die.cooldown = 0
+				plain_game.forced_face = face
+				var previous_money: float = plain_game.state.money
+				plain_game.request_roll([plain_die.id], source)
+				plain_game.settle()
+				face_matches = face_matches and plain_die.face == face and is_equal_approx(plain_game.state.money - previous_money, float(face))
+			check(face_matches, "%s %s pays every natural face exactly without bonuses" % [id, source])
+
 	game = fresh()
 	game.state.automatic.d6 = true
 	game.tick(0.4)

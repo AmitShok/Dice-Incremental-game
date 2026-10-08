@@ -8,6 +8,8 @@ Per-family die cost = base_cost × cost_growth ^ owned_count; default growth 2. 
 Payout = (natural face + flat bonus) × die base payout × matching upgrade modifiers × (1 + lifetime Fate × 0.1) × batch combination × spatial aura × critical. Additive modifier contributions are summed before multiplicative factors. Conditions inspect natural face. Values are fixed when the roll is reserved, so mid-animation purchases cannot retroactively change payout.
 
 ## Timing and probabilities
+
+All ordinary dice (D4, D6, D8, D10, D12, D20) have base payout 1: a natural 5 pays $5 before bonuses. Special dice retain their advertised multipliers: Golden ×10, Lucky ×2, Ember ×3, Prism ×2. Upgrades, Fate, combos, auras and criticals can still increase payouts. Hovering a landed die shows its last face and awarded amount. Earlier scripted pacing numbers below predate the ordinary-die payout correction and need retuning.
 Dice duration is authored per definition and divided by roll-speed modifier. Post-landing cooldown 0.15s. Automatic clocks preserve fractions, accumulate during rolling and cap backlog at five seconds. The system processes ready dice each update; it does not retrospectively simulate unlimited rolls in a long frame.
 
 Fair distributions default to unit weights. Lucky D6 = [1,1,1,1,3,3], giving P(5 or 6)=0.6. Loaded corners doubles ordinary D6 upper-half weights. Critical talent gives 10% chance of ×3 payout, expected multiplier 1.2. RNG for visuals/audio never consumes gameplay RNG.

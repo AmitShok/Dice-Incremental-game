@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — Ordinary dice pay their face value
+
+- Removed hidden D8/D10/D12 base multipliers (1.3/1.6/1.8). All ordinary dice now pay the rolled number before progression bonuses.
+- Made special-die payout multipliers explicit in descriptions and added last-roll face/payout information to die hover text.
+- Added every-face payout coverage for all ordinary dice through manual, automatic and helper roll paths.
+
 ## 2026-10-08 — D- infinity branding
 
 - Renamed the application, window title and table heading to D- infinity.
