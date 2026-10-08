@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-08 — Roll-table cooldown
+
+- Roll the table and Space share a 60-second cooldown after a successful batch; clicking individual dice, helpers and automatic rolls remain available.
+- The button shows a ceiling-rounded m:ss countdown and a refill progress bar, disabling until ready. No cooldown is consumed when no die can roll.
+- Remaining time persists in saves, decreases offline, and follows simulation pause/speed while playing. Older saves default to ready.
+- Dedicated cooldown/save/input/UI checks, 88 regression checks and rendered integration passed.
+
 ## 2026-10-08 — Dice icons in the shop
 
 - Added a die icon beside each dice purchase and per-family automatic-rolling card.

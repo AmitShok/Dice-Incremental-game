@@ -3,6 +3,8 @@ extends RefCounted
 
 const MAX_AMOUNT: float = 1e100
 const MAX_DICE: int = 100
+const TABLE_ROLL_COOLDOWN: float = 60.0
+var table_roll_remaining: float = 0.0
 var money: float = 0.0
 var run_earned: float = 0.0
 var dice: Array[DiceInstance] = []
@@ -46,7 +48,8 @@ func snapshot() -> Dictionary:
 		"talents": talents.duplicate(true), "statistics": statistics.duplicate(true),
 		"achievements": achievements.duplicate(), "helpers": helpers, "prestige_points": prestige_points,
 		"prestige_total": prestige_total, "next_id": next_id, "tutorial_step": tutorial_step,
-		"settings": settings.duplicate(true), "last_saved": last_saved, "rng_state": rng_state}
+		"settings": settings.duplicate(true), "last_saved": last_saved, "rng_state": rng_state,
+		"table_roll_remaining": table_roll_remaining}
 
 static func valid_number(value: Variant, lower: float = 0.0, upper: float = MAX_AMOUNT) -> bool:
 	return (value is float or value is int) and is_finite(float(value)) and float(value) >= lower and float(value) <= upper
@@ -60,6 +63,9 @@ static func restore(data: Dictionary, registry: ContentRegistry) -> GameState:
 	if not data.get("dice") is Array or data.dice.size() > MAX_DICE:
 		return null
 	var result := GameState.new()
+	if not valid_number(data.get("table_roll_remaining", 0.0), 0.0, TABLE_ROLL_COOLDOWN):
+		return null
+	result.table_roll_remaining = float(data.get("table_roll_remaining", 0.0))
 	result.money = float(data.money)
 	result.run_earned = float(data.get("run_earned", 0))
 	var seen: Dictionary = {}

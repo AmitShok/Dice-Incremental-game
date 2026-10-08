@@ -9,6 +9,8 @@ Payout = (natural face + flat bonus) × die base payout × matching upgrade modi
 
 ## Timing and probabilities
 
+Roll the table (button or Space) has a shared 60-second cooldown after a successful batch. Individual clicks and automatic/helper rolls retain their per-die timing. The table timer uses simulation time (including developer speed/pause), persists across saving, and decreases while offline. Historical scripted batch pacing probes below do not model this new table-action restriction.
+
 All ordinary dice (D4, D6, D8, D10, D12, D20) have base payout 1: a natural 5 pays $5 before bonuses. Special dice retain their advertised multipliers: Golden ×10, Lucky ×2, Ember ×3, Prism ×2. Upgrades, Fate, combos, auras and criticals can still increase payouts. Hovering a landed die shows its last face and awarded amount. Earlier scripted pacing numbers below predate the ordinary-die payout correction and need retuning.
 Dice duration is authored per definition and divided by roll-speed modifier. Post-landing cooldown 0.15s. Automatic clocks preserve fractions, accumulate during rolling and cap backlog at five seconds. The system processes ready dice each update; it does not retrospectively simulate unlimited rolls in a long frame.
 

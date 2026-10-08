@@ -6,6 +6,8 @@ user://progress.json contains {"save_version":1,"state":{...}}. The display name
 State contains money, run_earned, dice, counts, upgrades, automatic, talents, statistics, achievements, helpers, prestige_points, prestige_total, next_id, tutorial_step, settings, last_saved and rng_state. Each die contains id, definition_id, x, y, face and automatic_clock. Resource files and Nodes are never serialized.
 
 ## Lifecycle
+
+Optional `table_roll_remaining` stores 0–60 seconds of the shared table-roll cooldown. Missing values in older saves default to zero. Invalid values are rejected. Loaded cooldown decreases by elapsed offline time through the existing offline step; it is not cleared just by saving or restarting.
 Startup validates primary and falls back to backup when primary is corrupt. Unsupported newer versions are protected and disable saving. If both files are invalid, originals remain untouched and the UI reports that saving is disabled. No automatic reset destroys unrecognized data.
 
 Autosave every 30 seconds when no roll is pending; explicit save and exit settle pending outcomes exactly once with chains disabled. Written state is validated, serialized to .tmp, flushed, a valid primary is copied to .bak, and the candidate is promoted by rename. Failures retain prior files and surface status. Disk roundtrip, replacement and corrupt-primary recovery are tested on Windows. Cross-filesystem/power-loss guarantees require platform qualification and are not claimed.

@@ -22,10 +22,7 @@ func _process(delta: float) -> void:
 	last_tick_usec = Time.get_ticks_usec() - start
 
 func roll_all_dice() -> void:
-	var ids: Array[int] = []
-	for die in session.state.dice:
-		ids.append(die.id)
-	session.request_roll(ids)
+	session.roll_table()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST and not testing:

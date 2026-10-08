@@ -24,6 +24,18 @@ func _init(content: ContentRegistry, existing: GameState = null) -> void:
 	economy = EconomyService.new(state, registry)
 	progression = ProgressionService.new(state, registry, economy, events)
 
+func roll_table() -> bool:
+	if paused or state.table_roll_remaining > 0.0:
+		return false
+	var ids: Array[int] = []
+	for die in state.dice:
+		ids.append(die.id)
+	if not request_roll(ids):
+		return false
+	state.table_roll_remaining = GameState.TABLE_ROLL_COOLDOWN
+	events.changed.emit()
+	return true
+
 func request_roll(ids: Array, source: String = "manual", depth: int = 0) -> bool:
 	if paused or depth > 4 or pending.size() >= 100:
 		return false
@@ -106,6 +118,7 @@ func tick(delta: float) -> void:
 	if paused or not is_finite(delta) or delta <= 0:
 		return
 	StatisticsService.increment(state, "playtime", delta)
+	state.table_roll_remaining = maxf(0.0, state.table_roll_remaining - delta)
 	var completed: Array[int] = []
 	for key in pending:
 		pending[key].remaining -= delta
@@ -138,6 +151,7 @@ func move_die(id: int, at: Vector2) -> bool:
 
 func offline(seconds: float) -> float:
 	var elapsed: float = clampf(seconds, 0, 14400)
+	state.table_roll_remaining = maxf(0.0, state.table_roll_remaining - elapsed)
 	var amount: float = minf(GameState.MAX_AMOUNT, automation.expected_income(self) * elapsed * 0.5)
 	economy.credit(amount)
 	StatisticsService.increment(state, "offline_earned", amount)
