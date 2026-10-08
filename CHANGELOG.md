@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — Dice icons in the shop
+
+- Added a die icon beside each dice purchase and per-family automatic-rolling card.
+- Die-specific upgrades/talents use their target die's artwork; general bonuses remain unmarked so they do not imply a single-die restriction.
+- Icons reuse the existing Aseprite face sheets through AtlasTexture regions in the editable shop-card header. Rendered UI and purchase-scroll checks passed.
+
 ## 2026-10-08 — Shop keeps its place
 
 - Purchases update card prices and ownership in place, preserving scroll position and keyboard focus.

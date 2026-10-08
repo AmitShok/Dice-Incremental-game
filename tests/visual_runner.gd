@@ -58,6 +58,9 @@ func run() -> void:
 		main.shop.get_node(group + "/" + title).pressed.emit()
 		await process_frame
 		confirm_not_reset(main.shop.page == title)
+		if title == "Upgrades" and not OS.get_environment("DICE_TEST_OUTPUT").is_empty():
+			await RenderingServer.frame_post_draw
+			root.get_texture().get_image().save_png(OS.get_environment("DICE_TEST_OUTPUT").path_join("upgrades.png"))
 		checks += 1
 	var old_sound: bool = game.state.settings.sound
 	main.shop.body.get_node("SettingsPage/DeveloperTools").pressed.emit()

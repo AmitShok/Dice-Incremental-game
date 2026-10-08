@@ -6,7 +6,21 @@ size_flags_horizontal = 3
 [node name="Content" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Content"]
+[node name="Header" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DieIcon" type="TextureRect" parent="Content/Header"]
+visible = false
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Content/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2

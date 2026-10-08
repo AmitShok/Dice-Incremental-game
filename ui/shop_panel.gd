@@ -29,11 +29,21 @@ func label_text(text: String, font_size: int = 14) -> Label:
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label
 
-func card(title: String, description: String) -> VBoxContainer:
+func card(title: String, description: String, die_id: String = "") -> VBoxContainer:
 	var panel: PanelContainer = preload("res://scenes/ui/shop_card.tscn").instantiate()
 	body.add_child(panel)
 	var box: VBoxContainer = panel.get_node("Content")
-	box.get_node("Title").text = title
+	box.get_node("Header/Title").text = title
+	if session.registry.dice.has(die_id):
+		var definition: DiceDefinition = session.registry.dice[die_id]
+		var icon: TextureRect = box.get_node("Header/DieIcon")
+		var face := AtlasTexture.new()
+		face.atlas = definition.texture
+		face.region = Rect2((definition.sides - 1) * 32, 0, 32, 32)
+		face.filter_clip = true
+		icon.texture = face
+		icon.tooltip_text = definition.display_name
+		icon.show()
 	box.get_node("Description").text = description
 	return box
 
@@ -61,12 +71,12 @@ func show_page(which: String) -> void:
 			body.add_child(label_text("A little luck goes a long way.", 13))
 			for id in session.registry.dice:
 				var definition: DiceDefinition = session.registry.dice[id]
-				var box: VBoxContainer = card(definition.display_name, definition.description)
+				var box: VBoxContainer = card(definition.display_name, definition.description, id)
 				purchase_button(box, func(): return session.progression.buy_die(id), "die", id)
 		"Upgrades":
 			for id in session.registry.upgrades:
 				var definition: UpgradeDefinition = session.registry.upgrades[id]
-				var box: VBoxContainer = card(definition.display_name, definition.description)
+				var box: VBoxContainer = card(definition.display_name, definition.description, definition.target)
 				purchase_button(box, func(): return session.progression.buy_upgrade(id), "upgrade", id)
 		"Helpers":
 			var box: VBoxContainer = card("Meet Moss", "A tiny croupier with very big ambitions. Walks to ready dice and rolls them for you.")
@@ -75,7 +85,7 @@ func show_page(which: String) -> void:
 			body.add_child(label_text("Per-family auto-rolls. Helpers focus on the dice that still need a hand.", 13))
 			for id in session.state.counts:
 				var definition: DiceDefinition = session.registry.dice[id]
-				var auto_box: VBoxContainer = card(definition.display_name, "Every owned die in this family rolls automatically.")
+				var auto_box: VBoxContainer = card(definition.display_name, "Every owned die in this family rolls automatically.", id)
 				purchase_button(auto_box, func(): return session.progression.buy_automatic(id), "automatic", id)
 		"Fate":
 			var box: VBoxContainer = card("Begin again, luckier", "At $%s earned this run, trade the table for Fate. Each Fate earned adds +10%% income permanently. Dice, money, helpers and ordinary upgrades reset. Talents, settings and lifetime statistics stay." % NumberFormat.compact(ProgressionService.PRESTIGE_THRESHOLD))
@@ -85,7 +95,7 @@ func show_page(which: String) -> void:
 			body.add_child(label_text("Permanent talents", 19))
 			for id in session.registry.talents:
 				var definition: UpgradeDefinition = session.registry.talents[id]
-				var talent_box: VBoxContainer = card(definition.display_name, definition.description + (" Requires Fortune favors you." if not definition.prerequisite.is_empty() else ""))
+				var talent_box: VBoxContainer = card(definition.display_name, definition.description + (" Requires Fortune favors you." if not definition.prerequisite.is_empty() else ""), definition.target)
 				purchase_button(talent_box, func(): return session.progression.buy_upgrade(id, true), "talent", id)
 		"Ledger":
 			stats_label = label_text("", 15)
