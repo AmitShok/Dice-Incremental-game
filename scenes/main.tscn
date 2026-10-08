@@ -9,7 +9,7 @@
 [ext_resource type="Theme" path="res://ui/game_theme.tres" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debug_panel.tscn" id="8"]
 
-[node name="DiceIncremental" type="Control"]
+[node name="DInfinity" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

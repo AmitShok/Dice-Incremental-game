@@ -10,10 +10,14 @@ config_version=5
 
 [application]
 
-config/name="DiceIncremental"
+config/name="D- infinity"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Godot/app_userdata/DiceIncremental"
+config/custom_user_dir_name.linux="godot/app_userdata/DiceIncremental"
 run/main_scene="uid://b6najufqn2bf7"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="res://assets/exported/branding/d_infinity_icon.png"
+config/windows_native_icon="res://assets/exported/branding/d_infinity_icon.ico"
 
 [autoload]
 
@@ -27,8 +31,6 @@ window/size/viewport_height=640
 window/size/window_width_override=1120
 window/size/window_height_override=640
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
-window/stretch/scale_mode="fractional"
 
 [physics]
 

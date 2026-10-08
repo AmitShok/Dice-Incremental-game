@@ -1,4 +1,4 @@
-# DiceIncremental
+# D- infinity
 
 A cozy tabletop incremental about turning a handful of dice into a probability engine.
 

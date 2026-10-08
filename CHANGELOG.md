@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — D- infinity branding
+
+- Renamed the application, window title and table heading to D- infinity.
+- Created a layered Aseprite die icon with an infinity symbol, plus PNG and Windows ICO exports.
+- Kept the existing save-directory path through an explicit custom directory. Branding checks, all 70 regression checks and rendered UI tests passed.
+
 ## 2026-10-02 — Animated table ambience
 
 - Added independently flickering candles, rising cup steam and slow plant sway in an editable ambient scene.

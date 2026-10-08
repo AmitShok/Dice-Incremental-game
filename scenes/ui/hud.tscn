@@ -16,7 +16,7 @@ offset_right = 32.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.95686, 0.87059, 0.68627, 1)
 theme_override_font_sizes/font_size = 26
-text = "DICE / INCREMENTAL"
+text = "D- infinity"
 
 [node name="Subtitle" type="Label" parent="."]
 offset_left = 33.0
