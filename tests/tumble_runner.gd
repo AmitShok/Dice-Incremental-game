@@ -10,6 +10,16 @@ func check(value: bool, message: String) -> void:
 		failures += 1
 		push_error(message)
 
+func body_extent(image: Image) -> int:
+	# The old resting artwork includes a painted contact shadow, not part of the die body.
+	var body: Image = image.duplicate()
+	for y in body.get_height():
+		for x in body.get_width():
+			if body.get_pixel(x,y).is_equal_approx(Color("172c2b")):
+				body.set_pixel(x,y,Color.TRANSPARENT)
+	var bounds: Rect2i = body.get_used_rect()
+	return maxi(bounds.size.x, bounds.size.y)
+
 func run() -> void:
 	if not OS.get_cmdline_user_args().has("--test"):
 		quit(1)
@@ -23,11 +33,9 @@ func run() -> void:
 		var definition: DiceDefinition = game.registry.dice[id]
 		var rest_image: Image = definition.texture.get_image()
 		var roll_image: Image = definition.rolling_texture.get_image()
-		var rest_bounds: Rect2i = rest_image.get_region(Rect2i(0,0,32,32)).get_used_rect()
-		var rest_extent: int = maxi(rest_bounds.size.x, rest_bounds.size.y)
+		var rest_extent: int = body_extent(rest_image.get_region(Rect2i(0,0,32,32)))
 		for frame in 24:
-			var roll_bounds: Rect2i = roll_image.get_region(Rect2i(frame*32,0,32,32)).get_used_rect()
-			var extent: int = maxi(roll_bounds.size.x, roll_bounds.size.y)
+			var extent: int = body_extent(roll_image.get_region(Rect2i(frame*32,0,32,32)))
 			check(absi(extent - rest_extent) <= 1, "Rest/roll body size matches: " + id)
 		var index: int = ids.size()
 		var die: DiceInstance = game.state.add_die(id, Vector2(150 + index % 5 * 115, 245 + int(index/5) * 135))

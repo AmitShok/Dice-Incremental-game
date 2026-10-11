@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-11 — Restore preferred dice and icon style
+
+- Restored the earlier resting dice faces and rounded infinity icon, including their editable Aseprite masters.
+- Kept the tumbling and bounce animation, sizing each rolling frame to its restored die body so it no longer shrinks during rolls.
+- All 240 rolling-frame size comparisons, animation checks, branding checks and rendered integration passed.
+
 ## 2026-10-11 — Consistent dice artwork and clearer icon
 
 - Rebuilt resting faces and rolling frames from shared polyhedral geometry, palette and lighting, with matching 26-pixel body footprints inside each 32-pixel frame.
