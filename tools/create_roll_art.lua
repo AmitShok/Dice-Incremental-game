@@ -1,4 +1,4 @@
--- Creates only the new tumbling masters. Existing face artwork is untouched.
+-- Resting faces and rolling frames share mesh, palette, lighting and a 26px footprint.
 local root=assert(app.params["root"])
 local specs={{"d4",4,"efba69"},{"d6",6,"f0dfbd"},{"d8",8,"8ec4ab"},{"d10",10,"9bbada"},{"d12",12,"dc9ca7"},{"d20",20,"d68878"},{"golden_d6",6,"efc66d"},{"lucky_d6",6,"b4cf94"},{"exploding_d6",6,"eeab6d"},{"multiplier_d6",6,"c6b5e5"}}
 local function rgba(hex,m)
@@ -67,39 +67,62 @@ local function mesh(sides)
  return v,f
 end
 local pips={{{0,0}},{{-.45,-.45},{.45,.45}},{{-.45,-.45},{0,0},{.45,.45}},{{-.45,-.45},{.45,-.45},{-.45,.45},{.45,.45}},{{-.45,-.45},{.45,-.45},{0,0},{-.45,.45},{.45,.45}},{{-.45,-.45},{.45,-.45},{-.45,0},{.45,0},{-.45,.45},{.45,.45}}}
+local digits={['0']={'111','101','101','101','111'},['1']={'010','110','010','010','111'},['2']={'111','001','111','100','111'},['3']={'111','001','111','001','111'},['4']={'101','101','111','001','001'},['5']={'111','100','111','001','111'},['6']={'111','100','111','101','111'},['7']={'111','001','010','010','010'},['8']={'111','101','111','101','111'},['9']={'111','101','111','001','111'}}
 for _,spec in ipairs(specs) do
- local vertices,faces=mesh(spec[2]); local s=Sprite(32,32); s.layers[1].name="Shaded tumbling faces"
- for frame=1,24 do
+ local vertices,faces=mesh(spec[2])
+ for _,category in ipairs({'rolls','dice'}) do
+ local resting=category=='dice'
+ local count=resting and spec[2] or 24
+ local s=Sprite(32,32); s.layers[1].name=resting and 'Shaded result faces' or 'Shaded tumbling faces'
+ for frame=1,count do
   if frame>1 then s:newEmptyFrame() end
   local im=Image(32,32); local transformed={}; local projected={}
-  for i,v in ipairs(vertices) do local r=rotate(v,(frame-1)/24); transformed[i]=r; projected[i]={16+r[1]*7.4,16+r[2]*7.4} end
+  local minx,miny,maxx,maxy=999,999,-999,-999
+  for i,v in ipairs(vertices) do
+   local r=rotate(v,resting and 0.025 or (frame-1)/24+0.025); transformed[i]=r
+   minx=math.min(minx,r[1]);maxx=math.max(maxx,r[1]);miny=math.min(miny,r[2]);maxy=math.max(maxy,r[2])
+  end
+  local size=26/math.max(maxx-minx,maxy-miny)
+  for i,r in ipairs(transformed) do projected[i]={15.5+(r[1]-(minx+maxx)/2)*size,15.5+(r[2]-(miny+maxy)/2)*size} end
   local order={}
   for i,face in ipairs(faces) do local depth=0; for _,k in ipairs(face) do depth=depth+transformed[k][3]/#face end; order[#order+1]={id=i,depth=depth} end
   table.sort(order,function(a,b) return a.depth<b.depth end)
+  local primary=order[#order].id
   for _,entry in ipairs(order) do
    local face=faces[entry.id]; local points={}; local cx,cy=0,0
    for _,k in ipairs(face) do points[#points+1]=projected[k]; cx=cx+projected[k][1]/#face; cy=cy+projected[k][2]/#face end
-   polygon(im,points,rgba(spec[3],0.64+0.32*(entry.depth+1.5)/3))
+   polygon(im,points,rgba(spec[3],entry.id==primary and 1.0 or (0.67+0.22*(entry.depth+1.5)/3)))
    for i=1,#points do line(im,points[i],points[i%#points+1],rgba(spec[3],0.48)) end
    if spec[2]==6 then
-    for _,pip in ipairs(pips[entry.id]) do
+    for _,pip in ipairs(pips[resting and entry.id==primary and frame or entry.id]) do
      local u,v=(pip[1]+1)/2,(pip[2]+1)/2
      local a,b,c,d=points[1],points[2],points[3],points[4]
      local x=a[1]*(1-u)*(1-v)+b[1]*u*(1-v)+c[1]*u*v+d[1]*(1-u)*v
      local y=a[2]*(1-u)*(1-v)+b[2]*u*(1-v)+c[2]*u*v+d[2]*(1-u)*v
      pixel(im,x,y,rgba("171921",1))
+     if resting and entry.id==primary then pixel(im,x+1,y,rgba("171921",1));pixel(im,x,y+1,rgba("171921",1));pixel(im,x+1,y+1,rgba("171921",1)) end
     end
-   else pixel(im,cx,cy,rgba("171921",1)) end
+   elseif not resting then pixel(im,cx,cy,rgba("171921",1)) end
+  end
+  if resting and spec[2]~=6 then
+   -- The readable result is consistently centered on the body, never on a tiny edge face.
+   local text=tostring(frame);local startx=16-(#text*4-1)
+   for n=1,#text do for y,row in ipairs(digits[text:sub(n,n)]) do for x=1,3 do
+    if row:sub(x,x)=='1' then
+     for dy=0,1 do for dx=0,1 do pixel(im,startx+(n-1)*8+(x-1)*2+dx,11+(y-1)*2+dy,rgba('171921',1)) end end
+    end
+   end end end
   end
   if frame==1 then s.cels[1].image=im else s:newCel(s.layers[1],frame,im) end
   s.frames[frame].duration=1/24
  end
- local tag=s:newTag(1,24); tag.name="Tumble"
- app.fs.makeAllDirectories(root.."/assets/source/aseprite/rolls")
- app.fs.makeAllDirectories(root.."/assets/exported/rolls")
- s:saveAs(root.."/assets/source/aseprite/rolls/"..spec[1]..".aseprite")
+ local tag=s:newTag(1,count); tag.name=resting and "Results" or "Tumble"
+ app.fs.makeAllDirectories(root.."/assets/source/aseprite/"..category)
+ app.fs.makeAllDirectories(root.."/assets/exported/"..category)
+ s:saveAs(root.."/assets/source/aseprite/"..category.."/"..spec[1]..".aseprite")
  app.activeSprite=s
- app.command.ExportSpriteSheet{ui=false,askOverwrite=false,type=SpriteSheetType.HORIZONTAL,textureFilename=root.."/assets/exported/rolls/"..spec[1]..".png",dataFilename=root.."/assets/exported/rolls/"..spec[1]..".json",listTags=true}
+ app.command.ExportSpriteSheet{ui=false,askOverwrite=false,type=SpriteSheetType.HORIZONTAL,textureFilename=root.."/assets/exported/"..category.."/"..spec[1]..".png",dataFilename=root.."/assets/exported/"..category.."/"..spec[1]..".json",listTags=true}
  s:close()
+ end
 end
-print("Exported ten editable tumbling dice masters")
+print("Exported twenty matched resting and tumbling dice masters")

@@ -123,7 +123,9 @@ func _update_roll_pose(t: float) -> void:
 			sprite.texture = definition.rolling_texture
 			sprite.hframes = tumble_frames
 		var turnover: float = 1.0 - pow(1.0 - t / 0.86, 1.45)
-		sprite.frame = (tumble_offset + int(turnover * tumble_frames * tumble_cycles)) % tumble_frames
+		# Finish at the shared resting orientation instead of snapping from a random pose.
+		var end_frame: float = ceilf((tumble_offset + tumble_frames * tumble_cycles) / tumble_frames) * tumble_frames
+		sprite.frame = int(lerpf(tumble_offset, end_frame, turnover)) % tumble_frames
 	else:
 		if sprite.texture != definition.texture:
 			sprite.texture = definition.texture

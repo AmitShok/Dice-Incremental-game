@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-11 — Consistent dice artwork and clearer icon
+
+- Rebuilt resting faces and rolling frames from shared polyhedral geometry, palette and lighting, with matching 26-pixel body footprints inside each 32-pixel frame.
+- Rolls approach the resting orientation before revealing the result; numbered resting faces retain large readable digits.
+- Reworked the application icon as a three-faced die with side pips and a front infinity engraving; refreshed PNG, ICO and layered Aseprite master.
+- All 240 rolling-frame footprint comparisons and animation checks passed; 88 gameplay/save checks and rendered integration passed. The local 100-die probe measured 59.84 FPS.
+
 ## 2026-10-08 — Roll-table cooldown
 
 - Roll the table and Space share a 60-second cooldown after a successful batch; clicking individual dice, helpers and automatic rolls remain available.

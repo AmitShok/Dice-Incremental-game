@@ -5,7 +5,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    },
    "d8 1.aseprite": {
     "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
@@ -13,7 +13,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    },
    "d8 2.aseprite": {
     "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
@@ -21,7 +21,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    },
    "d8 3.aseprite": {
     "frame": { "x": 96, "y": 0, "w": 32, "h": 32 },
@@ -29,7 +29,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    },
    "d8 4.aseprite": {
     "frame": { "x": 128, "y": 0, "w": 32, "h": 32 },
@@ -37,7 +37,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    },
    "d8 5.aseprite": {
     "frame": { "x": 160, "y": 0, "w": 32, "h": 32 },
@@ -45,7 +45,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    },
    "d8 6.aseprite": {
     "frame": { "x": 192, "y": 0, "w": 32, "h": 32 },
@@ -53,7 +53,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    },
    "d8 7.aseprite": {
     "frame": { "x": 224, "y": 0, "w": 32, "h": 32 },
@@ -61,7 +61,7 @@
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 90
+    "duration": 41
    }
  },
  "meta": {
@@ -72,10 +72,10 @@
   "size": { "w": 256, "h": 32 },
   "scale": "1",
   "frameTags": [
-   { "name": "faces", "from": 0, "to": 7, "direction": "forward", "color": "#000000ff" }
+   { "name": "Results", "from": 0, "to": 7, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
-   { "name": "Faces", "opacity": 255, "blendMode": "normal" }
+   { "name": "Shaded result faces", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]

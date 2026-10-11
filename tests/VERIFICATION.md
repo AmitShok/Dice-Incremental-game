@@ -100,3 +100,8 @@ Validation: 70 gameplay/save checks passed. A dedicated rendered pose test passe
 
 ## 2 October: ambient table animation
 Added original Aseprite flame (8 frames), steam (16 frames), plant (12 frames), and derived layered room backdrop. Inspected the rendered tabletop for aligned candles, plant and cup. Automated ambient checks verified frame advancement, reduced-motion behavior, pause/resume, unchanged economy and silent test audio. Rendered integration passed. Six-second 100-die/eight-helper probe: 60.12 FPS, 600 resolved rolls, 54 draw calls, frame p95 17.81 ms. All background tests used the Dummy audio driver and --test. Aseprite's pre-existing PixelLab extension emitted its known startup warnings; all four new masters and exports completed.
+
+## 11 October: consistent rest/roll artwork
+Regenerated all ten resting face sheets and all ten 24-frame rolling sheets inside Aseprite from shared meshes, colors, lighting and normalized body footprints. Every rolling frame's maximum alpha-bound extent is within one pixel of its resting counterpart (240 comparisons). Numbered faces use readable 2x pixel glyphs. The animation approaches the resting orientation before result reveal. The game icon now shows front, top and side faces with pips and the infinity symbol; PNG/ICO and the Aseprite master were refreshed.
+
+Validation: all 88 gameplay/save checks passed; tumble checks across ten dice, branding/save-location checks and rendered integration passed. Inspected resting/rolling table captures and the new icon. The 100-die rendered probe reached 59.84 FPS with 600 completed rolls and p95 frame interval 18.16ms. All tests were silent. Existing PixelLab extension startup warnings did not prevent Aseprite exports.
