@@ -163,6 +163,20 @@ func run() -> void:
 	check(not restored.settings.motion and restored.statistics.rolls == 42 and restored.prestige_points == 2, "Save preserves settings, statistics and Fate")
 	var roundtrip_rng := GameSession.new(registry, restored)
 	check(roundtrip_rng.roller.rng.state == rng_a.rng.state, "Save preserves RNG state")
+	# The first broken exports autosaved an otherwise valid state with no dice.
+	var empty_table: Dictionary = game.state.snapshot()
+	empty_table.dice = []
+	empty_table.counts = {}
+	var empty_save: String = JSON.stringify({"save_version": 1, "state": empty_table})
+	var repaired := GameSession.new(registry, store.decode(empty_save))
+	check(repaired.state.dice.size() == 1 and repaired.state.counts.get("d6", 0) == 1, "Empty saved table receives exactly one starter die")
+	check(repaired.state.money == 123.75 and repaired.state.upgrades.heavy == 2 and repaired.state.talents.fortune == 1 and repaired.state.prestige_points == 2 and repaired.state.prestige_total == 3, "Empty-table recovery preserves currency and progression")
+	check(not repaired.state.settings.motion and repaired.state.statistics.rolls == 42 and repaired.state.rng_state == game.state.rng_state, "Empty-table recovery preserves settings, statistics and RNG")
+	check(repaired.request_roll([repaired.state.dice[0].id]) if not repaired.state.dice.is_empty() else false, "Recovered starter can roll")
+	repaired.settle()
+	var repaired_again := GameSession.new(registry, store.decode(JSON.stringify({"save_version": 1, "state": repaired.state.snapshot()})))
+	check(repaired_again.state.dice.size() == 1, "Saving and loading recovered table does not duplicate starter")
+	check(roundtrip_rng.state.dice.size() == 1 and roundtrip_rng.state.dice[0].position == Vector2(200,250), "Normal saved table keeps existing die")
 	check(store.decode("{broken") == null, "Malformed JSON rejected")
 	var broken: Dictionary = game.state.snapshot()
 	broken.dice[0].definition_id = "missing"

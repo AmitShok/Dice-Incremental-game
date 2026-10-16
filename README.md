@@ -37,6 +37,8 @@ In this development build, open Settings → Open developer tools (or press F3).
 
 ## Exporting Windows and HTML
 
+Builds now recover empty tables saved by the initial export bug without resetting progress. Upload the rebuilt Web ZIP to itch.io and reload the game to apply recovery. The main scene keeps a left-to-right layout regardless of the device layout direction.
+
 Use the **Windows Desktop** or **Web** preset in Project > Export. Re-export after updating; existing builds retain the old content loader. For Windows, keep the `.exe` and matching `.pck` together. For Web, export as `index.html` and upload all generated files together to an HTTPS host. For a local preview, serve the export folder with `python -m http.server 8000 --bind 127.0.0.1` and open `http://127.0.0.1:8000`; do not open the HTML directly from disk. The Web preset disables thread support so it does not require cross-origin isolation headers.
 
 Content discovery uses `ResourceLoader.list_directory()` so exported `.tres` remaps still resolve. See [Godot's resource listing guidance](https://docs.godotengine.org/en/4.7/classes/class_diraccess.html). Lucky weights use PackedFloat32Array because the 4.7.2 binary resource export dropped this property's PackedFloat64Array values; sampling still uses Float64 math.

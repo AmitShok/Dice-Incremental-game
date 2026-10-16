@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-16 — Recover empty tables and prevent mirrored mobile layout
+
+- Restore one starter D6 when loading an empty table left by the earlier broken exports, preserving money, upgrades, Fate, settings and statistics. Existing dice are unchanged.
+- Explicitly set the main scene layout to left-to-right so inherited RTL layouts cannot move the shop onto the table.
+- Add saved-empty-table regression coverage and phone portrait/landscape checks under both layout directions; include resizing checks in export verification.
+
 ## 2026-10-16 — Repair exported content loading
 
 - Use export-aware resource discovery to restore the starting die and dice/upgrade shops in Windows and Web exports; report empty catalogs instead of failing silently.

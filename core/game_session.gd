@@ -17,7 +17,9 @@ var forced_face: int = 0
 func _init(content: ContentRegistry, existing: GameState = null) -> void:
 	registry = content
 	state = existing if existing != null else GameState.new()
-	if existing == null and registry.dice.has("d6"):
+	# Early exports could autosave an empty table before their content loaded.
+	# Recover only the missing starter; retain the rest of the saved state.
+	if state.dice.is_empty() and registry.dice.has("d6"):
 		state.add_die("d6", Vector2(395, 310))
 	if not state.rng_state.is_empty() and state.rng_state.is_valid_int():
 		roller.rng.state = state.rng_state.to_int()
