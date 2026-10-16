@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-16 — Repair exported content loading
+
+- Use export-aware resource discovery to restore the starting die and dice/upgrade shops in Windows and Web exports; report empty catalogs instead of failing silently.
+- Preserve Lucky die probability weights during binary export using PackedFloat32Array storage.
+- Add a Web export preset and a repeatable script that builds and checks both release packages.
+- All 89 gameplay checks and rendered integration pass against both packages; Windows release startup and browser spawning, rolling/payout, and upgrade display verified.
+
 ## 2026-10-11 — Restore preferred dice and icon style
 
 - Restored the earlier resting dice faces and rounded infinity icon, including their editable Aseprite masters.

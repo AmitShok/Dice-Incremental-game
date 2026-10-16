@@ -11,7 +11,8 @@ extends Resource
 @export var cost_growth: float = 2.0
 @export var base_payout: float = 1.0
 @export var flat_bonus: float = 0.0
-@export var weights: PackedFloat64Array = []
+# Float32 weights survive text-to-binary export in Godot 4.7.2; roll math stays Float64.
+@export var weights: PackedFloat32Array = PackedFloat32Array()
 @export var duration: float = 0.85
 @export var unlock_earned: float = 0.0
 @export var auto_cost: float = 1000.0

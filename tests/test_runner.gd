@@ -27,7 +27,7 @@ func run() -> void:
 	invalid.base_cost = -1
 	check(not invalid.valid(), "Negative price content rejected")
 	invalid.base_cost = 1
-	invalid.weights = PackedFloat64Array([0,0,0,0,0,0])
+	invalid.weights = PackedFloat32Array([0,0,0,0,0,0])
 	check(not invalid.valid(), "Zero-weight distribution rejected")
 	var rng_a := RollSystem.new(1234)
 	var rng_b := RollSystem.new(1234)
@@ -41,6 +41,7 @@ func run() -> void:
 	var histogram: Array = rng_a.simulate_rolls(definition, 100000).histogram
 	for value in histogram:
 		check(absf(float(value) / 100000.0 - 1.0 / 6.0) < 0.007, "Fair D6 distribution")
+	check(registry.dice.lucky_d6.weights == PackedFloat32Array([1,1,1,1,3,3]), "Lucky weights survive resource packaging")
 	var loaded: Array = rng_a.simulate_rolls(registry.dice.lucky_d6, 100000).histogram
 	check(absf(float(loaded[4] + loaded[5]) / 100000.0 - 0.6) < 0.008, "Lucky die weighted distribution")
 

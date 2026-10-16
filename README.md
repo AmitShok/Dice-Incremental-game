@@ -35,6 +35,14 @@ The render benchmark warms up for two seconds, then reports actual frame interva
 
 In this development build, open Settings → Open developer tools (or press F3). The panel has a Close button. For isolated developer play use `GODOT --path . -- --test`. Before public release, disable `developer_tools_enabled` on the main scene; non-debug exports also hide the tools automatically.
 
+## Exporting Windows and HTML
+
+Use the **Windows Desktop** or **Web** preset in Project > Export. Re-export after updating; existing builds retain the old content loader. For Windows, keep the `.exe` and matching `.pck` together. For Web, export as `index.html` and upload all generated files together to an HTTPS host. For a local preview, serve the export folder with `python -m http.server 8000 --bind 127.0.0.1` and open `http://127.0.0.1:8000`; do not open the HTML directly from disk. The Web preset disables thread support so it does not require cross-origin isolation headers.
+
+Content discovery uses `ResourceLoader.list_directory()` so exported `.tres` remaps still resolve. See [Godot's resource listing guidance](https://docs.godotengine.org/en/4.7/classes/class_diraccess.html). Lucky weights use PackedFloat32Array because the 4.7.2 binary resource export dropped this property's PackedFloat64Array values; sampling still uses Float64 math.
+
+Run `./tools/verify_exports.ps1 -Godot "PATH_TO_GODOT.exe" -OutputDirectory "PATH_OUTSIDE_PROJECT"` in PowerShell to build both release targets and run gameplay and rendered integration checks against each exported PCK. Matching export templates must be installed. Tests use the editor executable to run test scripts against packaged resources because release templates do not support `--script`. They run silently with player saves disabled. Browser/Windows release startup should also be checked after engine upgrades.
+
 ## Artwork
 Normal export: `ASEPRITE -b --script-param root=PROJECT_PATH --script tools/export_art.lua`. This reads .aseprite masters and exports PNG/JSON; it never regenerates originals. tools/create_art.lua is the initial artwork construction script and may overwrite original art: do not run it on edited masters without a backup.
 

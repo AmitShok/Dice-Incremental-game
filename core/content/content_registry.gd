@@ -18,7 +18,8 @@ func _init() -> void:
 				catalog.erase(id)
 
 func _load_folder(path: String, destination: Dictionary, is_upgrade: bool) -> void:
-	var names: PackedStringArray = DirAccess.get_files_at(path)
+	# Resource names stay stable when exports remap .tres files to binary resources.
+	var names: PackedStringArray = ResourceLoader.list_directory(path)
 	names.sort()
 	for filename in names:
 		if not filename.ends_with(".tres"):
@@ -32,6 +33,9 @@ func _load_folder(path: String, destination: Dictionary, is_upgrade: bool) -> vo
 			errors.append("Invalid face sheet: " + path.path_join(filename))
 			continue
 		destination[resource.id] = resource
+
+	if destination.is_empty():
+		errors.append("No content loaded from: " + path)
 
 func all_modifiers() -> Array:
 	return upgrades.values() + talents.values()
