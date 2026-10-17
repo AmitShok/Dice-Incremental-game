@@ -9,26 +9,38 @@ theme_override_font_sizes/font_size = 19
 text = "Make yourself comfortable."
 
 [node name="DeveloperTools" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Open developer tools"
 
 [node name="sound" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Sound effects"
 
 [node name="motion" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Motion & bounce"
 
 [node name="flashes" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Counter flashes"
 
 [node name="numbers" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Floating payouts"
 
 [node name="particles" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Celebration sparks"
 
@@ -37,11 +49,14 @@ layout_mode = 2
 text = "Volume"
 
 [node name="Volume" type="HSlider" parent="."]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 
 [node name="Save" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Save now"
 
@@ -52,5 +67,7 @@ text = "Autosaves every 30 seconds and on exit. Offline earnings: 50% of estimat
 autowrap_mode = 3
 
 [node name="Reset" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 text = "Reset all progress..."

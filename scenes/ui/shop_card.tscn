@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [node name="ShopCard" type="PanelContainer"]
+mouse_filter = 1
 size_flags_horizontal = 3
 
 [node name="Content" type="VBoxContainer" parent="."]
@@ -38,6 +39,8 @@ text = "Content description"
 autowrap_mode = 3
 
 [node name="Purchase" type="Button" parent="Content"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Buy"

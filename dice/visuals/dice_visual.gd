@@ -21,6 +21,8 @@ var motion_enabled: bool = true
 var dense: bool = false
 var dragging: bool = false
 var press_position: Vector2
+var drag_threshold: float = 6.0
+var drag_started: bool = false
 var original_position: Vector2
 var age: float = 0
 var rolling: bool = false
@@ -57,16 +59,24 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed and not die.busy:
 			dragging = true
+			drag_started = false
+			# Touch-emulated mouse events use device -1; measure tolerance in screen pixels.
+			drag_threshold = 12.0 / maxf(0.1, get_viewport().get_final_transform().x.length()) if event.device == -1 else 6.0
 			press_position = event.global_position
 			original_position = position
 		elif not event.pressed and dragging:
 			dragging = false
-			if press_position.distance_to(event.global_position) < 6:
+			if event.canceled:
+				position = original_position
+			elif not drag_started:
 				selected.emit(die.id)
 			else:
 				moved.emit(die.id, position + Vector2(32, 32) * scale)
 			accept_event()
 	elif event is InputEventMouseMotion and dragging and not die.busy:
+		if not drag_started and press_position.distance_to(event.global_position) < drag_threshold:
+			return
+		drag_started = true
 		var center: Vector2 = original_position + event.global_position - press_position + Vector2(32, 32) * scale
 		position = center.clamp(Vector2(65, 150), Vector2(725, 500)) - Vector2(32, 32) * scale
 

@@ -45,6 +45,12 @@ Content discovery uses `ResourceLoader.list_directory()` so exported `.tres` rem
 
 Run `./tools/verify_exports.ps1 -Godot "PATH_TO_GODOT.exe" -OutputDirectory "PATH_OUTSIDE_PROJECT"` in PowerShell to build both release targets and run gameplay and rendered integration checks against each exported PCK. Matching export templates must be installed. Tests use the editor executable to run test scripts against packaged resources because release templates do not support `--script`. They run silently with player saves disabled. Browser/Windows release startup should also be checked after engine upgrades.
 
+## Touch controls
+
+Swipe vertically anywhere on shop cards or buttons to scroll with momentum. A swipe cancels the button press; a short tap buys or toggles once. Tabs, purchases, settings and developer controls have larger minimum button heights. The volume slider keeps its horizontal drag gesture. Tap a die to roll; drag it to arrange. Small finger jitter is tolerated, and a canceled touch does not commit a move. Landscape/fullscreen gives phones more usable space with the existing tabletop layout.
+
+`tests/touch_runner.gd` injects screen-touch events through Godot's input pipeline, checking swipes across four shop pages, purchase cancellation, taps, settings, mouse-wheel compatibility, dice jitter/drag and touch cancellation. Export verification runs it at desktop and phone landscape sizes against both packages. Physical-device browser behavior still merits testing on the target phones.
+
 ## Artwork
 Normal export: `ASEPRITE -b --script-param root=PROJECT_PATH --script tools/export_art.lua`. This reads .aseprite masters and exports PNG/JSON; it never regenerates originals. tools/create_art.lua is the initial artwork construction script and may overwrite original art: do not run it on edited masters without a backup.
 

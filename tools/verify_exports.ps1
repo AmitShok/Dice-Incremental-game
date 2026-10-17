@@ -33,5 +33,7 @@ foreach ($target in @(@('Windows Desktop','windows','D-infinity.exe','D-infinity
         $env:DICE_TEST_OUTPUT = $folder
         Invoke-GodotCheck ($target[1]+'-visual') @('--audio-driver','Dummy','--main-pack',('"'+$pack+'"'),'--script','res://tests/visual_runner.gd','--','--test')
         Invoke-GodotCheck ($target[1]+'-resize') @('--audio-driver','Dummy','--main-pack',('"'+$pack+'"'),'--script','res://tests/resize_runner.gd','--','--test')
+        Invoke-GodotCheck ($target[1]+'-touch') @('--audio-driver','Dummy','--main-pack',('"'+$pack+'"'),'--script','res://tests/touch_runner.gd','--','--test')
+        Invoke-GodotCheck ($target[1]+'-touch-phone') @('--audio-driver','Dummy','--main-pack',('"'+$pack+'"'),'--script','res://tests/touch_runner.gd','--','--test','--phone')
     } finally { $env:DICE_TEST_OUTPUT = $previousOutput }
 }

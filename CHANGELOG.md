@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-17 — Improve touchscreen controls
+
+- Let card and button input propagate to native scroll containers, with an 8-pixel drag threshold and native momentum/button cancellation.
+- Increase shop navigation, purchase, settings and developer button minimum heights to 44 logical pixels.
+- Tolerate finger jitter when tapping dice and cancel interrupted drags without moving or rolling.
+- Add touch-input regression coverage to Windows and Web package verification at desktop and phone landscape sizes.
+
 ## 2026-10-16 — Recover empty tables and prevent mirrored mobile layout
 
 - Restore one starter D6 when loading an empty table left by the earlier broken exports, preserving money, upgrades, Fate, settings and statistics. Existing dice are unchanged.

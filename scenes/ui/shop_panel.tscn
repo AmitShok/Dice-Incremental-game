@@ -14,30 +14,39 @@ script = ExtResource("1")
 layout_mode = 2
 
 [node name="Dice" type="Button" parent="Tabs"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Dice"
 
 [node name="Upgrades" type="Button" parent="Tabs"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Upgrades"
 
 [node name="Helpers" type="Button" parent="Tabs"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Helpers"
 
 [node name="Fate" type="Button" parent="Tabs"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Fate"
 
 [node name="Scroll" type="ScrollContainer" parent="."]
+scroll_deadzone = 8
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -50,11 +59,15 @@ size_flags_horizontal = 3
 layout_mode = 2
 
 [node name="Ledger" type="Button" parent="Footer"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Ledger"
 
 [node name="Settings" type="Button" parent="Footer"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Settings"
