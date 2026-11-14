@@ -3,7 +3,9 @@
 ## Contracts
 Amounts use double-precision floats capped at 1e100. This is a defined finite range, not arbitrary precision. Purchases reject nonfinite, nonpositive and unaffordable prices. UI formatting uses K/M/B/T and scientific notation beyond named suffixes. A future mantissa/exponent money type can replace this boundary if design exceeds the range.
 
-Per-family die cost = base_cost × cost_growth ^ owned_count; default growth 2. Starter D6 counts as owned. Ordinary upgrade cost = base × growth ^ current_level. Helpers cost 250 × 2.8 ^ hired, up to eight.
+Per-family die cost = base_cost × cost_growth ^ owned_count; default growth 2. Starter D6 counts as owned. Ordinary upgrade cost = base × growth ^ current_level. Helpers cost 250 × 2.8 ^ hired, up to eight. Talents cost Fate with the same base × growth ^ level rule.
+
+Fate reward = 0 below $100K run earnings, otherwise floor(sqrt(run earnings / 25000) × 1.25 ^ House edge level). ProgressionService.next_fate_at() inverts this for the "+1 more Fate at" hint. Head start cash is not counted as run earnings, so it cannot shorten the path to Fate by itself. Heirloom D6s and Old friends helpers count toward their cost curves, as owned dice and hired helpers always do.
 
 Payout = (natural face + flat bonus) × die base payout × matching upgrade modifiers × (1 + lifetime Fate × 0.1) × batch combination × spatial aura × critical. Additive modifier contributions are summed before multiplicative factors. Conditions inspect natural face. Values are fixed when the roll is reserved, so mid-animation purchases cannot retroactively change payout.
 

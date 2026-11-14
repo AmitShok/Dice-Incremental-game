@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "patience"
+display_name = "Patient table"
+description = "Roll the table cooldown is 25% shorter per level. Three levels."
+cost = 2.0
+growth = 2
+max_level = 3
+stat = "table_cooldown"
+operation = "multiply"
+value = 0.75
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "fortune"

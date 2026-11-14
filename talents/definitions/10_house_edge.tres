@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "house_edge"
+display_name = "House edge"
+description = "Earn 25% more Fate from every fresh start. Four levels."
+cost = 5.0
+growth = 2
+max_level = 4
+stat = "fate_gain"
+operation = "multiply"
+value = 1.25
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "crit"

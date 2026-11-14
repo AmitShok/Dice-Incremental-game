@@ -160,7 +160,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func ask_prestige() -> void:
 	_disconnect_confirmation()
-	confirm.dialog_text = "Earn %d Fate and begin again?\nResets money, dice, helpers and ordinary upgrades.\nKeeps talents, Fate, lifetime statistics and settings." % session.progression.fate_reward()
+	confirm.dialog_text = "Earn %d Fate and begin again?\nResets money, dice, helpers and ordinary upgrades.\nKeeps talents, Fate, lifetime statistics and settings.%s" % [session.progression.fate_reward(), session.progression.carryover_summary()]
 	confirm.confirmed.connect(func():
 		session.prestige()
 		SaveManager.save_game()

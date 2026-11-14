@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "head_start"
+display_name = "Head start"
+description = "Begin each new run with $500, then $5K, then $50K. Three levels."
+cost = 2.0
+growth = 3
+max_level = 3
+stat = "starting_cash"
+operation = "multiply"
+value = 10
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "fortune"

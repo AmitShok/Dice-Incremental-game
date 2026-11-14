@@ -2,6 +2,9 @@ class_name ProgressionService
 extends RefCounted
 
 const PRESTIGE_THRESHOLD: float = 100000.0
+# Fate = floor(sqrt(run earnings / FATE_SCALE) × House edge); reaching the threshold grants 2.
+const FATE_SCALE: float = 25000.0
+const MAX_FATE: int = 1000000000
 
 var state: GameState
 var registry: ContentRegistry
@@ -89,7 +92,36 @@ func hire_helper() -> bool:
 	return true
 
 func fate_reward() -> int:
-	return int(minf(1000000000 - state.prestige_total, floor(sqrt(state.run_earned / PRESTIGE_THRESHOLD))))
+	if state.run_earned < PRESTIGE_THRESHOLD:
+		return 0
+	var raw: float = floor(sqrt(state.run_earned / FATE_SCALE) * economy.modifier("fate_gain") + 1e-9)
+	return int(minf(MAX_FATE - state.prestige_total, raw))
+
+## Run earnings needed for one more Fate than fate_reward() currently gives.
+func next_fate_at() -> float:
+	var target: float = fate_reward() + 1
+	return minf(GameState.MAX_AMOUNT, maxf(PRESTIGE_THRESHOLD, FATE_SCALE * pow(target / economy.modifier("fate_gain"), 2)))
+
+## Head start: $500 × 10^(level − 1); nothing without the talent.
+func starting_cash() -> float:
+	var bonus: float = economy.modifier("starting_cash")
+	return 50.0 * bonus if bonus > 1.0 else 0.0
+
+## Text describing what talents carry into the next run, for the confirmation dialog.
+func carryover_summary() -> String:
+	var parts: PackedStringArray = []
+	if starting_cash() > 0:
+		parts.append("$" + NumberFormat.compact(starting_cash()))
+	if _talent_count("starting_dice") > 0:
+		parts.append("%d extra D6" % _talent_count("starting_dice"))
+	if _talent_count("starting_helpers") > 0:
+		parts.append("%d helper%s" % [_talent_count("starting_helpers"), "" if _talent_count("starting_helpers") == 1 else "s"])
+	if _talent_count("keep_automation") > 0 and not state.automatic.is_empty():
+		parts.append("your automatic rolling")
+	return "" if parts.is_empty() else "\nYour talents start the next run with " + ", ".join(parts) + "."
+
+func _talent_count(stat: String) -> int:
+	return maxi(0, roundi(economy.modifier(stat) - 1.0))
 
 func prestige() -> bool:
 	var reward: int = fate_reward()
@@ -102,10 +134,16 @@ func prestige() -> bool:
 	state.dice.clear()
 	state.counts.clear()
 	state.upgrades.clear()
-	state.automatic.clear()
+	if _talent_count("keep_automation") == 0:
+		state.automatic.clear()
 	state.helpers = 0
 	state.tutorial_step = 2
 	state.add_die("d6", Vector2(395, 310))
+	# Talents survive the reset, so their run-start bonuses apply after run upgrades are cleared.
+	state.money = starting_cash()
+	for index in _talent_count("starting_dice"):
+		state.add_die("d6", _open_position())
+	state.helpers = mini(8, _talent_count("starting_helpers"))
 	StatisticsService.increment(state, "prestiges")
 	events.prestige_completed.emit()
 	events.changed.emit()

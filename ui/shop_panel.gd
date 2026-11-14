@@ -47,6 +47,11 @@ func card(title: String, description: String, die_id: String = "") -> VBoxContai
 	box.get_node("Description").text = description
 	return box
 
+func _requirement_text(definition: UpgradeDefinition) -> String:
+	if definition.prerequisite.is_empty() or not session.registry.talents.has(definition.prerequisite):
+		return ""
+	return " Requires %s." % session.registry.talents[definition.prerequisite].display_name
+
 func purchase_button(box: VBoxContainer, callback: Callable, kind: String, id: String) -> void:
 	var button: Button = box.get_node("Purchase")
 	button.pressed.connect(func():
@@ -88,14 +93,17 @@ func show_page(which: String) -> void:
 				var auto_box: VBoxContainer = card(definition.display_name, "Every owned die in this family rolls automatically.", id)
 				purchase_button(auto_box, func(): return session.progression.buy_automatic(id), "automatic", id)
 		"Fate":
-			var box: VBoxContainer = card("Begin again, luckier", "At $%s earned this run, trade the table for Fate. Each Fate earned adds +10%% income permanently. Dice, money, helpers and ordinary upgrades reset. Talents, settings and lifetime statistics stay." % NumberFormat.compact(ProgressionService.PRESTIGE_THRESHOLD))
+			var box: VBoxContainer = card("Begin again, luckier", "At $%s earned this run, trade the table for Fate. The more you earn, the more Fate you take. Each Fate earned adds +10%% income permanently. Dice, money, helpers and ordinary upgrades reset. Talents, settings and lifetime statistics stay." % NumberFormat.compact(ProgressionService.PRESTIGE_THRESHOLD))
 			var button: Button = box.get_node("Purchase")
 			button.pressed.connect(func(): on_prestige.call())
-			rows.append({"button": button, "kind": "prestige", "id": ""})
+			var hint: Label = label_text("", 12)
+			hint.modulate = Color(1, 1, 1, 0.7)
+			box.add_child(hint)
+			rows.append({"button": button, "kind": "prestige", "id": "", "hint": hint})
 			body.add_child(label_text("Permanent talents", 19))
 			for id in session.registry.talents:
 				var definition: UpgradeDefinition = session.registry.talents[id]
-				var talent_box: VBoxContainer = card(definition.display_name, definition.description + (" Requires Fortune favors you." if not definition.prerequisite.is_empty() else ""), definition.target)
+				var talent_box: VBoxContainer = card(definition.display_name, definition.description + _requirement_text(definition), definition.target)
 				purchase_button(talent_box, func(): return session.progression.buy_upgrade(id, true), "talent", id)
 		"Ledger":
 			stats_label = label_text("", 15)
@@ -153,7 +161,7 @@ func update_rows() -> void:
 				locked = (not permanent and state.run_earned < definition.unlock_earned) or (not definition.prerequisite.is_empty() and int(levels.get(definition.prerequisite, 0)) == 0)
 				note = "%d/%d · " % [level, definition.max_level]
 				if locked:
-					note = "Requires " + definition.prerequisite.capitalize() if permanent else "Earn $" + NumberFormat.compact(definition.unlock_earned) + " to unlock"
+					note = "Requires " + session.registry.talents[definition.prerequisite].display_name if permanent else "Earn $" + NumberFormat.compact(definition.unlock_earned) + " to unlock"
 			"helper":
 				cost = session.progression.helper_price()
 				owned = state.helpers >= 8
@@ -167,6 +175,9 @@ func update_rows() -> void:
 			"prestige":
 				var reward: int = session.progression.fate_reward()
 				button.text = "Begin again · +%d Fate" % reward if reward > 0 else "$%s / $%s earned" % [NumberFormat.compact(state.run_earned), NumberFormat.compact(ProgressionService.PRESTIGE_THRESHOLD)]
+				button.tooltip_text = "Next Fate at $%s earned this run" % NumberFormat.compact(session.progression.next_fate_at()) if reward > 0 else ""
+				if reward > 0 and row.has("hint"):
+					row.hint.text = "+1 more Fate at $%s earned this run." % NumberFormat.compact(session.progression.next_fate_at())
 				button.disabled = reward <= 0
 				continue
 		var available: float = state.prestige_points if row.kind == "talent" else state.money

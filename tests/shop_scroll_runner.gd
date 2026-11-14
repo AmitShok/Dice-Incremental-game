@@ -14,6 +14,7 @@ func run() -> void:
 	game.state.run_earned = 100000000
 	game.state.prestige_points = 100
 	game.state.talents.fortune = 1
+	game.state.talents.crit = 1
 	for id in game.registry.dice:
 		game.state.add_die(id, Vector2(300,300))
 	var main: Control = load("res://scenes/main.tscn").instantiate()

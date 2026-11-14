@@ -17,10 +17,57 @@ func check(condition: bool, message: String) -> void:
 func fresh() -> GameSession:
 	return GameSession.new(registry)
 
+func _fate_endgame_checks() -> void:
+	var game: GameSession = fresh()
+	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD - 1
+	check(game.progression.fate_reward() == 0, "No Fate below the threshold")
+	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD
+	check(game.progression.fate_reward() == 2, "Threshold grants two Fate")
+	var next_at: float = game.progression.next_fate_at()
+	game.state.run_earned = next_at
+	check(next_at > ProgressionService.PRESTIGE_THRESHOLD and game.progression.fate_reward() == 3, "Next-Fate target grants exactly one more")
+	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD * 16
+	game.state.talents.house_edge = 2
+	check(game.progression.fate_reward() == 12, "House edge multiplies Fate")
+	game.state.run_earned = game.progression.next_fate_at()
+	check(game.progression.fate_reward() == 13, "Next-Fate target accounts for House edge")
+
+	game = fresh()
+	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD
+	game.state.talents.merge({"fortune": 1, "head_start": 2, "heirloom": 2, "stride": 1, "old_friend": 1, "muscle_memory": 1})
+	game.state.automatic.d6 = true
+	game.state.automatic.d4 = true
+	check(game.progression.carryover_summary().contains("$5.00K"), "Confirmation lists talent carry-over")
+	check(game.prestige(), "Talented prestige succeeds")
+	check(game.state.money == 5000.0 and game.state.run_earned == 0, "Head start grants unearned starting cash")
+	check(game.state.dice.size() == 3 and game.state.counts.d6 == 3, "Heirloom dice add starter D6s")
+	var spread: bool = game.state.dice[0].position.distance_to(game.state.dice[1].position) > 30 and game.state.dice[1].position.distance_to(game.state.dice[2].position) > 30
+	check(spread, "Heirloom dice do not overlap")
+	check(game.state.helpers == 1, "Old friends rehire a helper")
+	check(game.state.automatic.get("d6", false) and game.state.automatic.get("d4", false), "Enchanted memory keeps automation")
+	var restored: GameState = GameState.restore(game.state.snapshot(), registry)
+	check(restored != null and restored.talents.muscle_memory == 1 and restored.talents.heirloom == 2, "New talents survive save round trip")
+
+	game = fresh()
+	check(is_equal_approx(game.table_cooldown(), 60.0), "Base table cooldown")
+	game.state.talents.merge({"fortune": 1, "patience": 2})
+	check(game.roll_table() and is_equal_approx(game.state.table_roll_remaining, 33.75), "Patient table shortens cooldown")
+	check(GameState.restore(game.state.snapshot(), registry) != null, "Shortened cooldown saves")
+
+	var short_night: GameSession = fresh()
+	var long_night: GameSession = fresh()
+	short_night.state.automatic.d6 = true
+	long_night.state.automatic.d6 = true
+	long_night.state.talents.merge({"fortune": 1, "long_nights": 1})
+	var short_amount: float = short_night.offline(28800)
+	var long_amount: float = long_night.offline(28800)
+	# Fortune's +20% payout also applies, so a doubled window yields 2.4×.
+	check(is_equal_approx(long_amount, short_amount * 2.4), "Long nights doubles offline window")
+
 func run() -> void:
 	registry = ContentRegistry.new()
 	check(registry.errors.is_empty() and registry.dice.size() == 10, "All dice content validates")
-	check(registry.upgrades.size() == 7 and registry.talents.size() == 4, "Upgrades and talents load")
+	check(registry.upgrades.size() == 7 and registry.talents.size() == 11, "Upgrades and talents load")
 	var definition: DiceDefinition = registry.dice.d6
 	var invalid := DiceDefinition.new()
 	invalid.id = "invalid"
@@ -208,10 +255,11 @@ func run() -> void:
 	game.state.upgrades.heavy = 2
 	game.state.talents.fortune = 1
 	game.state.settings.sound = false
-	check(game.progression.fate_reward() == 2, "Fate square-root reward")
+	check(game.progression.fate_reward() == 4, "Fate square-root reward")
 	check(game.prestige(), "Prestige succeeds")
 	check(game.state.money == 0 and game.state.helpers == 0 and game.state.upgrades.is_empty() and game.state.dice.size() == 1, "Prestige resets run-only state")
-	check(game.state.prestige_points == 2 and game.state.talents.fortune == 1 and not game.state.settings.sound, "Prestige retains permanent state")
+	check(game.state.prestige_points == 4 and game.state.talents.fortune == 1 and not game.state.settings.sound, "Prestige retains permanent state")
+	_fate_endgame_checks()
 	game = fresh()
 	check(not game.prestige(), "Early prestige rejected")
 	check(game.offline(-100) == 0, "Backward clock earns nothing")

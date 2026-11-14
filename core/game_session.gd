@@ -34,9 +34,15 @@ func roll_table() -> bool:
 		ids.append(die.id)
 	if not request_roll(ids):
 		return false
-	state.table_roll_remaining = GameState.TABLE_ROLL_COOLDOWN
+	state.table_roll_remaining = table_cooldown()
 	events.changed.emit()
 	return true
+
+func table_cooldown() -> float:
+	return GameState.TABLE_ROLL_COOLDOWN * economy.modifier("table_cooldown")
+
+func offline_cap_seconds() -> float:
+	return 14400.0 * economy.modifier("offline_hours")
 
 func request_roll(ids: Array, source: String = "manual", depth: int = 0) -> bool:
 	if paused or depth > 4 or pending.size() >= 100:
@@ -152,7 +158,7 @@ func move_die(id: int, at: Vector2) -> bool:
 	return true
 
 func offline(seconds: float) -> float:
-	var elapsed: float = clampf(seconds, 0, 14400)
+	var elapsed: float = clampf(seconds, 0, offline_cap_seconds())
 	state.table_roll_remaining = maxf(0.0, state.table_roll_remaining - elapsed)
 	var amount: float = minf(GameState.MAX_AMOUNT, automation.expected_income(self) * elapsed * 0.5)
 	economy.credit(amount)

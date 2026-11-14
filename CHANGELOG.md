@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-14 — Deeper Fate endgame
+
+- Fate now pays floor(sqrt(run earnings / $25K)): 2 Fate at the $100K threshold, 4 at $400K, 6 at $900K. The Fate page shows the earnings needed for the next Fate.
+- Seven new talents: Head start, Heirloom dice, Patient table, Long nights, Old friends, Enchanted memory and House edge. They change how each new run opens (cash, dice, helpers, kept automation), shorten the table cooldown, extend offline earnings and boost Fate gain.
+- The prestige confirmation lists what talents carry into the next run. Talent cards name their actual prerequisite.
+- Existing saves load unchanged; new talents start at level 0. 17 new gameplay checks; all 112 checks, rendered, touch, scroll, resize and cooldown runners pass.
+
 ## 2026-10-17 — Improve touchscreen controls
 
 - Let card and button input propagate to native scroll containers, with an 8-pixel drag threshold and native momentum/button cancellation.
