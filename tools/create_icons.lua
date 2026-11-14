@@ -4,7 +4,10 @@
 local root = assert(app.params["root"], "Pass --script-param root=PROJECT_PATH")
 local ORDER = {"heavy","sixes","loaded","combos","hands","rhythm","chain","momentum","strong_arms","sharp_eyes",
   "many_hands","hire","fortune","crit","stride","echo","head_start","heirloom","patience","long_nights",
-  "old_friend","muscle_memory","house_edge","prestige","chip","capsule","lock","none","mix","up","table","book","gear"}
+  "old_friend","muscle_memory","house_edge","prestige","chip","capsule","lock","none","mix","up","table","book","gear",
+  "golden_touch","crit_chance","crit_power","deep_fortune","endless_favor","destiny","well_paid","bargain","haggler",
+  "born_harmony","perfect_harmony","chip_collector","hot_hands","fire_within","quick_hands","night_shift","weighted_fate",
+  "chip_hoard","hat_trick","divine"}
 local function hex(h) return app.pixelColor.rgba(tonumber(h:sub(1,2),16),tonumber(h:sub(3,4),16),tonumber(h:sub(5,6),16),255) end
 local INK,CREAM,GOLD,GOLD2,BRASS,RED,BLUE,GREEN,LILAC,WHITE,GREY=
   hex("0e0b10"),hex("f0dfbd"),hex("f5db9f"),hex("d8b874"),hex("8a6a40"),hex("d65a52"),hex("6fb6e0"),hex("7fbf7a"),hex("b6a2e0"),hex("ffffff"),hex("8c8a96")
@@ -56,6 +59,26 @@ local draw = {
   table=function() r(1,4,14,9,INK); r(2,5,12,7,hex("6b3d2b")); r(4,6,8,5,hex("2b5547")); p(5,7,hex("3c6b5c")); r(2,12,2,3,INK); r(12,12,2,3,INK) end,
   book=function() r(1,3,14,11,INK); r(2,4,5,9,CREAM); r(9,4,5,9,CREAM); r(7,4,2,9,hex("c9b996")); for y=6,11,2 do r(3,y,3,1,GREY); r(10,y,3,1,GREY) end end,
   gear=function() circ(8,8,5,GREY,true); for a=0,7 do local ang=a/8*math.pi*2; r(math.floor(8+6*math.cos(ang)+0.5)-1,math.floor(8+6*math.sin(ang)+0.5)-1,2,2,GREY) end; circ(8,8,2,INK,true) end,
+  golden_touch=function() die(2,5,GOLD,{{2,2},{6,2},{4,4},{2,6},{6,6}}); star(12,3,WHITE); p(14,6,GOLD) end,
+  crit_chance=function() circ(8,8,6,RED,false); circ(8,8,4,CREAM,false); circ(8,8,2,RED,true); p(8,8,WHITE) end,
+  crit_power=function() for a=0,7 do local ang=a/8*math.pi*2; ln(7,9,math.floor(7+5*math.cos(ang)+0.5),math.floor(9+5*math.sin(ang)+0.5),a%2==0 and GOLD or RED) end; r(12,1,1,5,WHITE); r(10,3,5,1,WHITE) end,
+  deep_fortune=function() circ(8,10,5,hex("b88a50"),true); circ(8,10,5,INK,false); r(6,3,5,3,hex("b88a50")); r(5,5,7,1,INK); r(7,8,3,1,GOLD); r(8,7,1,5,GOLD); r(7,11,3,1,GOLD) end,
+  endless_favor=function() for t=0,47 do local a=t/48*math.pi*2; p(math.floor(8+6*math.sin(a)+0.5),math.floor(8+3*math.sin(2*a)+0.5),GOLD) end; star(8,3,WHITE) end,
+  destiny=function() star(8,8,LILAC); ln(8,2,8,14,LILAC); ln(2,8,14,8,LILAC); p(8,8,WHITE); p(4,4,LILAC); p(12,12,LILAC); p(12,4,LILAC); p(4,12,LILAC) end,
+  well_paid=function() circ(6,9,5,GOLD,true); circ(6,9,5,INK,false); r(5,7,2,5,BRASS); r(11,2,4,4,hex("e6b48c")); r(10,6,6,5,hex("3f6a5a")) end,
+  bargain=function() r(3,4,10,8,GOLD2); r(3,4,10,1,WHITE); p(5,6,INK); r(7,7,5,1,INK); r(7,9,4,1,INK); ln(12,4,14,2,BRASS); p(14,2,BRASS); p(2,13,RED); ln(2,13,6,13,RED) end,
+  haggler=function() r(3,2,10,12,CREAM); r(3,2,10,1,WHITE); r(3,13,10,1,BRASS); for y=4,10,2 do r(5,y,6,1,GREY) end; r(6,12,5,1,RED) end,
+  born_harmony=function() die(1,6,CREAM,{{4,4}}); die(6,6,CREAM,{{4,4}}); circ(8,4,2,GREEN,true); p(8,4,WHITE) end,
+  perfect_harmony=function() die(1,7,CREAM,{{2,2},{6,6}}); die(6,7,CREAM,{{2,2},{6,6}}); r(4,2,8,3,GOLD); p(4,1,GOLD); p(8,1,GOLD); p(11,1,GOLD) end,
+  chip_collector=function() for i=0,2 do r(3,11-i*3,10,3,INK); r(4,12-i*3,8,1,RED); r(4,11-i*3,8,1,CREAM) end; star(13,2,GOLD) end,
+  hot_hands=function() r(6,5,4,9,hex("e0703a")); r(5,8,6,5,hex("e0703a")); r(7,9,2,4,GOLD); p(7,4,hex("e0703a")); r(12,3,1,4,WHITE); r(13,4,1,1,WHITE); ln(1,10,3,10,WHITE) end,
+  fire_within=function() r(6,4,4,10,BLUE); r(5,7,6,6,BLUE); r(7,8,2,5,WHITE); p(7,3,BLUE); p(9,2,BLUE); p(4,9,BLUE); p(11,9,BLUE) end,
+  quick_hands=function() die(6,4,CREAM,{{4,4},{2,2},{6,6}}); ln(0,6,4,6,WHITE); ln(1,9,4,9,WHITE); ln(0,12,4,12,WHITE) end,
+  night_shift=function() circ(6,6,5,GOLD,true); circ(9,4,4,hex("1a2445"),true); circ(11,11,3,GOLD2,true); circ(11,11,3,INK,false); p(11,11,BRASS) end,
+  weighted_fate=function() ln(8,2,8,13,BRASS); ln(2,5,14,5,BRASS); ln(2,5,1,10,GREY); ln(2,5,4,10,GREY); r(0,10,5,1,GREY); ln(14,5,12,8,GREY); ln(14,5,15,8,GREY); r(11,8,5,1,GREY); r(1,7,3,3,CREAM); r(5,13,7,2,BRASS) end,
+  chip_hoard=function() for i=0,3 do r(1+i%2*7,10-math.floor(i/2)*4,7,3,INK); r(2+i%2*7,10-math.floor(i/2)*4,5,1,RED); r(2+i%2*7,11-math.floor(i/2)*4,5,1,CREAM) end; r(4,1,8,2,GOLD) end,
+  hat_trick=function() r(4,9,8,2,INK); r(5,4,6,6,hex("2b2b38")); r(5,8,6,1,RED); r(2,11,12,2,hex("2b2b38")); star(13,3,GOLD) end,
+  divine=function() circ(8,3,4,GOLD,false); r(6,7,4,7,WHITE); r(4,8,2,4,CREAM); r(10,8,2,4,CREAM); p(7,9,INK); p(9,9,INK) end,
 }
 for i,id in ipairs(ORDER) do ox=(i-1)*16; draw[id]() end
 s.layers[1].name="Icons"

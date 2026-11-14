@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "crit"
 display_name = "Critical chance"
-description = "10% of rolls pay triple, forever."
+description = "Each roll has a 10% chance to be critical and pay triple."
 summary = "10% of rolls pay ×3"
 cost = 2.0
 growth = 1
@@ -18,4 +18,6 @@ condition = ""
 target = ""
 unlock_earned = 0.0
 permanent = true
-prerequisite = "fortune"
+prerequisite = "golden_touch"
+icon = ""
+tree_position = Vector2i(2, 0)

@@ -8,8 +8,8 @@
 script = ExtResource("1")
 id = "echo"
 display_name = "Resonance"
-description = "Maximums permanently trigger neighboring dice."
-summary = "Max rolls trigger a neighbour, forever"
+description = "Rolling a die's highest face also throws the nearest die."
+summary = "Max rolls trigger a neighbour"
 cost = 3.0
 growth = 1
 max_level = 1
@@ -21,4 +21,6 @@ target = ""
 unlock_earned = 0.0
 permanent = true
 prerequisite = "fortune"
+icon = ""
+tree_position = Vector2i(1, 1)
 effects = Array[Resource]([ExtResource("2")])

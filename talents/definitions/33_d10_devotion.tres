@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "d10_devotion"
+display_name = "Azure devotion"
+description = "Every Azure D10 pays 50% more per level."
+summary = "Azure D10 pays +50%"
+cost = 5.0
+growth = 2
+max_level = 5
+stat = "payout"
+operation = "multiply"
+value = 1.5
+condition = ""
+target = "d10"
+unlock_earned = 0.0
+permanent = true
+prerequisite = "d8_devotion"
+icon = ""
+tree_position = Vector2i(5, 2)

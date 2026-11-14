@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "house_edge"
 display_name = "House edge"
-description = "Earn 25% more Fate from every fresh start. Four levels."
+description = "Earn 25% more Fate from every fresh start, per level."
 summary = "+25% Fate per reset"
 cost = 5.0
 growth = 2
@@ -19,3 +19,5 @@ target = ""
 unlock_earned = 0.0
 permanent = true
 prerequisite = "crit"
+icon = ""
+tree_position = Vector2i(1, -1)

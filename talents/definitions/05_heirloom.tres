@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "heirloom"
 display_name = "Heirloom dice"
-description = "Begin each new run with one extra Ivory D6 per level. Three levels."
+description = "Begin each new run with one extra Ivory D6 per level."
 summary = "Start runs with +1 D6"
 cost = 3.0
 growth = 2
@@ -19,3 +19,5 @@ target = ""
 unlock_earned = 0.0
 permanent = true
 prerequisite = "head_start"
+icon = ""
+tree_position = Vector2i(-2, -1)

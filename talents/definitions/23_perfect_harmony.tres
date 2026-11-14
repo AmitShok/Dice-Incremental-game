@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "perfect_harmony"
+display_name = "Perfect harmony"
+description = "Every combo multiplier is 25% bigger per level."
+summary = "Combos pay +25%"
+cost = 4.0
+growth = 2
+max_level = 5
+stat = "combo_power"
+operation = "multiply"
+value = 1.25
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "born_harmony"
+icon = ""
+tree_position = Vector2i(-3, 1)

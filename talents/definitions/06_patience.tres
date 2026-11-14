@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "patience"
 display_name = "Patient table"
-description = "Roll the table cooldown is 25% shorter per level. Three levels."
+description = "Roll the table comes back 25% sooner per level."
 summary = "Table cooldown −25%"
 cost = 2.0
 growth = 2
@@ -19,3 +19,5 @@ target = ""
 unlock_earned = 0.0
 permanent = true
 prerequisite = "fortune"
+icon = ""
+tree_position = Vector2i(0, 1)

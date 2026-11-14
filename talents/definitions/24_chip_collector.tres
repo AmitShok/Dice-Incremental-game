@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "chip_collector"
+display_name = "Chip collector"
+description = "Each 1 you roll drops one more chip per level."
+summary = "+1 chip per 1 rolled"
+cost = 3.0
+growth = 3
+max_level = 3
+stat = "chip_gain"
+operation = "add"
+value = 1
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "heirloom"
+icon = ""
+tree_position = Vector2i(-3, -1)

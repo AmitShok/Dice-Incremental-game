@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "old_friend"
 display_name = "Old friends"
-description = "Moss returns: begin each new run with one helper per level. Two levels."
+description = "Begin each new run with one helper per level."
 summary = "Start runs with +1 helper"
 cost = 4.0
 growth = 3
@@ -19,3 +19,5 @@ target = ""
 unlock_earned = 0.0
 permanent = true
 prerequisite = "stride"
+icon = ""
+tree_position = Vector2i(0, -2)

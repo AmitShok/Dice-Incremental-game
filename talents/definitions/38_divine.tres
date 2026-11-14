@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "divine"
+display_name = "Divine intervention"
+description = "A rolled 1 has a 10% chance per level to land on the highest face instead."
+summary = "Some 1s become max rolls"
+cost = 6.0
+growth = 2
+max_level = 3
+stat = "second_chance"
+operation = "add"
+value = 0.1
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "crit"
+icon = ""
+tree_position = Vector2i(2, -1)

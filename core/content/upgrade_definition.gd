@@ -18,11 +18,16 @@ extends Resource
 @export var permanent: bool = false
 @export var prerequisite: String = ""
 @export var effects: Array[Resource] = []
+## Talent tree only: which shop icon to draw (defaults to the id) and the node's cell on the map.
+@export var icon: String = ""
+@export var tree_position: Vector2i = Vector2i.ZERO
 
 func valid() -> bool:
 	if not stat in ["payout", "luck", "combos", "helper_speed", "roll_speed", "chain", "critical",
 			"starting_cash", "starting_dice", "starting_helpers", "table_cooldown", "offline_hours", "keep_helpers", "fate_gain",
-			"helper_payout", "helper_smart", "helper_hands", "streak_window"] or not operation in ["add", "multiply"]:
+			"helper_payout", "helper_smart", "helper_hands", "streak_window", "crit_chance", "crit_power",
+			"die_discount", "upgrade_discount", "streak_power", "combo_power", "offline_rate", "chip_gain",
+			"hat_bonus", "chip_hoard", "second_chance"] or not operation in ["add", "multiply"]:
 		return false
 	if not condition in ["", "six", "maximum"] or value < 0 or (operation == "multiply" and value == 0):
 		return false

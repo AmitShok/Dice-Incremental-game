@@ -69,7 +69,9 @@ func _ready() -> void:
 	session.events.table_unlocked.connect(func(id: String): notify("New table unlocked · " + TableCatalog.TABLES[id].name + ". Pick it on the Tables page."))
 	session.events.streak_stage_changed.connect(on_streak_stage)
 	refresh()
-	if session.migration_refund > 0:
+	if session.talent_refund > 0:
+		notify("The talent tree grew! Your %d spent Fate is back. Each Fate you hold now makes every roll pay 1%% more." % session.talent_refund)
+	elif session.migration_refund > 0:
 		notify("Auto-rolling is now done by helpers. Refunded $" + NumberFormat.compact(session.migration_refund) + " for your enchanted dice.")
 	elif SaveManager.offline_amount > 0:
 		notify("Welcome back. Your table earned $" + NumberFormat.compact(SaveManager.offline_amount) + " while you were away.")
@@ -150,7 +152,7 @@ func on_prestige() -> void:
 	combo_time = 0
 	combo.text = ""
 	refresh()
-	notify("A fresh table. A familiar feeling. Fate remembers.")
+	notify("A fresh table. Each Fate you hold makes every roll pay 1% more.")
 	audio.play("combo")
 	shop.show_page("Fate")
 
@@ -273,7 +275,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func ask_prestige() -> void:
 	_disconnect_confirmation()
-	confirm.dialog_text = "Earn %d Fate and begin again?\nResets money, dice, helpers and ordinary upgrades.\nKeeps talents, Fate, lifetime statistics and settings.%s" % [session.progression.fate_reward(), session.progression.carryover_summary()]
+	confirm.dialog_text = "Earn %d Fate and begin again?\nResets money, dice, helpers and ordinary upgrades.\nKeeps talents, Fate, lifetime statistics and settings.\nEach Fate you hold makes every roll pay 1%% more.%s" % [session.progression.fate_reward(), session.progression.carryover_summary()]
 	confirm.confirmed.connect(func():
 		session.prestige()
 		SaveManager.save_game()
@@ -355,7 +357,7 @@ func _add_fate_plaque_button() -> void:
 	plaque.focus_mode = Control.FOCUS_NONE
 	plaque.position = Vector2(790, 8)
 	plaque.size = Vector2(252, 70)
-	plaque.tooltip_text = "Open Fate talents"
+	plaque.tooltip_text = "Open Fate talents. Each Fate you hold makes every roll pay 1% more."
 	plaque.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	plaque.add_theme_stylebox_override("hover", StyleBoxEmpty.new())
 	plaque.add_theme_stylebox_override("pressed", StyleBoxEmpty.new())

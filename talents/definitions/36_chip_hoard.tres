@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "chip_hoard"
+display_name = "Chip hoard"
+description = "Each chip you hold adds 0.05% income per level, counting up to 1,000 chips (+50%)."
+summary = "Held chips boost income"
+cost = 4.0
+growth = 2
+max_level = 3
+stat = "chip_hoard"
+operation = "add"
+value = 0.0005
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "chip_collector"
+icon = ""
+tree_position = Vector2i(-3, -2)

@@ -6,7 +6,10 @@ extends RefCounted
 const ORDER: Array[String] = ["heavy", "sixes", "loaded", "combos", "hands", "rhythm", "chain", "momentum",
 	"strong_arms", "sharp_eyes", "many_hands", "hire", "fortune", "crit", "stride", "echo", "head_start",
 	"heirloom", "patience", "long_nights", "old_friend", "muscle_memory", "house_edge", "prestige", "chip",
-	"capsule", "lock", "none", "mix", "up", "table", "book", "gear"]
+	"capsule", "lock", "none", "mix", "up", "table", "book", "gear",
+	"golden_touch", "crit_chance", "crit_power", "deep_fortune", "endless_favor", "destiny", "well_paid", "bargain", "haggler",
+	"born_harmony", "perfect_harmony", "chip_collector", "hot_hands", "fire_within", "quick_hands", "night_shift", "weighted_fate",
+	"chip_hoard", "hat_trick", "divine"]
 const SHEET: Texture2D = preload("res://assets/exported/icons/shop_icons.png")
 const HATS: Texture2D = preload("res://assets/exported/helpers/hats.png")
 static var _cache: Dictionary = {}

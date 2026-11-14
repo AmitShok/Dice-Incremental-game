@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "weighted_fate"
+display_name = "Weighted fate"
+description = "The upper half of every die comes up 25% more often per level."
+summary = "High faces 25% likelier"
+cost = 3.0
+growth = 2
+max_level = 4
+stat = "luck"
+operation = "multiply"
+value = 1.25
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "golden_touch"
+icon = ""
+tree_position = Vector2i(2, 1)

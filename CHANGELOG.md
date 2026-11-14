@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-11-14 — Hold or spend: held Fate and a 39-talent tree
+
+- Removed the hidden +10% income per lifetime Fate. Instead, every Fate you hold unspent adds +1% income, so spending is a visible trade.
+- The bonus is shown in four places:
+  - the Fate plaque ("FATE 40 · +40%"),
+  - the talent tree header,
+  - each talent's info line ("Buying it drops your held-Fate bonus from +40% to +30%"),
+  - the reset dialog and the Ledger, which also lists total Fate earned.
+- The talent tree grew from 11 to 39 talents on a draggable map, with Fortune at the centre. Its branches:
+  - **Payouts:** Golden touch, Keen eye, Heavy hitter, Deep pockets, and Endless favor (500 ranks), plus Divine intervention (some 1s become max rolls).
+  - **Fate gain:** Destiny.
+  - **Helpers:** Well-paid crew, Sharp crew, Extra hands.
+  - **Shop:** Bargain hunter, Haggler.
+  - **Combos:** Born in harmony, Perfect harmony.
+  - **Chips and hats:** Chip collector, Chip hoard, Hat trick.
+  - **Streaks and time:** Hot hands, Fire within, Quick hands, Night shift, Weighted fate.
+  - **Dice:** one Devotion talent per die family (D4 to D20).
+- Some ideas come from Gamblers Table's large talent update, which pays out for hats owned and for holding unused currency.
+- Old saves get every spent talent rank back as Fate once, with a notice, so you can choose again from the new tree.
+- 20 new talent icons; talent nodes show their icon at 2×.
+
 ## 2026-11-14 — A Gamblers Table-style shop
 
 - The shop is now a compact item list: icon tabs (Dice, Upgrades, Helpers & hats, Tables, Fate) with the active one highlighted, and click-to-buy cards showing an icon, name, price (red when you can't afford it) and owned count or level. Descriptions moved to an info box at the bottom of the shop that explains whatever card you point at or tap.

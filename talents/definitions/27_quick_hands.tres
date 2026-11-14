@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "quick_hands"
+display_name = "Quick hands"
+description = "Dice tumble 15% faster per level, so you and your helpers roll more."
+summary = "Dice land 15% faster"
+cost = 2.0
+growth = 2
+max_level = 5
+stat = "roll_speed"
+operation = "multiply"
+value = 1.15
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "patience"
+icon = ""
+tree_position = Vector2i(1, 2)

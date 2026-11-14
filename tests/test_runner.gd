@@ -178,6 +178,77 @@ func _new_mechanics_checks() -> void:
 	game.state.helpers = 0
 	check(game.automation.expected_income(game) == 0.0, "No helpers means no idle income")
 
+func _talent_tree_checks() -> void:
+	# Unspent Fate is +1% income each; spending it lowers the bonus. Lifetime Fate gives nothing.
+	var game: GameSession = fresh()
+	var plain: float = game.economy.payout(registry.dice.d6, 6)
+	game.state.prestige_total = 500
+	check(is_equal_approx(game.economy.payout(registry.dice.d6, 6), plain), "Lifetime Fate alone no longer raises payouts")
+	game.state.prestige_points = 50
+	check(is_equal_approx(game.economy.payout(registry.dice.d6, 6), plain * 1.5), "Each held Fate adds 1% income")
+	check(game.progression.buy_upgrade("fortune", true) and game.state.prestige_points == 49, "Buying a talent spends held Fate")
+	check(is_equal_approx(game.economy.payout(registry.dice.d6, 6), plain * 1.49 * 1.2), "Spending Fate lowers the held bonus")
+
+	# Every talent has its own cell and an existing prerequisite.
+	var cells: Dictionary = {}
+	var layout_ok: bool = true
+	for id in registry.talents:
+		var definition: UpgradeDefinition = registry.talents[id]
+		layout_ok = layout_ok and not cells.has(definition.tree_position) and (definition.prerequisite.is_empty() or registry.talents.has(definition.prerequisite))
+		layout_ok = layout_ok and (not definition.target.is_empty() or ShopIcons.icon(definition.icon if not definition.icon.is_empty() else id) != null)
+		cells[definition.tree_position] = id
+	check(layout_ok, "Talents have unique cells, real prerequisites and icons")
+
+	# Old saves (no fate_version) get every spent Fate back once.
+	var old: Dictionary = fresh().state.snapshot()
+	old.erase("fate_version")
+	old.talents = {"fortune": 3, "crit": 1}
+	old.prestige_points = 4
+	var restored: GameState = GameState.restore(old, registry)
+	var migrated := GameSession.new(registry, restored)
+	check(migrated.talent_refund == 9 and migrated.state.prestige_points == 13 and migrated.state.talents.is_empty(), "Old talent trees are refunded")
+	var again := GameSession.new(registry, GameState.restore(migrated.state.snapshot(), registry))
+	check(again.talent_refund == 0 and again.state.prestige_points == 13, "The talent refund happens only once")
+
+	# Critical talents: chance and power.
+	var crits: GameSession = fresh()
+	check(crits.economy.crit_chance() == 0.0, "No criticals without the Critical talent")
+	crits.state.talents.merge({"crit": 1, "crit_chance": 4, "crit_power": 2})
+	check(is_equal_approx(crits.economy.crit_chance(), 0.3) and is_equal_approx(crits.economy.crit_multiplier(), 5.0), "Keen eye and Heavy hitter improve criticals")
+
+	# Discounts, streak power, combo power, chips, hoarding and offline rate.
+	var shop: GameSession = fresh()
+	var die_price: float = shop.economy.die_price("d6")
+	var upgrade_price: float = shop.economy.upgrade_price(registry.upgrades.heavy)
+	shop.state.talents.merge({"bargain": 2, "haggler": 1})
+	check(is_equal_approx(shop.economy.die_price("d6"), die_price * 0.81) and is_equal_approx(shop.economy.upgrade_price(registry.upgrades.heavy), upgrade_price * 0.9), "Bargain hunter and Haggler discount the shop")
+	var streaky: GameSession = fresh()
+	streaky.streak = 50
+	streaky.state.talents.fire_within = 4
+	check(is_equal_approx(streaky.streak_multiplier(), 3.0), "Fire within makes BLAZING ×3")
+	var hoard: GameSession = fresh()
+	var base_pay: float = hoard.economy.payout(registry.dice.d6, 6)
+	hoard.state.chips = 5000
+	hoard.state.hats = ["cap", "flower"]
+	hoard.state.talents.merge({"chip_hoard": 1, "hat_trick": 1})
+	check(is_equal_approx(hoard.economy.payout(registry.dice.d6, 6), base_pay * 1.5 * 1.06), "Chip hoard caps at 1,000 chips and Hat trick counts hats")
+	var chips: GameSession = table_of(["d6"], [Vector2(300, 300)])
+	chips.state.talents.chip_collector = 2
+	chips.forced_face = 1
+	chips.request_roll([chips.state.dice[0].id])
+	chips.settle()
+	check(chips.state.chips == 3, "Chip collector adds chips per 1 rolled")
+	var divine: GameSession = table_of(["d6"], [Vector2(300, 300)])
+	divine.state.talents.divine = 3
+	var ones: int = 0
+	for attempt in 3000:
+		divine.state.dice[0].cooldown = 0
+		divine.request_roll([divine.state.dice[0].id])
+		divine.settle()
+		ones += 1 if divine.state.dice[0].face == 1 else 0
+	# A fair D6 lands 1 about 500 times in 3000; with 30% rescued it is about 350.
+	check(ones < 420, "Divine intervention turns some 1s into maximums")
+
 func _fate_endgame_checks() -> void:
 	var game: GameSession = fresh()
 	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD - 1
@@ -232,7 +303,7 @@ func _fate_endgame_checks() -> void:
 func run() -> void:
 	registry = ContentRegistry.new()
 	check(registry.errors.is_empty() and registry.dice.size() == 13, "All dice content validates")
-	check(registry.upgrades.size() == 11 and registry.talents.size() == 11, "Upgrades and talents load")
+	check(registry.upgrades.size() == 11 and registry.talents.size() == 39, "Upgrades and talents load")
 	var definition: DiceDefinition = registry.dice.d6
 	var invalid := DiceDefinition.new()
 	invalid.id = "invalid"
@@ -419,6 +490,7 @@ func run() -> void:
 	check(game.state.money == 0 and game.state.helpers == 0 and game.state.upgrades.is_empty() and game.state.dice.size() == 1, "Prestige resets run-only state")
 	check(game.state.prestige_points == 4 and game.state.talents.fortune == 1 and not game.state.settings.sound, "Prestige retains permanent state")
 	_fate_endgame_checks()
+	_talent_tree_checks()
 	game = fresh()
 	check(not game.prestige(), "Early prestige rejected")
 	check(game.offline(-100) == 0, "Backward clock earns nothing")

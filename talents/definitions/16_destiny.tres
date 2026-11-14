@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "destiny"
+display_name = "Destiny"
+description = "Earn 10% more Fate from every fresh start, per level. Twenty levels."
+summary = "+10% Fate per reset"
+cost = 20.0
+growth = 1.5
+max_level = 20
+stat = "fate_gain"
+operation = "multiply"
+value = 1.1
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "house_edge"
+icon = ""
+tree_position = Vector2i(1, -2)

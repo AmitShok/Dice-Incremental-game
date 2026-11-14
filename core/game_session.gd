@@ -22,6 +22,8 @@ var streak: int = 0
 var streak_timer: float = 0.0
 ## Cash refunded on load for legacy auto-roll purchases (helpers replaced them).
 var migration_refund: float = 0.0
+## Fate handed back once when old talent trees were replaced (shown as a notice on load).
+var talent_refund: int = 0
 
 func _init(content: ContentRegistry, existing: GameState = null) -> void:
 	registry = content
@@ -36,6 +38,7 @@ func _init(content: ContentRegistry, existing: GameState = null) -> void:
 	progression = ProgressionService.new(state, registry, economy, events)
 	progression.cosmetic_rng.randomize()
 	_refund_legacy_automation()
+	_refund_old_talents()
 
 func _refund_legacy_automation() -> void:
 	for id in state.automatic:
@@ -44,6 +47,20 @@ func _refund_legacy_automation() -> void:
 	state.automatic.clear()
 	if migration_refund > 0:
 		state.money = minf(GameState.MAX_AMOUNT, state.money + migration_refund)
+
+## Saves from before the big talent tree get every spent Fate back so they can pick again.
+func _refund_old_talents() -> void:
+	if state.fate_version >= GameState.FATE_VERSION:
+		return
+	for id in state.talents:
+		var definition: UpgradeDefinition = registry.talents.get(id)
+		if definition == null:
+			continue
+		for level in int(state.talents[id]):
+			talent_refund += int(round(definition.cost * pow(definition.growth, level)))
+	state.talents.clear()
+	state.prestige_points = mini(ProgressionService.MAX_FATE, state.prestige_points + talent_refund)
+	state.fate_version = GameState.FATE_VERSION
 
 func roll_table() -> bool:
 	if paused or state.table_roll_remaining > 0.0:
@@ -76,7 +93,8 @@ func streak_stage() -> int:
 	return stage
 
 func streak_multiplier() -> float:
-	return STREAK_STAGES[streak_stage()][1]
+	# Fire within makes every stage hotter: WARM ×1.25 becomes ×1.5 at +100%.
+	return 1.0 + (float(STREAK_STAGES[streak_stage()][1]) - 1.0) * economy.modifier("streak_power")
 
 func _bump_streak() -> void:
 	var before: int = streak_stage()
@@ -100,7 +118,10 @@ func request_roll(ids: Array, source: String = "manual", depth: int = 0, bonus: 
 		var face: int = roller.sample(definition, economy.modifier("luck", definition.id))
 		if OS.is_debug_build() and forced_face != 0:
 			face = definition.sides if forced_face < 0 else clampi(forced_face, 1, definition.sides)
-		var critical: bool = economy.modifier("critical") > 1.0 and roller.rng.randf() < 0.1
+		# Divine intervention: some 1s land on the top face. Only draws RNG when owned.
+		if face == 1 and economy.modifier("second_chance") > 1.0 and roller.rng.randf() < economy.modifier("second_chance") - 1.0:
+			face = definition.sides
+		var critical: bool = economy.crit_chance() > 0.0 and roller.rng.randf() < economy.crit_chance()
 		var duration: float = definition.duration / economy.modifier("roll_speed")
 		var outcome: Dictionary = {"roll_id": next_roll, "die_id": die.id, "definition_id": definition.id,
 			"face": face, "sides": definition.sides, "source": source, "depth": depth,
@@ -128,6 +149,7 @@ func request_roll(ids: Array, source: String = "manual", depth: int = 0, bonus: 
 	if not combo.label.is_empty():
 		if state.table_id == "velvet":
 			combo.multiplier *= 1.5
+		combo.multiplier *= economy.modifier("combo_power")
 		events.combo_triggered.emit(combo.label, combo.multiplier)
 		StatisticsService.increment(state, "combos")
 		var combo_stat: String = "straights" if combo.label == "STRAIGHT" else ("triples" if combo.label == "TRIPLES" else "doubles")
@@ -140,7 +162,7 @@ func request_roll(ids: Array, source: String = "manual", depth: int = 0, bonus: 
 		var die: DiceInstance = state.find_die(outcome.die_id)
 		outcome.combo = combo.multiplier
 		outcome.label = combo.label
-		var multiplier: float = shared * (3.0 if outcome.critical else 1.0) * _situational(outcome)
+		var multiplier: float = shared * (economy.crit_multiplier() if outcome.critical else 1.0) * _situational(outcome)
 		outcome.payout = economy.payout(definition, outcome.face, multiplier, SynergyService.aura(state, registry, die))
 		pending[outcome.roll_id] = outcome
 		events.die_roll_started.emit(outcome.duplicate())
@@ -181,7 +203,7 @@ func finish_roll(roll_id: int, allow_chains: bool = true) -> bool:
 	if outcome.face == 20 and outcome.sides == 20:
 		StatisticsService.increment(state, "natural_twenty")
 	if outcome.face == 1:
-		var earned_chips: int = 2 if state.table_id == "starlit" else 1
+		var earned_chips: int = (2 if state.table_id == "starlit" else 1) * roundi(economy.modifier("chip_gain"))
 		state.chips = mini(1000000000, state.chips + earned_chips)
 		StatisticsService.increment(state, "chips", earned_chips)
 	events.die_landed.emit(outcome)
@@ -304,7 +326,7 @@ func move_die(id: int, at: Vector2) -> bool:
 func offline(seconds: float) -> float:
 	var elapsed: float = clampf(seconds, 0, offline_cap_seconds())
 	state.table_roll_remaining = maxf(0.0, state.table_roll_remaining - elapsed)
-	var amount: float = minf(GameState.MAX_AMOUNT, automation.expected_income(self) * elapsed * 0.5)
+	var amount: float = minf(GameState.MAX_AMOUNT, automation.expected_income(self) * elapsed * 0.5 * economy.modifier("offline_rate"))
 	economy.credit(amount)
 	StatisticsService.increment(state, "offline_earned", amount)
 	StatisticsService.increment(state, "earned", amount)

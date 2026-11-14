@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "night_shift"
+display_name = "Night shift"
+description = "You earn 25% more while away, per level."
+summary = "+25% offline earnings"
+cost = 3.0
+growth = 2
+max_level = 4
+stat = "offline_rate"
+operation = "multiply"
+value = 1.25
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "long_nights"
+icon = ""
+tree_position = Vector2i(-2, 3)

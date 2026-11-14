@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "d12_devotion"
+display_name = "Rose devotion"
+description = "Every Rose D12 pays 50% more per level."
+summary = "Rose D12 pays +50%"
+cost = 6.0
+growth = 2
+max_level = 5
+stat = "payout"
+operation = "multiply"
+value = 1.5
+condition = ""
+target = "d12"
+unlock_earned = 0.0
+permanent = true
+prerequisite = "d10_devotion"
+icon = ""
+tree_position = Vector2i(5, 3)

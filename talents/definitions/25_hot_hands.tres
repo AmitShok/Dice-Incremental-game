@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "hot_hands"
+display_name = "Hot hands"
+description = "You have 25% more time between clicks to keep a hot streak, per level."
+summary = "Streaks last 25% longer"
+cost = 2.0
+growth = 2
+max_level = 4
+stat = "streak_window"
+operation = "multiply"
+value = 1.25
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "patience"
+icon = ""
+tree_position = Vector2i(0, 2)

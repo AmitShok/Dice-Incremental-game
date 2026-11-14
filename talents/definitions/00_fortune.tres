@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = "fortune"
 display_name = "Fortune favors you"
-description = "+20% payout permanently. Five levels."
-summary = "+20% all payouts, forever"
+description = "Every roll pays 20% more per level."
+summary = "+20% all payouts"
 cost = 1.0
 growth = 2
 max_level = 5
@@ -19,3 +19,5 @@ target = ""
 unlock_earned = 0.0
 permanent = true
 prerequisite = ""
+icon = ""
+tree_position = Vector2i(0, 0)

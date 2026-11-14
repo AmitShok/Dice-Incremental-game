@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bargain"
+display_name = "Bargain hunter"
+description = "Every die in the shop costs 10% less per level."
+summary = "Dice cost 10% less"
+cost = 2.0
+growth = 2
+max_level = 5
+stat = "die_discount"
+operation = "multiply"
+value = 0.9
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "head_start"
+icon = ""
+tree_position = Vector2i(-2, 0)

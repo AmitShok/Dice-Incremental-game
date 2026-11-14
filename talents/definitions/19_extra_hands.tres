@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "extra_hands"
+display_name = "Extra hands"
+description = "Each helper throws one more die at once per level, every run."
+summary = "Helpers throw +1 die"
+cost = 8.0
+growth = 3
+max_level = 2
+stat = "helper_hands"
+operation = "add"
+value = 1
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "old_friend"
+icon = "many_hands"
+tree_position = Vector2i(1, -3)

@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = "stride"
 display_name = "Fleet of foot"
-description = "Helpers are permanently 35% faster."
-summary = "Helpers 35% faster, forever"
+description = "Helpers walk and throw 35% faster."
+summary = "Helpers 35% faster"
 cost = 2.0
 growth = 1
 max_level = 1
@@ -19,3 +19,5 @@ target = ""
 unlock_earned = 0.0
 permanent = true
 prerequisite = "fortune"
+icon = ""
+tree_position = Vector2i(0, -1)

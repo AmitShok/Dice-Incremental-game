@@ -19,6 +19,9 @@ var achievements: Array = []
 var helpers: int = 0
 var prestige_points: int = 0
 var prestige_total: int = 0
+## 2 = the big talent tree with the +1% per held Fate bonus. Older saves get talents refunded.
+const FATE_VERSION: int = 2
+var fate_version: int = FATE_VERSION
 var next_id: int = 1
 var tutorial_step: int = 0
 var settings: Dictionary = {"sound": true, "music": true, "motion": true, "flashes": true, "numbers": true, "particles": true, "volume": 0.55}
@@ -58,7 +61,7 @@ func snapshot() -> Dictionary:
 		"prestige_total": prestige_total, "next_id": next_id, "tutorial_step": tutorial_step,
 		"settings": settings.duplicate(true), "last_saved": last_saved, "rng_state": rng_state,
 		"table_roll_remaining": table_roll_remaining, "chips": chips, "hats": hats.duplicate(),
-		"crew_hat": crew_hat, "table_id": table_id, "tables": tables.duplicate()}
+		"crew_hat": crew_hat, "table_id": table_id, "tables": tables.duplicate(), "fate_version": fate_version}
 
 static func valid_number(value: Variant, lower: float = 0.0, upper: float = MAX_AMOUNT) -> bool:
 	return (value is float or value is int) and is_finite(float(value)) and float(value) >= lower and float(value) <= upper
@@ -122,6 +125,10 @@ static func restore(data: Dictionary, registry: ContentRegistry) -> GameState:
 		if not valid_integer(data.get(key, 0)):
 			return null
 		result.set(key, int(data.get(key, 0)))
+	# Saves without the field predate the big talent tree.
+	if not valid_integer(data.get("fate_version", 1)):
+		return null
+	result.fate_version = int(data.get("fate_version", 1))
 	if result.helpers > MAX_HELPERS:
 		return null
 	if not data.get("achievements", []) is Array:

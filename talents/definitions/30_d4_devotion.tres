@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "d4_devotion"
+display_name = "Amber devotion"
+description = "Every Amber D4 pays 50% more per level."
+summary = "Amber D4 pays +50%"
+cost = 2.0
+growth = 2
+max_level = 5
+stat = "payout"
+operation = "multiply"
+value = 1.5
+condition = ""
+target = "d4"
+unlock_earned = 0.0
+permanent = true
+prerequisite = "weighted_fate"
+icon = ""
+tree_position = Vector2i(2, 2)

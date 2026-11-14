@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fire_within"
+display_name = "Fire within"
+description = "Hot streak bonuses grow 25% per level: BLAZING ×2 becomes ×3 at max."
+summary = "Streak bonus +25%"
+cost = 4.0
+growth = 2
+max_level = 4
+stat = "streak_power"
+operation = "add"
+value = 0.25
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "hot_hands"
+icon = ""
+tree_position = Vector2i(0, 3)

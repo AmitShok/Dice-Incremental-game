@@ -110,8 +110,7 @@ func expected_income(session: GameSession) -> float:
 	for die in session.state.dice:
 		var definition: DiceDefinition = session.registry.dice[die.definition_id]
 		var mean: float = session.economy.expected(definition, session.roller.weights_for(definition, session.economy.modifier("luck", definition.id)))
-		if session.economy.modifier("critical") > 1.0:
-			mean *= 1.2
+		mean *= 1.0 + session.economy.crit_chance() * (session.economy.crit_multiplier() - 1.0)
 		values.append(mean * SynergyService.aura(session.state, session.registry, die))
 	if values.is_empty() or session.state.helpers == 0:
 		return 0.0

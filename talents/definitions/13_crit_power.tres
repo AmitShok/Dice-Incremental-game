@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "crit_power"
+display_name = "Heavy hitter"
+description = "Critical rolls pay one more multiple per level: ×4, ×5, up to ×7."
+summary = "Criticals pay +1×"
+cost = 4.0
+growth = 2
+max_level = 4
+stat = "crit_power"
+operation = "add"
+value = 1
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "crit"
+icon = ""
+tree_position = Vector2i(3, 1)

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "deep_fortune"
+display_name = "Deep pockets"
+description = "Every roll pays 50% more per level. Ten levels."
+summary = "+50% all payouts"
+cost = 10.0
+growth = 1.6
+max_level = 10
+stat = "payout"
+operation = "multiply"
+value = 1.5
+condition = ""
+target = ""
+unlock_earned = 0.0
+permanent = true
+prerequisite = "crit"
+icon = ""
+tree_position = Vector2i(4, 0)

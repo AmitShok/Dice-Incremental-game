@@ -42,7 +42,7 @@ const HINTS: Dictionary = {
 	"Upgrades": "Upgrades help every die on the table.",
 	"Helpers": "Helpers throw dice for you. Roll 1s for chips, open capsules for hats.",
 	"Tables": "Each table bends one rule. Unlock more by playing.",
-	"Fate": "Begin again for Fate, then spend it in the talent tree.",
+	"Fate": "Each Fate you hold makes every roll pay 1% more. Keep it, or spend it on permanent talents.",
 	"Ledger": "Everything you have rolled so far.",
 	"Settings": "Make yourself comfortable."}
 
@@ -270,7 +270,7 @@ func _fate_page() -> void:
 	button.get_node("Line/Icon").texture = ShopIcons.icon("prestige")
 	button.get_node("Line/Text/Name").text = "Begin again"
 	button.pressed.connect(func(): on_prestige.call())
-	button.mouse_entered.connect(func(): show_info(ShopIcons.icon("prestige"), "Begin again", "Trade this run for Fate. Each Fate is +10% income forever. Dice, money, helpers and upgrades reset; talents stay."))
+	button.mouse_entered.connect(func(): show_info(ShopIcons.icon("prestige"), "Begin again", "Trade this run for Fate. Each Fate you hold makes every roll pay 1% more. Dice, money, helpers and upgrades reset; talents stay."))
 	rows.append({"button": button, "kind": "prestige", "id": "", "price": button.get_node("Line/Text/Price"), "count": button.get_node("Line/Count")})
 	var tree: Button = ITEM_SCENE.instantiate()
 	body.add_child(tree)
@@ -410,6 +410,7 @@ func _update_ledger() -> void:
 		return
 	var state: GameState = session.state
 	var text: String = ""
+	text += "Fate held: %d\nFate earned in total: %d\nEach Fate you hold makes every roll pay 1%% more.\n\n" % [state.prestige_points, state.prestige_total]
 	for pair in [["rolls", "Dice rolled"], ["earned", "Lifetime earnings"], ["best_payout", "Largest payout"], ["maximums", "Maximum rolls"], ["minimums", "Minimum rolls"], ["combos", "Combinations"], ["criticals", "Critical rolls"], ["helpers_hired", "Helpers hired"], ["prestiges", "Fresh starts"], ["offline_earned", "Offline earnings"], ["best_streak", "Best hot streak"], ["arcs", "Dice sparked"], ["blasts", "Blasts"], ["gilded", "Dice gilded"], ["dice_sold", "Dice sold"], ["chips", "Chips found"], ["capsules", "Capsules opened"]]:
 		text += "%s: %s\n" % [pair[1], NumberFormat.compact(float(state.statistics.get(pair[0], 0)))]
 	text += "\nPlaytime: %.1f minutes\n\nMILESTONES\n" % (float(state.statistics.get("playtime", 0)) / 60.0)

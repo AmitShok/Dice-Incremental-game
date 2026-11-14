@@ -18,7 +18,7 @@ Dice duration is authored per definition and divided by roll-speed modifier. Pos
 
 Payout multipliers fixed at reservation: combination (×1.5 more on Velvet) × arc charge (×2) × hot streak stage × critical × helper training (helper throws) × table rule (Workbench manual ×0.75; Starlit max ×2, ones ×0) × gilded (×3, ×5 on Gilded baize). Sell value = 0.5 × price of the latest copy in that family (base × growth^(owned−1)); it is credited to money, never run earnings.
 
-Fair distributions default to unit weights. Lucky D6 = [1,1,1,1,3,3], giving P(5 or 6)=0.6. Loaded corners doubles ordinary D6 upper-half weights. Critical talent gives 10% chance of ×3 payout, expected multiplier 1.2. RNG for visuals/audio never consumes gameplay RNG.
+Fair distributions default to unit weights. Lucky D6 = [1,1,1,1,3,3], giving P(5 or 6)=0.6. Loaded corners doubles ordinary D6 upper-half weights. Critical talent gives 10% chance of ×3 payout (expected ×1.2); Keen eye adds 5% chance per rank (max 30%) and Heavy hitter +1× per rank (max ×7). Payout = (face + flat) × base × payout modifiers × (1 + 0.01 × unspent Fate) × Hat trick × Chip hoard (chips counted up to 1,000) × combo × aura, then streak, critical and table multipliers. RNG for visuals/audio never consumes gameplay RNG.
 
 ## Estimates / offline
 Displayed ~income/sec is an analytical estimate of helper production only: mean die value (weighted payout, bonuses, aura) × min(helpers × dice per throw, dice) × helper speed × Strong arms / a three-second cycle. With no helpers it is zero, so offline earnings need at least one helper. It is not a measured throughput meter and does not include chain/explosion/combo gains.
