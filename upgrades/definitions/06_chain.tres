@@ -9,6 +9,7 @@ script = ExtResource("1")
 id = "chain"
 display_name = "Chain reaction"
 description = "Maximums roll the nearest ready die within 140px."
+summary = "Max rolls trigger a neighbour"
 cost = 2200.0
 growth = 1
 max_level = 1

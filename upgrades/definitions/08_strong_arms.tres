@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "strong_arms"
 display_name = "Strong arms"
 description = "Dice thrown by helpers pay 50% more. Three levels."
+summary = "Helper throws pay +50%"
 cost = 600.0
 growth = 3
 max_level = 3

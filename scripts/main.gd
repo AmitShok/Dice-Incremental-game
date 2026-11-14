@@ -14,6 +14,7 @@ var workers: Array[Sprite2D] = []
 @onready var wallet: Label = $HUD/Wallet
 @onready var income: Label = $HUD/Income
 @onready var fate: Label = $HUD/Fate
+@onready var chips: Label = $HUD/House
 @onready var hint: Label = $HUD/Hint
 @onready var toast: Label = $HUD/Toast
 @onready var combo: Label = $HUD/Combo
@@ -31,6 +32,7 @@ var toast_time: float = 0.0
 var combo_time: float = 0.0
 var debug_panel: PanelContainer
 @onready var confirm: ConfirmationDialog = $Confirm
+var talents: TalentTree
 var hud_dirty: bool = false
 var wallet_tween: Tween
 
@@ -46,6 +48,14 @@ func _ready() -> void:
 	shop.on_reset = ask_reset
 	shop.on_developer_tools = open_developer_tools
 	shop.developer_tools_enabled = developer_tools_enabled and OS.is_debug_build()
+	talents = TalentTree.new()
+	add_child(talents)
+	move_child(talents, confirm.get_index())
+	talents.setup(session)
+	talents.on_prestige = ask_prestige
+	talents.on_notice = notify
+	shop.on_fate = talents.open
+	_add_fate_plaque_button()
 	shop.setup(session)
 	session.events.changed.connect(func(): hud_dirty = true)
 	session.events.die_roll_started.connect(on_roll)
@@ -75,6 +85,7 @@ func _ready() -> void:
 func refresh() -> void:
 	wallet.text = "$" + NumberFormat.compact(session.state.money)
 	fate.text = "FATE  %d" % session.state.prestige_points
+	chips.text = "CHIPS %d  ·  HATS %d/%d" % [session.state.chips, session.state.hats.size(), Cosmetics.HATS.size()]
 	var eps: float = session.automation.expected_income(session)
 	income.text = "~$%s / sec  ·  %d dice" % [NumberFormat.compact(eps), session.state.dice.size()]
 	StatisticsService.check_achievements(session.state, session.events)
@@ -110,6 +121,10 @@ func on_land(outcome: Dictionary) -> void:
 		feedback.accumulate(outcome.payout)
 	else:
 		feedback.payout(outcome.payout, outcome.position, outcome.face == outcome.sides or outcome.critical)
+	if outcome.face == 1 and session.state.dice.size() <= 30:
+		feedback.payout_text("+%d chip" % (2 if session.state.table_id == "starlit" else 1), outcome.position + Vector2(0, 18), Color("#ff9a8a"))
+		if session.state.chips == Cosmetics.CAPSULE_COST:
+			notify("25 chips! Open a hat capsule on the Helpers page.")
 	if outcome.die_id % 4 == 0 or session.pending.size() < 4:
 		audio.play("max" if outcome.face == outcome.sides or outcome.critical else "land")
 	if session.state.settings.flashes and (wallet_tween == null or not wallet_tween.is_running()):
@@ -157,8 +172,11 @@ func _process(delta: float) -> void:
 			refresh()
 			hud_dirty = false
 		shop.update_rows()
+		if talents.visible:
+			talents.refresh()
 	_update_helpers()
 	_update_streak()
+	_update_fate_progress()
 
 func _update_helpers() -> void:
 	while workers.size() < session.automation.workers.size():
@@ -194,7 +212,7 @@ func _dress_helper(sprite: Sprite2D, index: int) -> void:
 		hat.position = Vector2(0, -10 - (sprite.frame % 2))
 
 func _update_streak() -> void:
-	var active: bool = session.streak > 0
+	var active: bool = session.streak >= 3
 	streak_box.visible = active
 	if not active:
 		return
@@ -328,3 +346,45 @@ func _apply_table() -> void:
 	var path: String = "res://assets/exported/tables/%s.png" % shown_table
 	if ResourceLoader.exists(path):
 		surface.texture = load(path)
+
+## The Fate plaque in the header opens the talent tree; a thin bar shows progress to Fate.
+func _add_fate_plaque_button() -> void:
+	var plaque := Button.new()
+	plaque.name = "FatePlaque"
+	plaque.flat = true
+	plaque.focus_mode = Control.FOCUS_NONE
+	plaque.position = Vector2(790, 8)
+	plaque.size = Vector2(252, 70)
+	plaque.tooltip_text = "Open Fate talents"
+	plaque.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	plaque.add_theme_stylebox_override("hover", StyleBoxEmpty.new())
+	plaque.add_theme_stylebox_override("pressed", StyleBoxEmpty.new())
+	plaque.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	plaque.pressed.connect(talents.open)
+	$HUD.add_child(plaque)
+	var bar := ProgressBar.new()
+	bar.name = "FateProgress"
+	bar.show_percentage = false
+	bar.max_value = 1.0
+	bar.step = 0.0
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.position = Vector2(800, 70)
+	bar.size = Vector2(230, 4)
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = Color("#b6a2e0")
+	var back := StyleBoxFlat.new()
+	back.bg_color = Color(0, 0, 0, 0.35)
+	bar.add_theme_stylebox_override("fill", fill)
+	bar.add_theme_stylebox_override("background", back)
+	$HUD.add_child(bar)
+
+func _update_fate_progress() -> void:
+	var bar: ProgressBar = $HUD.get_node_or_null("FateProgress")
+	if bar == null:
+		return
+	var state: GameState = session.state
+	var reward: int = session.progression.fate_reward()
+	var floor_at: float = 0.0 if reward == 0 else ProgressionService.FATE_SCALE * pow(reward / session.economy.modifier("fate_gain"), 2)
+	var goal: float = session.progression.next_fate_at()
+	bar.value = clampf((state.run_earned - floor_at) / maxf(1.0, goal - floor_at), 0.0, 1.0)
+	fate.modulate = Color(1.25, 1.15, 1.4) if reward > 0 and int(Time.get_ticks_msec() / 500) % 2 == 0 else Color.WHITE

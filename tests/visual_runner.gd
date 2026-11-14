@@ -86,6 +86,8 @@ func run() -> void:
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png(OS.get_environment("DICE_TEST_OUTPUT").path_join(title.to_lower() + ".png"))
 		checks += 1
+	confirm_not_reset(main.talents.visible)
+	main.talents.hide()
 	var old_sound: bool = game.state.settings.sound
 	main.shop.body.get_node("SettingsPage/DeveloperTools").pressed.emit()
 	confirm_not_reset(main.debug_panel.visible)
@@ -144,6 +146,7 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(folder.path_join("table-rolling.png"))
 	main.shop.show_page("Fate")
+	await process_frame
 	await process_frame
 	if not folder.is_empty():
 		await RenderingServer.frame_post_draw

@@ -81,7 +81,7 @@ offset_right = 798.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.66667, 0.61569, 0.56471, 1)
 theme_override_font_sizes/font_size = 11
-text = "THE HOUSE OF POSSIBILITY"
+text = "CHIPS 0  ·  HATS 0/8"
 
 [node name="Hint" type="Label" parent="."]
 offset_left = 90.0

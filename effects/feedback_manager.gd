@@ -27,7 +27,9 @@ func _ready() -> void:
 		label.visible = false
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		label.add_theme_font_size_override("font_size", 20)
-		label.add_theme_color_override("font_color", Color("#ffe0a0"))
+		label.add_theme_color_override("font_color", Color("#fff4dc"))
+		label.add_theme_color_override("font_outline_color", Color("#120d10"))
+		label.add_theme_constant_override("outline_size", 6)
 		label.add_theme_color_override("font_shadow_color", Color("#172c2b"))
 		label.add_theme_constant_override("shadow_offset_x", 2)
 		label.add_theme_constant_override("shadow_offset_y", 2)
@@ -47,8 +49,11 @@ func payout(amount: float, at: Vector2, exceptional: bool = false) -> void:
 		cursor = (cursor + 1) % labels.size()
 		_remove_existing(label)
 		label.text = "+$" + NumberFormat.compact(amount)
+		# Bigger wins get bigger numbers, so jackpots read at a glance.
+		var size: int = int(clampf(16.0 + log(maxf(1.0, amount)) / log(10.0) * 3.0, 16.0, 34.0))
+		label.add_theme_font_size_override("font_size", size + (6 if exceptional else 0))
+		label.modulate = Color("#ffd86b") if exceptional else Color.WHITE
 		label.position = at + Vector2(-25, -25)
-		label.modulate = Color.WHITE
 		label.visible = true
 		active.append({"node": label, "age": 0.0, "velocity": Vector2(0, -36), "duration": 1.0})
 	if exceptional and settings.get("particles", true):
@@ -106,6 +111,7 @@ func payout_text(text: String, at: Vector2, color: Color) -> void:
 	cursor = (cursor + 1) % labels.size()
 	_remove_existing(label)
 	label.text = text
+	label.add_theme_font_size_override("font_size", 16)
 	label.position = at + Vector2(-28, -40)
 	label.modulate = color
 	label.visible = true

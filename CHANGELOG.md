@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-14 — A Gamblers Table-style shop
+
+- The shop is now a compact item list: icon tabs (Dice, Upgrades, Helpers & hats, Tables, Fate) with the active one highlighted, and click-to-buy cards showing an icon, name, price (red when you can't afford it) and owned count or level. Descriptions moved to an info box at the bottom of the shop that explains whatever card you point at or tap.
+- Only the next locked item in each list is shown, so lists stay short.
+- Hats are a picture grid on the Helpers tab (unfound hats show as silhouettes) next to the capsule machine, which shows your chips and reveals each prize with its rarity colour.
+- Tables are picture tiles using their real surface art.
+- Fate talents open as a node tree over the table, from the Fate tab or by clicking the Fate plaque; a thin bar under the plaque shows progress to the next Fate and the plaque pulses when Fate is ready.
+- The header shows chips and hats collected; a natural 1 pops "+1 chip", and reaching 25 chips points you to the capsule.
+- Bigger, outlined payout numbers that grow with the amount; Ledger and Settings became icon buttons.
+- New 33-icon shop sheet (`tools/create_icons.lua`) and a one-line `summary` on every die, upgrade and talent.
+
 ## 2026-11-14 — Helpers, selling, streaks, spreading dice, tables, audio and new art
 
 - **Helpers are the only automation.** Per-family auto-roll is gone; existing saves get its cost refunded as cash with a notice. New helper training on the Helpers page: Strong arms (+50% helper pay), Sharp eyes (pick the most valuable die) and Many hands (throw 2–3 nearby dice together, so helpers can make combinations). Helper cap raised to 12. The Enchanted memory talent became Loyal crew (keep hired helpers across Fate).

@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "heirloom"
 display_name = "Heirloom dice"
 description = "Begin each new run with one extra Ivory D6 per level. Three levels."
+summary = "Start runs with +1 D6"
 cost = 3.0
 growth = 2
 max_level = 3

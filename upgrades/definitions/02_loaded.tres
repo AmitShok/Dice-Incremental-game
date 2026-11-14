@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "loaded"
 display_name = "Loaded corners"
 description = "D6 faces 4–6 gain double probability weight."
+summary = "D6 rolls 4–6 more often"
 cost = 300.0
 growth = 1
 max_level = 1

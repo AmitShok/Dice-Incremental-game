@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "stride"
 display_name = "Fleet of foot"
 description = "Helpers are permanently 35% faster."
+summary = "Helpers 35% faster, forever"
 cost = 2.0
 growth = 1
 max_level = 1

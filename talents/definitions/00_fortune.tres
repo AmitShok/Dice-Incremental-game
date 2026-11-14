@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "fortune"
 display_name = "Fortune favors you"
 description = "+20% payout permanently. Five levels."
+summary = "+20% all payouts, forever"
 cost = 1.0
 growth = 2
 max_level = 5

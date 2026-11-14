@@ -13,6 +13,7 @@ rolling_texture = ExtResource("roll")
 id = "blast_d10"
 display_name = "Blast D10"
 description = "Pays 2x. A natural 10 blasts every die nearby into one big throw. Combinations count."
+summary = "Pays ×2 · a 10 blasts nearby"
 sides = 10
 base_cost = 15000.0
 base_payout = 2

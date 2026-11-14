@@ -12,6 +12,7 @@ rolling_texture = ExtResource("roll")
 id = "d20"
 display_name = "Crimson D20"
 description = "Twenty ways to tempt fate."
+summary = "Pays 1–20"
 sides = 20
 base_cost = 700.0
 base_payout = 1

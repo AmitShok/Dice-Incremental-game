@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "momentum"
 display_name = "Momentum"
 description = "Hot streaks last 50% longer between your clicks. Three levels."
+summary = "Hot streaks last 50% longer"
 cost = 120.0
 growth = 2.5
 max_level = 3

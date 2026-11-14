@@ -12,6 +12,7 @@ rolling_texture = ExtResource("roll")
 id = "d10"
 display_name = "Azure D10"
 description = "Cool hands. Higher stakes."
+summary = "Pays 1–10"
 sides = 10
 base_cost = 280.0
 base_payout = 1

@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[node name="ShopRow" type="PanelContainer"]
+mouse_filter = 1
+size_flags_horizontal = 3
+
+[node name="Line" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Line"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Line"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Line/Text"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+text = "Item"
+text_overrun_behavior = 3
+
+[node name="Summary" type="Label" parent="Line/Text"]
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(0.74, 0.78, 0.72, 1)
+theme_override_font_sizes/font_size = 12
+text = "What it does"
+autowrap_mode = 3
+
+[node name="Detail" type="Label" parent="Line/Text"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(0.66, 0.7, 0.66, 1)
+theme_override_font_sizes/font_size = 12
+text = "Full description"
+autowrap_mode = 3
+
+[node name="Purchase" type="Button" parent="Line"]
+custom_minimum_size = Vector2(88, 44)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+theme_override_font_sizes/font_size = 13
+text = "$0"

@@ -12,6 +12,7 @@ rolling_texture = ExtResource("roll")
 id = "d8"
 display_name = "Jade D8"
 description = "Eight faces. A little more possibility."
+summary = "Pays 1–8"
 sides = 8
 base_cost = 130.0
 base_payout = 1

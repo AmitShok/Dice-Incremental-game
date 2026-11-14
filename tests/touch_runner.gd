@@ -42,7 +42,7 @@ func run() -> void:
  root.add_child(main)
  await process_frame
  await process_frame
- for page in ["Dice", "Upgrades", "Fate", "Settings"]:
+ for page in ["Dice", "Upgrades", "Helpers", "Settings"]:
   main.shop.show_page(page)
   await process_frame
   await process_frame

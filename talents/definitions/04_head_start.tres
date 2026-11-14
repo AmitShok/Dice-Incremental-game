@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "head_start"
 display_name = "Head start"
 description = "Begin each new run with $500, then $5K, then $50K. Three levels."
+summary = "Start runs with $500 → $50K"
 cost = 2.0
 growth = 3
 max_level = 3

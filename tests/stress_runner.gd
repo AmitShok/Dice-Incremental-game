@@ -38,7 +38,7 @@ func run() -> void:
 	if not folder.is_empty():
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(folder.path_join("stress-%d-dice.png" % count))
-	print("STRESS: ", count, " auto dice, 8 helpers; frames/s=", snappedf(frames / seconds, 0.1), "; rolls=", game.state.statistics.get("rolls", 0), "; memory MB=", snappedf(OS.get_static_memory_usage() / 1000000.0, 0.1))
+	print("STRESS: ", count, " dice, 8 helpers; frames/s=", snappedf(frames / seconds, 0.1), "; rolls=", game.state.statistics.get("rolls", 0), "; memory MB=", snappedf(OS.get_static_memory_usage() / 1000000.0, 0.1))
 	frame_samples.sort()
 	tick_samples.sort()
 	if not frame_samples.is_empty():

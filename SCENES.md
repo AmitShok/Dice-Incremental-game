@@ -8,7 +8,9 @@ Open `scenes/main.tscn` in the 2D editor. The main scene now contains the game's
 | `scenes/tabletop.tscn` | Room sprite and the separate Dice and Helpers layers |
 | `scenes/ui/hud.tscn` | Title, wallet, income, Fate, hints, combo text, roll button and toast positions/styles |
 | `scenes/ui/shop_panel.tscn` | Sidebar position/size, navigation buttons, scrolling content and footer |
-| `scenes/ui/shop_card.tscn` | Shared purchase card layout, title, description and purchase button |
+| `scenes/ui/shop_item.tscn` | Click-to-buy shop card: icon, name, price and owned count |
+| `scenes/ui/shop_card.tscn` | Larger card with description (legacy layout, still available) |
+| `ui/talent_tree.gd` | Fate talent tree popup; node positions in its LAYOUT table |
 | `scenes/ui/settings_page.tscn` | Settings buttons, volume slider, save/reset buttons and help text |
 | `scenes/ui/debug_panel.tscn` | Development controls; opened from Settings or F3 in debug builds when the main scene developer_tools_enabled switch is on |
 | `scenes/d_6.tscn` | Generic die with editable Face, Shadow and Marker nodes; D6 is its editor preview |

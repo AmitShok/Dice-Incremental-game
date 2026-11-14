@@ -12,6 +12,7 @@ rolling_texture = ExtResource("roll")
 id = "d12"
 display_name = "Rose D12"
 description = "A generous dozen chances."
+summary = "Pays 1–12"
 sides = 12
 base_cost = 450.0
 base_payout = 1

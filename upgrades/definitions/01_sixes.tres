@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "sixes"
 display_name = "Lucky sixes"
 description = "Natural sixes pay three times as much."
+summary = "Natural 6s pay ×3"
 cost = 180.0
 growth = 1
 max_level = 1

@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "hands"
 display_name = "Quick hands"
 description = "Helpers walk and act 25% faster. Four levels."
+summary = "Helpers 25% faster"
 cost = 400.0
 growth = 2
 max_level = 4

@@ -13,6 +13,7 @@ rolling_texture = ExtResource("roll")
 id = "spark_d8"
 display_name = "Spark D8"
 description = "Pays 2x. Rolling 5 or higher arcs to the two nearest dice, which roll charged for double pay."
+summary = "Pays ×2 · 5+ sparks 2 dice"
 sides = 8
 base_cost = 6000.0
 base_payout = 2

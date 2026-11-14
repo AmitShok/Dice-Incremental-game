@@ -13,6 +13,7 @@ rolling_texture = ExtResource("roll")
 id = "gild_d12"
 display_name = "Gild D12"
 description = "Pays 2x. A natural 12 gilds nearby dice: their next roll pays triple."
+summary = "Pays ×2 · a 12 gilds nearby"
 sides = 12
 base_cost = 30000.0
 base_payout = 2

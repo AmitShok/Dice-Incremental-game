@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "crit"
 display_name = "Critical chance"
 description = "10% of rolls pay triple, forever."
+summary = "10% of rolls pay ×3"
 cost = 2.0
 growth = 1
 max_level = 1

@@ -9,6 +9,7 @@ script = ExtResource("1")
 id = "echo"
 display_name = "Resonance"
 description = "Maximums permanently trigger neighboring dice."
+summary = "Max rolls trigger a neighbour, forever"
 cost = 3.0
 growth = 1
 max_level = 1

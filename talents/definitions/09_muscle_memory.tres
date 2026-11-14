@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "muscle_memory"
 display_name = "Loyal crew"
 description = "Every helper you hired stays with you when you begin again."
+summary = "Keep helpers when you begin again"
 cost = 15.0
 growth = 1
 max_level = 1

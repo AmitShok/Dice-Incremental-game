@@ -20,7 +20,7 @@ func run() -> void:
 	var main: Control = load("res://scenes/main.tscn").instantiate()
 	root.add_child(main)
 	var failures: int = 0
-	for page in ["Dice", "Upgrades", "Helpers", "Fate"]:
+	for page in ["Dice", "Upgrades", "Helpers"]:
 		main.shop.show_page(page)
 		await process_frame
 		await process_frame
@@ -28,7 +28,7 @@ func run() -> void:
 		await process_frame
 		var row: Dictionary = main.shop.rows.back()
 		var button: Button = row.button
-		var old_text: String = button.text
+		var old_text: String = row.price.text
 		var old_scroll: int = main.shop.scroll.scroll_vertical
 		button.grab_focus()
 		if button.disabled or old_scroll <= 0:
@@ -37,7 +37,7 @@ func run() -> void:
 		button.pressed.emit()
 		await process_frame
 		await process_frame
-		if not is_instance_valid(button) or main.shop.scroll.scroll_vertical != old_scroll or button.text == old_text or not button.has_focus():
+		if not is_instance_valid(button) or main.shop.scroll.scroll_vertical != old_scroll or row.price.text == old_text or not button.has_focus():
 			push_error("Purchase lost scroll/focus or failed to refresh: " + page)
 			failures += 1
 	main.shop.show_page("Settings")
@@ -51,5 +51,5 @@ func run() -> void:
 	await process_frame
 	if main.shop.scroll.scroll_vertical != previous:
 		failures += 1
-	print("SHOP SCROLL: ", failures, " failures; purchases across four pages and Settings toggle")
+	print("SHOP SCROLL: ", failures, " failures; purchases across three pages and Settings toggle")
 	quit(1 if failures else 0)

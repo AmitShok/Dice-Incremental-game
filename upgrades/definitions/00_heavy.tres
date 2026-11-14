@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "heavy"
 display_name = "Heavy dice"
 description = "+25% to every payout. Five levels."
+summary = "+25% all payouts"
 cost = 50.0
 growth = 2
 max_level = 5

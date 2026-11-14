@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = "old_friend"
 display_name = "Old friends"
 description = "Moss returns: begin each new run with one helper per level. Two levels."
+summary = "Start runs with +1 helper"
 cost = 4.0
 growth = 3
 max_level = 2

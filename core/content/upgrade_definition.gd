@@ -4,6 +4,8 @@ extends Resource
 @export var id: String = ""
 @export var display_name: String = ""
 @export_multiline var description: String = ""
+## One short line shown on shop rows; the description becomes the tooltip.
+@export var summary: String = ""
 @export var cost: float = 100.0
 @export var growth: float = 2.0
 @export var max_level: int = 1
