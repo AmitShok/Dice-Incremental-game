@@ -18,7 +18,7 @@ custom_minimum_size = Vector2(0, 44)
 mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Dice"
 
 [node name="Upgrades" type="Button" parent="Tabs"]
@@ -26,7 +26,7 @@ custom_minimum_size = Vector2(0, 44)
 mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Upgrades"
 
 [node name="Helpers" type="Button" parent="Tabs"]
@@ -34,15 +34,23 @@ custom_minimum_size = Vector2(0, 44)
 mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Helpers"
+
+[node name="Tables" type="Button" parent="Tabs"]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "Tables"
 
 [node name="Fate" type="Button" parent="Tabs"]
 custom_minimum_size = Vector2(0, 44)
 mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Fate"
 
 [node name="Scroll" type="ScrollContainer" parent="."]

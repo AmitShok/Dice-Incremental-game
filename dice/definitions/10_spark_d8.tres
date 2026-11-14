@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/dice/spark_d8.png" id="2"]
+[ext_resource type="Resource" path="res://synergies/definitions/arc.tres" id="3"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/rolls/spark_d8.png" id="roll"]
+
+[resource]
+script = ExtResource("1")
+rolling_texture = ExtResource("roll")
+id = "spark_d8"
+display_name = "Spark D8"
+description = "Pays 2x. Rolling 5 or higher arcs to the two nearest dice, which roll charged for double pay."
+sides = 8
+base_cost = 6000.0
+base_payout = 2
+unlock_earned = 8000.0
+auto_cost = 1000.0
+duration = 0.9
+behavior = "arc"
+texture = ExtResource("2")
+effects = Array[Resource]([ExtResource("3")])

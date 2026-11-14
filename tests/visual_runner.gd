@@ -53,14 +53,38 @@ func run() -> void:
 	first._gui_input(release)
 	confirm_not_reset(game.state.dice[0].position.is_equal_approx(start + Vector2(40, 30)) and not game.state.dice[0].busy)
 	print("DRAG: movement committed without rolling")
-	for title in ["Dice", "Upgrades", "Helpers", "Fate", "Ledger", "Settings"]:
+	# Dragging a die into the sell tray sells it for half its latest price.
+	var dice_before: int = game.state.dice.size()
+	var money_before: float = game.state.money
+	var seller: DiceVisual = main.visuals[game.state.dice[1].id]
+	var tray_center: Vector2 = main.sell_tray.position + main.sell_tray.size * 0.5
+	var seller_start: Vector2 = game.state.dice[1].position
+	var sell_press := InputEventMouseButton.new()
+	sell_press.button_index = MOUSE_BUTTON_LEFT
+	sell_press.pressed = true
+	sell_press.global_position = seller_start
+	seller._gui_input(sell_press)
+	var sell_move := InputEventMouseMotion.new()
+	sell_move.global_position = tray_center
+	seller._gui_input(sell_move)
+	confirm_not_reset(main.sell_label.text.begins_with("Release to sell"))
+	var sell_release := InputEventMouseButton.new()
+	sell_release.button_index = MOUSE_BUTTON_LEFT
+	sell_release.pressed = false
+	sell_release.global_position = tray_center
+	seller._gui_input(sell_release)
+	await process_frame
+	confirm_not_reset(game.state.dice.size() == dice_before - 1 and game.state.money > money_before and main.visuals.size() == dice_before - 1)
+	print("SELL: dragging into the tray sells the die")
+	game.state.chips = 60
+	for title in ["Dice", "Upgrades", "Helpers", "Tables", "Fate", "Ledger", "Settings"]:
 		var group: String = "Footer" if title in ["Ledger", "Settings"] else "Tabs"
 		main.shop.get_node(group + "/" + title).pressed.emit()
 		await process_frame
 		confirm_not_reset(main.shop.page == title)
-		if title == "Upgrades" and not OS.get_environment("DICE_TEST_OUTPUT").is_empty():
+		if title in ["Upgrades", "Helpers", "Tables"] and not OS.get_environment("DICE_TEST_OUTPUT").is_empty():
 			await RenderingServer.frame_post_draw
-			root.get_texture().get_image().save_png(OS.get_environment("DICE_TEST_OUTPUT").path_join("upgrades.png"))
+			root.get_texture().get_image().save_png(OS.get_environment("DICE_TEST_OUTPUT").path_join(title.to_lower() + ".png"))
 		checks += 1
 	var old_sound: bool = game.state.settings.sound
 	main.shop.body.get_node("SettingsPage/DeveloperTools").pressed.emit()
@@ -108,7 +132,7 @@ func run() -> void:
 	main.ask_prestige()
 	await process_frame
 	checks += 1
-	confirm_not_reset(game.state.dice.size() == 10)
+	confirm_not_reset(game.state.dice.size() == 9)
 	main.confirm.hide()
 	var ids: Array = []
 	for die in game.state.dice:

@@ -17,6 +17,8 @@ func clear() -> void:
 		item.node.visible = false
 	active.clear()
 	aggregate = 0.0
+	bursts.clear()
+	queue_redraw()
 
 func _ready() -> void:
 	z_index = 20
@@ -65,6 +67,7 @@ func _remove_existing(node: CanvasItem) -> void:
 			active.remove_at(index)
 
 func _process(delta: float) -> void:
+	_tick_bursts(delta)
 	aggregate_clock += delta
 	if aggregate_clock >= 0.25:
 		aggregate_clock = 0.0
@@ -80,3 +83,68 @@ func _process(delta: float) -> void:
 		if item.age >= item.duration:
 			item.node.visible = false
 			active.remove_at(index)
+
+# --- Spreading-effect visuals (drawn with _draw; pooled by a small bounded list) ---
+const EFFECT_COLORS: Dictionary = {"arc": Color("#8fe3ff"), "blast": Color("#ff9a5a"), "gild": Color("#ffd86b"), "reroll": Color("#f4ce83")}
+var bursts: Array[Dictionary] = []
+
+func effect(action: String, from: Vector2, targets: Array) -> void:
+	if not settings.get("particles", true):
+		return
+	if bursts.size() >= 24:
+		bursts.pop_front()
+	bursts.append({"action": action, "from": from, "targets": targets.duplicate(), "age": 0.0, "duration": 0.6 if action != "blast" else 0.5})
+	if action == "gild":
+		for target in targets:
+			payout_text("GILDED", target, Color("#ffd86b"))
+	queue_redraw()
+
+func payout_text(text: String, at: Vector2, color: Color) -> void:
+	if not settings.get("numbers", true):
+		return
+	var label: Label = labels[cursor]
+	cursor = (cursor + 1) % labels.size()
+	_remove_existing(label)
+	label.text = text
+	label.position = at + Vector2(-28, -40)
+	label.modulate = color
+	label.visible = true
+	active.append({"node": label, "age": 0.0, "velocity": Vector2(0, -28), "duration": 0.9})
+
+func _draw() -> void:
+	for burst in bursts:
+		var t: float = burst.age / burst.duration
+		var color: Color = EFFECT_COLORS.get(burst.action, Color.WHITE)
+		color.a = 1.0 - t
+		match burst.action:
+			"arc":
+				for target in burst.targets:
+					# A jagged bolt: deterministic zig-zag between source and target.
+					var points := PackedVector2Array()
+					var from: Vector2 = burst.from
+					var to: Vector2 = target
+					var normal: Vector2 = (to - from).orthogonal().normalized()
+					for step in 7:
+						var k: float = step / 6.0
+						var jitter: float = 0.0 if step == 0 or step == 6 else (7.0 if step % 2 == 0 else -7.0)
+						points.append(from.lerp(to, k) + normal * jitter)
+					draw_polyline(points, color, 3.0)
+					draw_polyline(points, Color(1, 1, 1, color.a), 1.0)
+			"blast":
+				draw_arc(burst.from, 20.0 + 120.0 * t, 0, TAU, 40, color, 4.0 * (1.0 - t) + 1.0)
+			"gild":
+				draw_arc(burst.from, 15.0 + 105.0 * t, 0, TAU, 32, color, 2.0)
+				for target in burst.targets:
+					draw_circle(target, 18.0 * (1.0 - t) + 4.0, Color(color.r, color.g, color.b, color.a * 0.35))
+			"reroll":
+				for target in burst.targets:
+					draw_line(burst.from, target, color, 2.0)
+
+func _tick_bursts(delta: float) -> void:
+	if bursts.is_empty():
+		return
+	for index in range(bursts.size() - 1, -1, -1):
+		bursts[index].age += delta
+		if bursts[index].age >= bursts[index].duration:
+			bursts.remove_at(index)
+	queue_redraw()

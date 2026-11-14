@@ -17,6 +17,167 @@ func check(condition: bool, message: String) -> void:
 func fresh() -> GameSession:
 	return GameSession.new(registry)
 
+## A session with exactly the given dice, in order, at the given positions.
+func table_of(ids: Array, positions: Array) -> GameSession:
+	var game: GameSession = fresh()
+	game.state.dice.clear()
+	game.state.counts.clear()
+	for index in ids.size():
+		game.state.add_die(ids[index], positions[index])
+	return game
+
+func _new_mechanics_checks() -> void:
+	# Legacy auto-roll purchases become a cash refund; nothing auto-rolls any more.
+	var legacy := GameState.new()
+	legacy.add_die("d6", Vector2(300, 300))
+	legacy.automatic = {"d6": true, "d4": true}
+	var migrated := GameSession.new(registry, legacy)
+	check(migrated.state.automatic.is_empty() and migrated.migration_refund == 1450.0 and migrated.state.money == 1450.0, "Legacy auto-roll is refunded")
+	for index in 40:
+		migrated.tick(0.1)
+	check(migrated.pending.is_empty() and float(migrated.state.statistics.get("rolls", 0)) == 0, "Nothing rolls without helpers")
+
+	# Selling returns half of the latest copy's price and lowers the next price.
+	var game: GameSession = fresh()
+	game.state.money = 100
+	game.state.run_earned = 100
+	game.progression.buy_die("d6")
+	game.progression.buy_die("d6")
+	var earned_before: float = game.state.run_earned
+	check(is_equal_approx(game.sell_value(game.state.dice[2].id), 20.0), "Sell value is half the latest price")
+	check(is_equal_approx(game.sell_die(game.state.dice[2].id), 20.0) and game.state.counts.d6 == 2 and game.state.dice.size() == 2, "Selling removes the die")
+	check(is_equal_approx(game.economy.die_price("d6"), 40.0) and game.state.run_earned == earned_before, "Selling lowers the next price and is not earnings")
+	game.request_roll([game.state.dice[0].id])
+	check(game.sell_die(game.state.dice[0].id) == 0.0, "Rolling dice cannot be sold")
+	game.settle()
+	game.sell_die(game.state.dice[0].id)
+	check(game.sell_die(game.state.dice[0].id) == 0.0 and game.state.dice.size() == 1, "The last die cannot be sold")
+	var restored: GameState = GameState.restore(game.state.snapshot(), registry)
+	check(restored != null and restored.counts.d6 == 1, "Save after selling restores counts")
+
+	# Hot streak: manual clicks raise the multiplier, idling resets it.
+	game = fresh()
+	game.forced_face = 3
+	for index in 10:
+		game.state.dice[0].cooldown = 0
+		game.request_roll([game.state.dice[0].id])
+		game.settle()
+	check(game.streak == 10 and is_equal_approx(game.streak_multiplier(), 1.25), "Ten quick clicks reach the warm stage")
+	var before: float = game.state.money
+	game.state.dice[0].cooldown = 0
+	game.request_roll([game.state.dice[0].id])
+	game.settle()
+	check(is_equal_approx(game.state.money - before, 3.75), "Streak multiplies payouts")
+	game.tick(GameSession.STREAK_WINDOW + 0.1)
+	check(game.streak == 0, "Streak cools after the window")
+	game.state.upgrades.momentum = 2
+	check(is_equal_approx(game.streak_window(), GameSession.STREAK_WINDOW * 2.0), "Momentum lengthens the window")
+
+	# Spark arcs to the two nearest ready dice with a charged bonus.
+	game = table_of(["spark_d8", "d6", "d6", "d6"], [Vector2(300, 300), Vector2(340, 300), Vector2(260, 300), Vector2(700, 480)])
+	game.forced_face = 8
+	game.request_roll([game.state.dice[0].id], "chain")
+	game.tick(1.0)
+	var charged: int = 0
+	for outcome in game.pending.values():
+		if outcome.charged:
+			charged += 1
+	check(charged == 2 and not game.state.dice[3].busy, "Spark arcs to the two nearest dice only")
+	game.settle()
+	check(game.state.statistics.arcs == 2, "Arcs are counted")
+
+	# Blast throws all nearby ready dice as one combination-eligible batch.
+	game = table_of(["blast_d10", "d6", "d6", "d6"], [Vector2(300, 300), Vector2(340, 300), Vector2(260, 300), Vector2(300, 340)])
+	game.state.upgrades.combos = 1
+	game.forced_face = 10
+	var combos: Array = []
+	game.events.combo_triggered.connect(func(label, multiplier): combos.append(label))
+	game.request_roll([game.state.dice[0].id], "chain")
+	game.tick(1.0)
+	check(game.pending.size() == 3 and combos.size() == 1, "Blast rolls neighbors together and combos count")
+	game.settle()
+
+	# Gild marks nearby dice; their next roll pays triple once (5x on the Gilded table).
+	game = table_of(["gild_d12", "d6", "d6"], [Vector2(300, 300), Vector2(330, 300), Vector2(700, 480)])
+	game.forced_face = 12
+	game.request_roll([game.state.dice[0].id], "chain")
+	game.tick(1.1)
+	check(game.state.dice[1].gilded and not game.state.dice[2].gilded, "Gild marks only nearby dice")
+	check(GameState.restore(game.state.snapshot(), registry).dice[1].gilded, "Gilded state saves")
+	game.forced_face = 2
+	before = game.state.money
+	game.state.dice[1].cooldown = 0
+	game.request_roll([game.state.dice[1].id], "chain")
+	game.settle()
+	check(is_equal_approx(game.state.money - before, 6.0) and not game.state.dice[1].gilded, "Gilded roll pays triple once")
+
+	# Natural ones drop chips; capsules turn chips into hats.
+	game = fresh()
+	game.forced_face = 1
+	game.request_roll([game.state.dice[0].id], "chain")
+	game.settle()
+	check(game.state.chips == 1, "A natural one drops a chip")
+	check(game.progression.pull_capsule() == "", "Capsule needs enough chips")
+	game.state.chips = 1000
+	var first_hat: String = game.progression.pull_capsule()
+	check(Cosmetics.HATS.has(first_hat) and game.state.hats.has(first_hat) and game.state.crew_hat == first_hat, "First capsule hat is worn")
+	for index in 30:
+		game.progression.pull_capsule()
+	check(game.state.hats.size() > 1 and game.state.chips > 1000 - 31 * Cosmetics.CAPSULE_COST, "Duplicate hats refund chips")
+	check(game.progression.wear_hat("mix") and Cosmetics.hat_for(game.state, 1) == game.state.hats[1], "Mixed hats rotate across helpers")
+	check(not game.progression.wear_hat("not-a-hat"), "Unknown hats are rejected")
+
+	# Tables unlock from lifetime progress, survive Fate and change rules.
+	game = fresh()
+	check(not game.select_table("velvet"), "Locked table cannot be chosen")
+	game.state.statistics["combos"] = 25.0
+	game.forced_face = 3
+	game.request_roll([game.state.dice[0].id], "chain")
+	game.settle()
+	check(game.state.tables.has("velvet") and game.select_table("velvet"), "Velvet unlocks after 25 combinations")
+	check(is_equal_approx(game.streak_window(), GameSession.STREAK_WINDOW * 0.5), "Velvet shortens streaks")
+	game.state.tables.append("starlit")
+	game.select_table("starlit")
+	game.forced_face = 1
+	game.state.dice[0].cooldown = 0
+	before = game.state.money
+	var chips_before: int = game.state.chips
+	game.request_roll([game.state.dice[0].id], "chain")
+	game.settle()
+	check(game.state.money == before and game.state.chips == chips_before + 2, "Starlit ones pay nothing but drop two chips")
+	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD
+	game.prestige()
+	check(game.state.table_id == "starlit" and game.state.tables.has("velvet") and game.state.chips == chips_before + 2, "Tables and chips survive Fate")
+	restored = GameState.restore(game.state.snapshot(), registry)
+	check(restored.table_id == "starlit" and restored.tables.size() == 3, "Tables save")
+	var tampered: Dictionary = game.state.snapshot()
+	tampered.table_id = "gilded"
+	check(GameState.restore(tampered, registry).table_id == "felt", "Unowned saved table falls back to felt")
+
+	# Smarter helpers pick the most valuable die; many hands throw several together.
+	game = table_of(["d4", "d20", "d6"], [Vector2(150, 300), Vector2(600, 300), Vector2(300, 300)])
+	game.state.helpers = 1
+	game.state.upgrades.sharp_eyes = 1
+	game.automation.sync(1)
+	check(game.automation._choose(game, 0) == game.state.dice[1], "Sharp eyes choose the most valuable die")
+	game = table_of(["d6", "d6", "d6", "d6"], [Vector2(300, 300), Vector2(330, 300), Vector2(300, 330), Vector2(700, 480)])
+	game.state.helpers = 1
+	game.state.upgrades.many_hands = 2
+	var batch_sizes: Array = []
+	game.events.die_roll_started.connect(func(outcome): if outcome.source == "helper": batch_sizes.append(outcome.die_id))
+	for index in 200:
+		game.tick(0.05)
+		if not batch_sizes.is_empty():
+			break
+	check(batch_sizes.size() == 3, "Many hands throws three nearby dice together")
+	game = fresh()
+	game.state.helpers = 1
+	var plain_income: float = game.automation.expected_income(game)
+	game.state.upgrades.strong_arms = 1
+	check(plain_income > 0 and is_equal_approx(game.automation.expected_income(game), plain_income * 1.5), "Strong arms raise helper income")
+	game.state.helpers = 0
+	check(game.automation.expected_income(game) == 0.0, "No helpers means no idle income")
+
 func _fate_endgame_checks() -> void:
 	var game: GameSession = fresh()
 	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD - 1
@@ -35,18 +196,22 @@ func _fate_endgame_checks() -> void:
 	game = fresh()
 	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD
 	game.state.talents.merge({"fortune": 1, "head_start": 2, "heirloom": 2, "stride": 1, "old_friend": 1, "muscle_memory": 1})
-	game.state.automatic.d6 = true
-	game.state.automatic.d4 = true
-	check(game.progression.carryover_summary().contains("$5.00K"), "Confirmation lists talent carry-over")
+	game.state.helpers = 5
+	check(game.progression.carryover_summary().contains("$5.00K") and game.progression.carryover_summary().contains("5 of your helpers"), "Confirmation lists talent carry-over")
 	check(game.prestige(), "Talented prestige succeeds")
 	check(game.state.money == 5000.0 and game.state.run_earned == 0, "Head start grants unearned starting cash")
 	check(game.state.dice.size() == 3 and game.state.counts.d6 == 3, "Heirloom dice add starter D6s")
 	var spread: bool = game.state.dice[0].position.distance_to(game.state.dice[1].position) > 30 and game.state.dice[1].position.distance_to(game.state.dice[2].position) > 30
 	check(spread, "Heirloom dice do not overlap")
-	check(game.state.helpers == 1, "Old friends rehire a helper")
-	check(game.state.automatic.get("d6", false) and game.state.automatic.get("d4", false), "Enchanted memory keeps automation")
+	check(game.state.helpers == 5, "Loyal crew keeps every hired helper")
 	var restored: GameState = GameState.restore(game.state.snapshot(), registry)
 	check(restored != null and restored.talents.muscle_memory == 1 and restored.talents.heirloom == 2, "New talents survive save round trip")
+	game = fresh()
+	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD
+	game.state.helpers = 5
+	game.state.talents.merge({"fortune": 1, "stride": 1, "old_friend": 1})
+	game.prestige()
+	check(game.state.helpers == 1, "Old friends rehire one helper without Loyal crew")
 
 	game = fresh()
 	check(is_equal_approx(game.table_cooldown(), 60.0), "Base table cooldown")
@@ -56,8 +221,8 @@ func _fate_endgame_checks() -> void:
 
 	var short_night: GameSession = fresh()
 	var long_night: GameSession = fresh()
-	short_night.state.automatic.d6 = true
-	long_night.state.automatic.d6 = true
+	short_night.state.helpers = 1
+	long_night.state.helpers = 1
 	long_night.state.talents.merge({"fortune": 1, "long_nights": 1})
 	var short_amount: float = short_night.offline(28800)
 	var long_amount: float = long_night.offline(28800)
@@ -66,8 +231,8 @@ func _fate_endgame_checks() -> void:
 
 func run() -> void:
 	registry = ContentRegistry.new()
-	check(registry.errors.is_empty() and registry.dice.size() == 10, "All dice content validates")
-	check(registry.upgrades.size() == 7 and registry.talents.size() == 11, "Upgrades and talents load")
+	check(registry.errors.is_empty() and registry.dice.size() == 13, "All dice content validates")
+	check(registry.upgrades.size() == 11 and registry.talents.size() == 11, "Upgrades and talents load")
 	var definition: DiceDefinition = registry.dice.d6
 	var invalid := DiceDefinition.new()
 	invalid.id = "invalid"
@@ -113,12 +278,12 @@ func run() -> void:
 	check(not game.finish_roll(rid) and game.state.money == 7.5, "Duplicate completion cannot award twice")
 	check(game.state.statistics.rolls == 1 and game.state.statistics.maximums == 1, "Statistics count one resolution")
 	game.state.dice[0].cooldown = 0
-	game.request_roll([1], "automatic")
+	game.request_roll([1], "helper")
 	game.settle()
-	check(game.state.money == 15, "Automatic and manual payout paths match")
+	check(game.state.money == 15, "Helper and manual payout paths match")
 
 	for id in ["d4", "d6", "d8", "d10", "d12", "d20"]:
-		for source in ["manual", "automatic", "helper"]:
+		for source in ["manual", "helper", "chain"]:
 			var face_matches: bool = true
 			var plain_game: GameSession = fresh()
 			plain_game.state.dice.clear()
@@ -127,20 +292,14 @@ func run() -> void:
 			for face in range(1, registry.dice[id].sides + 1):
 				plain_die.cooldown = 0
 				plain_game.forced_face = face
+				plain_game.streak = 0
 				var previous_money: float = plain_game.state.money
 				plain_game.request_roll([plain_die.id], source)
 				plain_game.settle()
 				face_matches = face_matches and plain_die.face == face and is_equal_approx(plain_game.state.money - previous_money, float(face))
 			check(face_matches, "%s %s pays every natural face exactly without bonuses" % [id, source])
 
-	game = fresh()
-	game.state.automatic.d6 = true
-	game.tick(0.4)
-	check(game.pending.is_empty(), "Auto interval not yet reached")
-	game.tick(0.7)
-	check(game.pending.size() == 1 and is_equal_approx(game.state.dice[0].automatic_clock, 0.1), "Timer carries fractional remainder")
-	game.tick(20)
-	check(game.pending.size() <= 1 and game.state.dice[0].automatic_clock <= 5, "Stall work remains bounded")
+	_new_mechanics_checks()
 
 	var doubles: Dictionary = SynergyService.batch([{"face": 2}, {"face": 2}], true)
 	var triple: Dictionary = SynergyService.batch([{"face": 6}, {"face": 6}, {"face": 6}], true)
@@ -194,7 +353,7 @@ func run() -> void:
 	game.state.money = 123.75
 	game.state.run_earned = 100
 	game.state.upgrades.heavy = 2
-	game.state.automatic.d6 = true
+	game.state.helpers = 3
 	game.state.settings.motion = false
 	game.state.statistics.rolls = 42
 	game.state.talents.fortune = 1
@@ -206,7 +365,7 @@ func run() -> void:
 	var encoded: String = JSON.stringify({"save_version": 1, "state": game.state.snapshot()})
 	var restored: GameState = store.decode(encoded)
 	check(restored != null and restored.money == 123.75 and restored.dice[0].position == Vector2(200,250), "Save preserves money and positions")
-	check(restored.upgrades.heavy == 2 and restored.automatic.d6 and restored.talents.fortune == 1, "Save preserves progression")
+	check(restored.upgrades.heavy == 2 and restored.helpers == 3 and restored.talents.fortune == 1, "Save preserves progression")
 	check(not restored.settings.motion and restored.statistics.rolls == 42 and restored.prestige_points == 2, "Save preserves settings, statistics and Fate")
 	var roundtrip_rng := GameSession.new(registry, restored)
 	check(roundtrip_rng.roller.rng.state == rng_a.rng.state, "Save preserves RNG state")
@@ -263,7 +422,7 @@ func run() -> void:
 	game = fresh()
 	check(not game.prestige(), "Early prestige rejected")
 	check(game.offline(-100) == 0, "Backward clock earns nothing")
-	game.state.automatic.d6 = true
+	game.state.helpers = 1
 	var offline_1: float = game.offline(14400)
 	var offline_2: float = game.offline(999999)
 	check(is_equal_approx(offline_1, offline_2) and offline_1 > 0, "Offline earnings capped")

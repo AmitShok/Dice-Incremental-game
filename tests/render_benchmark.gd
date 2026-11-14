@@ -37,7 +37,6 @@ func run() -> void:
 		game.state.counts.clear()
 		for index in 100:
 			game.state.add_die("d6", Vector2(85 + index % 11 * 61, 170 + int(index / 11) * 34))
-		game.state.automatic.d6 = true
 		game.state.helpers = 8
 		game.roller.rng.seed = 38
 		if mode == "silent":

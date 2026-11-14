@@ -1,49 +1,72 @@
 class_name AudioService
 extends Node
+## Plays imported WAV cues on the Sfx bus and a looping track on the Music bus.
+## Buses come from res://default_bus_layout.tres (never created at runtime) and every
+## stream is an imported asset, which keeps Web exports using sample playback reliable.
+## Sounds regenerate with tools/generate_audio.gd.
+
+const CUES: Dictionary = {
+	"roll": preload("res://assets/audio/sfx/roll.wav"),
+	"land": preload("res://assets/audio/sfx/land.wav"),
+	"max": preload("res://assets/audio/sfx/max.wav"),
+	"buy": preload("res://assets/audio/sfx/buy.wav"),
+	"sell": preload("res://assets/audio/sfx/sell.wav"),
+	"combo": preload("res://assets/audio/sfx/combo.wav"),
+	"streak": preload("res://assets/audio/sfx/streak.wav"),
+	"arc": preload("res://assets/audio/sfx/arc.wav"),
+	"blast": preload("res://assets/audio/sfx/blast.wav"),
+	"gild": preload("res://assets/audio/sfx/gild.wav"),
+	"capsule": preload("res://assets/audio/sfx/capsule.wav"),
+	"click": preload("res://assets/audio/sfx/click.wav"),
+}
+const MUSIC: AudioStream = preload("res://assets/audio/music/table_loop.wav")
+## Per-cue trims so frequent cues sit under rarer celebratory ones.
+const LEVELS: Dictionary = {"roll": -10.0, "land": -9.0, "click": -8.0, "max": -4.0, "buy": -5.0, "sell": -5.0}
+
 var settings: Dictionary
 var voices: Array[AudioStreamPlayer] = []
-var bank: Dictionary = {}
+var music: AudioStreamPlayer
 var cursor: int = 0
+var last_played: Dictionary = {}
 
 func _ready() -> void:
-	for bus_name in ["Music", "Ambience", "Dice", "UI", "Money", "Helpers", "Machines", "Effects"]:
-		if AudioServer.get_bus_index(bus_name) < 0:
-			AudioServer.add_bus()
-			AudioServer.set_bus_name(AudioServer.bus_count - 1, bus_name)
 	for index in 12:
 		var voice := AudioStreamPlayer.new()
+		voice.bus = &"Sfx"
 		add_child(voice)
 		voices.append(voice)
-	bank["roll"] = _tone(210.0, 0.09, 0.5)
-	bank["land"] = _tone(135.0, 0.12, 0.75)
-	bank["max"] = _tone(880.0, 0.22, 0.08)
-	bank["buy"] = _tone(660.0, 0.16, 0.03)
-	bank["combo"] = _tone(1100.0, 0.35, 0.1)
+	music = AudioStreamPlayer.new()
+	music.bus = &"Music"
+	music.stream = MUSIC
+	add_child(music)
+	music.finished.connect(func(): if _music_wanted(): music.play())
+	apply_settings()
 
-func _tone(frequency: float, duration: float, noise_amount: float) -> AudioStreamWAV:
-	var wave := AudioStreamWAV.new()
-	wave.format = AudioStreamWAV.FORMAT_16_BITS
-	wave.mix_rate = 22050
-	var samples: int = int(duration * wave.mix_rate)
-	var bytes := PackedByteArray()
-	bytes.resize(samples * 2)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = int(frequency)
-	for index in samples:
-		var t: float = float(index) / wave.mix_rate
-		var envelope: float = pow(1.0 - float(index) / samples, 3.0) * minf(1, t * 900)
-		var signal_value: float = (sin(TAU * frequency * t) + sin(TAU * frequency * 1.5 * t) * 0.3) * (1 - noise_amount) + rng.randf_range(-1, 1) * noise_amount
-		bytes.encode_s16(index * 2, int(signal_value * envelope * 10000))
-	wave.data = bytes
-	return wave
+func _music_wanted() -> bool:
+	return settings != null and bool(settings.get("music", true)) and not OS.get_cmdline_user_args().has("--test")
+
+## Call after any settings change; starts/stops music and applies volume.
+func apply_settings() -> void:
+	if settings == null:
+		return
+	var volume: float = float(settings.get("volume", 0.55))
+	music.volume_db = linear_to_db(maxf(0.001, volume)) - 8.0
+	if _music_wanted() and not music.playing:
+		music.play()
+	elif not _music_wanted() and music.playing:
+		music.stop()
 
 func play(cue: String) -> void:
-	if not settings.get("sound", true) or not bank.has(cue) or voices.is_empty():
+	if settings == null or not settings.get("sound", true) or not CUES.has(cue) or voices.is_empty():
 		return
+	# Large tables can land dozens of dice per frame; one voice per cue per 40 ms is plenty.
+	var now: int = Time.get_ticks_msec()
+	if now - int(last_played.get(cue, -1000)) < 40:
+		return
+	last_played[cue] = now
 	var voice: AudioStreamPlayer = voices[cursor]
 	cursor = (cursor + 1) % voices.size()
-	voice.stream = bank[cue]
-	voice.bus = "Dice" if cue in ["roll", "land"] else "Effects"
-	voice.volume_db = linear_to_db(maxf(0.001, float(settings.get("volume", 0.55)))) - 7
+	voice.stream = CUES[cue]
+	voice.volume_db = linear_to_db(maxf(0.001, float(settings.get("volume", 0.55)))) + float(LEVELS.get(cue, -6.0))
 	voice.pitch_scale = randf_range(0.94, 1.06)
 	voice.play()

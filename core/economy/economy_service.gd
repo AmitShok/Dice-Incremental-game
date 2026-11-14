@@ -9,10 +9,15 @@ func _init(game_state: GameState, content: ContentRegistry) -> void:
 	registry = content
 
 func die_price(id: String) -> float:
+	return die_price_at(id, int(state.counts.get(id, 0)))
+
+## Price of a die when `owned` copies of its family are already on the table.
+func die_price_at(id: String, owned: int) -> float:
 	if not registry.dice.has(id):
 		return INF
 	var definition: DiceDefinition = registry.dice[id]
-	return minf(GameState.MAX_AMOUNT, definition.base_cost * pow(definition.cost_growth, int(state.counts.get(id, 0))))
+	var discount: float = 0.7 if state.table_id == "gilded" and definition.behavior == "gild" else 1.0
+	return minf(GameState.MAX_AMOUNT, definition.base_cost * discount * pow(definition.cost_growth, owned))
 
 func upgrade_price(definition: UpgradeDefinition) -> float:
 	var levels: Dictionary = state.talents if definition.permanent else state.upgrades

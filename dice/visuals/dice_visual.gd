@@ -3,6 +3,14 @@ extends Control
 
 signal selected(id: int)
 signal moved(id: int, position: Vector2)
+## Emitted while dragging so the table can highlight the sell tray.
+signal drag_moved(id: int, center: Vector2)
+## Emitted on release after a drag; the table decides between moving and selling.
+signal dropped(id: int, center: Vector2)
+
+## Dragging may leave the felt to reach the sell tray below it.
+const DRAG_MIN := Vector2(40, 140)
+const DRAG_MAX := Vector2(780, 592)
 var die: DiceInstance
 var definition: DiceDefinition
 @onready var sprite: Sprite2D = $Face
@@ -71,14 +79,15 @@ func _gui_input(event: InputEvent) -> void:
 			elif not drag_started:
 				selected.emit(die.id)
 			else:
-				moved.emit(die.id, position + Vector2(32, 32) * scale)
+				dropped.emit(die.id, position + Vector2(32, 32) * scale)
 			accept_event()
 	elif event is InputEventMouseMotion and dragging and not die.busy:
 		if not drag_started and press_position.distance_to(event.global_position) < drag_threshold:
 			return
 		drag_started = true
 		var center: Vector2 = original_position + event.global_position - press_position + Vector2(32, 32) * scale
-		position = center.clamp(Vector2(65, 150), Vector2(725, 500)) - Vector2(32, 32) * scale
+		position = center.clamp(DRAG_MIN, DRAG_MAX) - Vector2(32, 32) * scale
+		drag_moved.emit(die.id, center.clamp(DRAG_MIN, DRAG_MAX))
 
 func start(outcome: Dictionary, settings: Dictionary) -> void:
 	rolling = true
@@ -163,3 +172,19 @@ func land(outcome: Dictionary, settings: Dictionary) -> void:
 	marker.text = "CRIT!" if outcome.critical else ("MAX!" if outcome.face == outcome.sides else "D%d" % definition.sides)
 	tooltip_text = "%s\n%s\nLast roll: %d → $%s%s\nClick to roll · drag to arrange" % [definition.display_name, definition.description, outcome.face, NumberFormat.compact(outcome.payout), " (includes bonuses)" if not is_equal_approx(outcome.payout, float(outcome.face)) else ""]
 	marker.modulate = Color("#f4ce83") if outcome.face == outcome.sides else Color("#b9c5ae")
+
+## Returns the visual to the die's authoritative position (after a move or a refused sale).
+func snap() -> void:
+	dragging = false
+	if not rolling:
+		position = die.position - Vector2(32, 32) * scale
+	update_gild()
+
+## Gilded dice glow warm gold until their next roll consumes the bonus.
+func update_gild() -> void:
+	if die == null or rolling:
+		return
+	sprite.self_modulate = Color(1.25, 1.08, 0.55) if die.gilded else Color.WHITE
+	if die.gilded:
+		marker.text = "GILDED"
+		marker.modulate = Color("#ffd86b")

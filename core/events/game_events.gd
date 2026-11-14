@@ -10,3 +10,7 @@ signal purchased(kind: String, id: String)
 signal achievement_unlocked(id: String)
 signal prestige_completed
 signal notice(message: String)
+signal effect_triggered(action: String, from: Vector2, targets: Array)
+signal die_sold(amount: float, position: Vector2)
+signal table_unlocked(id: String)
+signal streak_stage_changed(stage: int)

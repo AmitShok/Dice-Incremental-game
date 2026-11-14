@@ -6,6 +6,8 @@ extends Control
 
 var session: GameSession
 @onready var table: Node2D = $Tabletop/Dice
+@onready var surface: Sprite2D = $Tabletop/Surface
+var shown_table: String = ""
 @onready var helper_layer: Node2D = $Tabletop/Helpers
 var visuals: Dictionary = {}
 var workers: Array[Sprite2D] = []
@@ -15,6 +17,12 @@ var workers: Array[Sprite2D] = []
 @onready var hint: Label = $HUD/Hint
 @onready var toast: Label = $HUD/Toast
 @onready var combo: Label = $HUD/Combo
+@onready var streak_box: Control = $HUD/Streak
+@onready var streak_label: Label = $HUD/Streak/Label
+@onready var streak_bar: ProgressBar = $HUD/Streak/Bar
+@onready var sell_tray: PanelContainer = $HUD/SellTray
+@onready var sell_label: Label = $HUD/SellTray/Label
+const HATS_TEXTURE_PATH: String = "res://assets/exported/helpers/hats.png"
 @onready var shop: ShopPanel = $ShopPanel
 @onready var feedback: FeedbackManager = $Feedback
 @onready var audio: AudioService = $Audio
@@ -31,6 +39,8 @@ func _ready() -> void:
 	$HUD/RollButton.pressed.connect(GameManager.roll_all_dice)
 	feedback.settings = session.state.settings
 	audio.settings = session.state.settings
+	audio.apply_settings()
+	shop.on_settings_changed = audio.apply_settings
 	shop.on_notice = notify
 	shop.on_prestige = ask_prestige
 	shop.on_reset = ask_reset
@@ -44,8 +54,14 @@ func _ready() -> void:
 	session.events.purchased.connect(on_purchase)
 	session.events.achievement_unlocked.connect(func(id: String): notify("Milestone unlocked · " + id))
 	session.events.prestige_completed.connect(on_prestige)
+	session.events.effect_triggered.connect(on_effect)
+	session.events.die_sold.connect(on_sold)
+	session.events.table_unlocked.connect(func(id: String): notify("New table unlocked · " + TableCatalog.TABLES[id].name + ". Pick it on the Tables page."))
+	session.events.streak_stage_changed.connect(on_streak_stage)
 	refresh()
-	if SaveManager.offline_amount > 0:
+	if session.migration_refund > 0:
+		notify("Auto-rolling is now done by helpers. Refunded $" + NumberFormat.compact(session.migration_refund) + " for your enchanted dice.")
+	elif SaveManager.offline_amount > 0:
 		notify("Welcome back. Your table earned $" + NumberFormat.compact(SaveManager.offline_amount) + " while you were away.")
 	elif not SaveManager.status.is_empty():
 		notify(SaveManager.status)
@@ -69,13 +85,16 @@ func refresh() -> void:
 			table.add_child(visual)
 			visual.setup(die, session.registry.dice[die.definition_id])
 			visual.selected.connect(func(id: int): session.request_roll([id]))
-			visual.moved.connect(func(id: int, at: Vector2): session.move_die(id, at))
+			visual.dropped.connect(on_die_dropped)
+			visual.drag_moved.connect(on_die_dragged)
 			visuals[die.id] = visual
 		visuals[die.id].set_density(session.state.dice.size())
+		visuals[die.id].update_gild()
 	for id in visuals.keys():
 		if session.state.find_die(id) == null:
 			visuals[id].queue_free()
 			visuals.erase(id)
+	_apply_table()
 	shop.update_rows()
 
 func on_roll(outcome: Dictionary) -> void:
@@ -103,9 +122,12 @@ func on_combo(label: String, multiplier: float) -> void:
 	combo_time = 2
 	audio.play("combo")
 
-func on_purchase(_kind: String, _id: String) -> void:
-	audio.play("buy")
-	notify("A little more possibility.")
+func on_purchase(kind: String, _id: String) -> void:
+	if kind == "capsule":
+		audio.play("capsule")
+	else:
+		audio.play("buy")
+		notify("A little more possibility.")
 	refresh()
 
 func on_prestige() -> void:
@@ -136,6 +158,7 @@ func _process(delta: float) -> void:
 			hud_dirty = false
 		shop.update_rows()
 	_update_helpers()
+	_update_streak()
 
 func _update_helpers() -> void:
 	while workers.size() < session.automation.workers.size():
@@ -149,6 +172,78 @@ func _update_helpers() -> void:
 		workers[index].position = (worker.position as Vector2).round()
 		var base: int = {"idle": 0, "walk": 2, "interact": 6, "roll": 8, "celebrate": 10}.get(worker.phase, 0)
 		workers[index].frame = base + int(Time.get_ticks_msec() / 160) % 2
+		_dress_helper(workers[index], index)
+
+## Hats are an optional child sprite; frames follow Cosmetics.HATS[id].frame.
+func _dress_helper(sprite: Sprite2D, index: int) -> void:
+	var hat: Sprite2D = sprite.get_node_or_null("Hat")
+	if hat == null:
+		if not ResourceLoader.exists(HATS_TEXTURE_PATH):
+			return
+		hat = Sprite2D.new()
+		hat.name = "Hat"
+		hat.texture = load(HATS_TEXTURE_PATH)
+		hat.hframes = Cosmetics.HATS.size()
+		hat.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		sprite.add_child(hat)
+	var id: String = Cosmetics.hat_for(session.state, index)
+	hat.visible = not id.is_empty()
+	if hat.visible:
+		hat.frame = Cosmetics.HATS[id].frame
+		# Bob with the helper's two-frame idle/walk cycle.
+		hat.position = Vector2(0, -10 - (sprite.frame % 2))
+
+func _update_streak() -> void:
+	var active: bool = session.streak > 0
+	streak_box.visible = active
+	if not active:
+		return
+	var stage: Array = GameSession.STREAK_STAGES[session.streak_stage()]
+	var title: String = stage[2] if not str(stage[2]).is_empty() else "STREAK"
+	streak_label.text = "%s %d  ·  ×%s" % [title, session.streak, str(stage[1])]
+	streak_bar.value = clampf(session.streak_timer / maxf(0.01, session.streak_window()), 0.0, 1.0)
+
+func on_streak_stage(stage: int) -> void:
+	if stage > 0:
+		combo.text = "%s STREAK  ×%s" % [GameSession.STREAK_STAGES[stage][2], str(GameSession.STREAK_STAGES[stage][1])]
+		combo_time = 1.5
+		audio.play("streak")
+
+func on_effect(action: String, from: Vector2, targets: Array) -> void:
+	feedback.effect(action, from, targets)
+	audio.play({"arc": "arc", "blast": "blast", "gild": "gild"}.get(action, "max"))
+	if action == "gild":
+		for visual in visuals.values():
+			visual.update_gild()
+
+func on_sold(amount: float, at: Vector2) -> void:
+	feedback.payout_text("SOLD +$" + NumberFormat.compact(amount), sell_tray.position + sell_tray.size * 0.5, Color("#ffe0a0"))
+	audio.play("sell")
+	refresh()
+
+func _sell_zone() -> Rect2:
+	return Rect2(sell_tray.position, sell_tray.size)
+
+func on_die_dragged(id: int, center: Vector2) -> void:
+	if _sell_zone().has_point(center):
+		sell_tray.modulate = Color(1.3, 1.15, 0.8)
+		sell_label.text = "Release to sell for $%s" % NumberFormat.compact(session.sell_value(id)) if session.can_sell(id) else "Keep at least one die"
+	else:
+		_reset_tray()
+
+func on_die_dropped(id: int, center: Vector2) -> void:
+	_reset_tray()
+	if _sell_zone().has_point(center):
+		if session.sell_die(id) <= 0.0:
+			notify("You need at least one die on the table.")
+	else:
+		session.move_die(id, center)
+	if visuals.has(id):
+		visuals[id].snap()
+
+func _reset_tray() -> void:
+	sell_tray.modulate = Color.WHITE
+	sell_label.text = "SELL TRAY\ndrag a die here"
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -206,7 +301,7 @@ func _build_debug() -> void:
 				"Force max": session.forced_face = -1
 				"Force min": session.forced_face = 1
 				"Normal RNG": session.forced_face = 0
-				"Hire helper": session.state.helpers = mini(8, session.state.helpers + 1)
+				"Hire helper": session.state.helpers = mini(GameState.MAX_HELPERS, session.state.helpers + 1)
 				"Speed x1": Engine.time_scale = 1
 				"Speed x2": Engine.time_scale = 2
 				"Speed x10": Engine.time_scale = 10
@@ -224,3 +319,12 @@ func _capture_later() -> void:
 			destination = argument.trim_prefix("--capture=")
 	get_viewport().get_texture().get_image().save_png(destination)
 	get_tree().quit()
+
+## Swaps the felt for the chosen table's surface art (assets/exported/tables/<id>.png).
+func _apply_table() -> void:
+	if shown_table == session.state.table_id:
+		return
+	shown_table = session.state.table_id
+	var path: String = "res://assets/exported/tables/%s.png" % shown_table
+	if ResourceLoader.exists(path):
+		surface.texture = load(path)

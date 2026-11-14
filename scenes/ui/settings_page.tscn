@@ -20,6 +20,12 @@ mouse_filter = 1
 layout_mode = 2
 text = "Sound effects"
 
+[node name="music" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 44)
+mouse_filter = 1
+layout_mode = 2
+text = "Music"
+
 [node name="motion" type="Button" parent="."]
 custom_minimum_size = Vector2(0, 44)
 mouse_filter = 1

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-14 — Helpers, selling, streaks, spreading dice, tables, audio and new art
+
+- **Helpers are the only automation.** Per-family auto-roll is gone; existing saves get its cost refunded as cash with a notice. New helper training on the Helpers page: Strong arms (+50% helper pay), Sharp eyes (pick the most valuable die) and Many hands (throw 2–3 nearby dice together, so helpers can make combinations). Helper cap raised to 12. The Enchanted memory talent became Loyal crew (keep hired helpers across Fate).
+- **Sell tray.** Drag any die off the felt into the tray below the table for half the price of its latest copy. Prices drop back accordingly; refunds never count toward Fate.
+- **Hot streak.** Quick manual clicks build a streak (×1.25 → ×3) shown above the table; the Momentum upgrade lengthens it.
+- **Spreading dice.** Spark D8 arcs to nearby dice for charged ×2 throws, Blast D10 throws its neighbours as one combo-eligible batch, Gild D12 makes neighbours' next roll pay ×3. New arc/blast/gild visuals.
+- **Tables and chips.** Natural 1s drop chips. Five tables with lifetime unlocks and rule changes (Green felt, Velvet parlour, Oak workbench, Starlit cloth, Gilded baize), a hat capsule machine and a wardrobe for helpers.
+- **Audio fixed on the web.** Sound effects and a new music loop ship as imported WAV assets on a fixed bus layout, which the Web export's sample playback needs; verified playing and looping in a local Web build. New Music toggle in Settings. Regenerate sounds with `tools/generate_audio.gd`.
+- **Art pass 1.** Full-screen room with lamplit wallpaper, a mahogany-and-brass table, wallet and Fate plaques and a shop cabinet; five table surfaces; a new 2×-pixel UI skin with a pressed state; sell tray; eight helper hats; Spark/Blast/Gild dice derived from the existing dice style. Masters from `tools/create_art_v2.lua` and `tools/recolor_dice.gd`; `tests/art_preview_runner.gd` renders every table for review.
+- 144 gameplay checks plus visual, touch, scroll, cooldown, resize, tumble, ambient, stress and branding runners pass.
+
 ## 2026-11-14 — Deeper Fate endgame
 
 - Fate now pays floor(sqrt(run earnings / $25K)): 2 Fate at the $100K threshold, 4 at $400K, 6 at $900K. The Fate page shows the earnings needed for the next Fate.

@@ -31,3 +31,6 @@ static func check_achievements(state: GameState, events: GameEvents) -> void:
 		if checks[id] and not state.achievements.has(id):
 			state.achievements.append(id)
 			events.achievement_unlocked.emit(id)
+
+static func record_max(state: GameState, key: String, value: float) -> void:
+	state.statistics[key] = maxf(float(state.statistics.get(key, 0)), minf(GameState.MAX_AMOUNT, value))

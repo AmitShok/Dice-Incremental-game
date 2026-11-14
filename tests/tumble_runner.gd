@@ -42,8 +42,8 @@ func run() -> void:
 		ids.append(die.id)
 	var main: Control = load("res://scenes/main.tscn").instantiate()
 	root.add_child(main)
-	if main.visuals.size() != 10:
-		push_error("Expected all ten die visuals to load")
+	if main.visuals.size() != main.session.registry.dice.size():
+		push_error("Expected every die visual to load")
 		quit(1)
 		return
 	game.request_roll(ids)
@@ -73,5 +73,5 @@ func run() -> void:
 		visual._update_roll_pose(0.5)
 		check(visual.position == before and visual.sprite.rotation == 0 and visual.sprite.texture == visual.definition.texture, "Reduced motion stays still")
 	game.settle()
-	print("TUMBLE RESULT: ", failures, " failures across all 10 dice")
+	print("TUMBLE RESULT: ", failures, " failures across all dice")
 	quit(1 if failures else 0)

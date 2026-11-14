@@ -3,7 +3,7 @@
 ## Files and version
 user://progress.json contains {"save_version":1,"state":{...}}. The display name is D- infinity, but a custom user directory keeps the existing DiceIncremental save location (on Windows: %APPDATA%/Godot/app_userdata/DiceIncremental). The rename does not move or replace player files. progress.json.bak is the previous validated primary. progress.json.tmp is the write candidate.
 
-State contains money, run_earned, dice, counts, upgrades, automatic, talents, statistics, achievements, helpers, prestige_points, prestige_total, next_id, tutorial_step, settings, last_saved and rng_state. Each die contains id, definition_id, x, y, face and automatic_clock. Resource files and Nodes are never serialized.
+State contains money, run_earned, dice, counts, upgrades, automatic (legacy; refunded and emptied on load), talents, statistics, achievements, helpers (0–12), prestige_points, prestige_total, next_id, tutorial_step, settings (now including music), last_saved, rng_state, and the optional chips, hats, crew_hat, table_id and tables. Each die contains id, definition_id, x, y, face, automatic_clock (legacy) and optional gilded. Missing optional fields default (0 chips, no hats, felt table); unknown hats or tables are dropped and an unowned table falls back to felt. Resource files and Nodes are never serialized.
 
 ## Lifecycle
 

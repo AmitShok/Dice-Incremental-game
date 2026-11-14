@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "momentum"
+display_name = "Momentum"
+description = "Hot streaks last 50% longer between your clicks. Three levels."
+cost = 120.0
+growth = 2.5
+max_level = 3
+stat = "streak_window"
+operation = "add"
+value = 0.5
+condition = ""
+target = ""
+unlock_earned = 20.0
+permanent = false
+prerequisite = ""

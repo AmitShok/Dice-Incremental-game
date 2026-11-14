@@ -1,11 +1,24 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://ui/roll_table_button.gd" id="roll"]
+[ext_resource type="Texture2D" path="res://assets/exported/ui/sell_tray.png" id="tray"]
 
 [sub_resource type="StyleBoxEmpty" id="empty"]
 
+[sub_resource type="StyleBoxTexture" id="tray_style"]
+texture = ExtResource("tray")
+content_margin_left = 40.0
+content_margin_right = 8.0
+
 [sub_resource type="StyleBoxFlat" id="fill"]
 bg_color = Color(0.49, 0.65, 0.49, 0.3)
+
+[sub_resource type="StyleBoxFlat" id="streak_fill"]
+bg_color = Color(1, 0.58, 0.28, 0.9)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -17,18 +30,18 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Title" type="Label" parent="."]
-offset_left = 32.0
+offset_left = 84.0
 offset_top = 12.0
-offset_right = 32.0
+offset_right = 84.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.95686, 0.87059, 0.68627, 1)
 theme_override_font_sizes/font_size = 26
 text = "D- infinity"
 
 [node name="Subtitle" type="Label" parent="."]
-offset_left = 33.0
+offset_left = 85.0
 offset_top = 49.0
-offset_right = 33.0
+offset_right = 85.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.69804, 0.6, 0.47451, 1)
 theme_override_font_sizes/font_size = 11
@@ -141,3 +154,54 @@ mouse_filter = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 text = "ROLL THE TABLE   [SPACE]"
+
+[node name="Streak" type="Control" parent="."]
+visible = false
+offset_left = 440.0
+offset_top = 84.0
+offset_right = 670.0
+offset_bottom = 110.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Streak"]
+layout_mode = 0
+offset_right = 230.0
+offset_bottom = 18.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.72, 0.42, 1)
+theme_override_font_sizes/font_size = 13
+text = "HOT STREAK 12  ·  ×1.25"
+horizontal_alignment = 2
+
+[node name="Bar" type="ProgressBar" parent="Streak"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 19.0
+offset_right = 230.0
+offset_bottom = 24.0
+mouse_filter = 2
+max_value = 1.0
+step = 0.0
+value = 1.0
+show_percentage = false
+theme_override_styles/background = SubResource("empty")
+theme_override_styles/fill = SubResource("streak_fill")
+
+[node name="SellTray" type="PanelContainer" parent="."]
+offset_left = 576.0
+offset_top = 530.0
+offset_right = 776.0
+offset_bottom = 584.0
+mouse_filter = 2
+tooltip_text = "Drag a die here to sell it for half of what it cost."
+theme_override_styles/panel = SubResource("tray_style")
+
+[node name="Label" type="Label" parent="SellTray"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.86, 0.78, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "SELL TRAY
+drag a die here"
+horizontal_alignment = 1
+vertical_alignment = 1

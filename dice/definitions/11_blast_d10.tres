@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/dice/blast_d10.png" id="2"]
+[ext_resource type="Resource" path="res://synergies/definitions/blast.tres" id="3"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/rolls/blast_d10.png" id="roll"]
+
+[resource]
+script = ExtResource("1")
+rolling_texture = ExtResource("roll")
+id = "blast_d10"
+display_name = "Blast D10"
+description = "Pays 2x. A natural 10 blasts every die nearby into one big throw. Combinations count."
+sides = 10
+base_cost = 15000.0
+base_payout = 2
+unlock_earned = 20000.0
+auto_cost = 1000.0
+duration = 0.95
+behavior = "blast"
+texture = ExtResource("2")
+effects = Array[Resource]([ExtResource("3")])

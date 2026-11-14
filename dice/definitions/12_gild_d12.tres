@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="DiceDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://core/content/dice_definition.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/dice/gild_d12.png" id="2"]
+[ext_resource type="Resource" path="res://synergies/definitions/gild.tres" id="3"]
+
+[ext_resource type="Texture2D" path="res://assets/exported/rolls/gild_d12.png" id="roll"]
+
+[resource]
+script = ExtResource("1")
+rolling_texture = ExtResource("roll")
+id = "gild_d12"
+display_name = "Gild D12"
+description = "Pays 2x. A natural 12 gilds nearby dice: their next roll pays triple."
+sides = 12
+base_cost = 30000.0
+base_payout = 2
+unlock_earned = 40000.0
+auto_cost = 1000.0
+duration = 1.0
+behavior = "gild"
+texture = ExtResource("2")
+effects = Array[Resource]([ExtResource("3")])

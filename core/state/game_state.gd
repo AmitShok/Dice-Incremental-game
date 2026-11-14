@@ -4,12 +4,14 @@ extends RefCounted
 const MAX_AMOUNT: float = 1e100
 const MAX_DICE: int = 100
 const TABLE_ROLL_COOLDOWN: float = 60.0
+const MAX_HELPERS: int = 12
 var table_roll_remaining: float = 0.0
 var money: float = 0.0
 var run_earned: float = 0.0
 var dice: Array[DiceInstance] = []
 var counts: Dictionary = {}
 var upgrades: Dictionary = {}
+# Legacy per-family auto-roll purchases; refunded and cleared on load (helpers replaced them).
 var automatic: Dictionary = {}
 var talents: Dictionary = {}
 var statistics: Dictionary = {}
@@ -22,6 +24,12 @@ var tutorial_step: int = 0
 var settings: Dictionary = {"sound": true, "music": true, "motion": true, "flashes": true, "numbers": true, "particles": true, "volume": 0.55}
 var last_saved: float = 0.0
 var rng_state: String = ""
+# Cosmetic and table progress survives Fate resets.
+var chips: int = 0
+var hats: Array = []
+var crew_hat: String = ""
+var table_id: String = "felt"
+var tables: Array = ["felt"]
 
 func add_die(definition_id: String, at: Vector2) -> DiceInstance:
 	var die := DiceInstance.new()
@@ -49,7 +57,8 @@ func snapshot() -> Dictionary:
 		"achievements": achievements.duplicate(), "helpers": helpers, "prestige_points": prestige_points,
 		"prestige_total": prestige_total, "next_id": next_id, "tutorial_step": tutorial_step,
 		"settings": settings.duplicate(true), "last_saved": last_saved, "rng_state": rng_state,
-		"table_roll_remaining": table_roll_remaining}
+		"table_roll_remaining": table_roll_remaining, "chips": chips, "hats": hats.duplicate(),
+		"crew_hat": crew_hat, "table_id": table_id, "tables": tables.duplicate()}
 
 static func valid_number(value: Variant, lower: float = 0.0, upper: float = MAX_AMOUNT) -> bool:
 	return (value is float or value is int) and is_finite(float(value)) and float(value) >= lower and float(value) <= upper
@@ -86,6 +95,9 @@ static func restore(data: Dictionary, registry: ContentRegistry) -> GameState:
 		if not valid_number(clock_value, 0, 60):
 			return null
 		die.automatic_clock = float(clock_value)
+		if not item.get("gilded", false) is bool:
+			return null
+		die.gilded = item.get("gilded", false)
 		result.next_id = maxi(result.next_id, die.id + 1)
 	if not valid_integer(data.get("next_id", result.next_id), result.next_id):
 		return null
@@ -110,7 +122,7 @@ static func restore(data: Dictionary, registry: ContentRegistry) -> GameState:
 		if not valid_integer(data.get(key, 0)):
 			return null
 		result.set(key, int(data.get(key, 0)))
-	if result.helpers > 8:
+	if result.helpers > MAX_HELPERS:
 		return null
 	if not data.get("achievements", []) is Array:
 		return null
@@ -136,4 +148,25 @@ static func restore(data: Dictionary, registry: ContentRegistry) -> GameState:
 	if not data.get("rng_state", "").is_empty() and not data.get("rng_state").is_valid_int():
 		return null
 	result.rng_state = data.get("rng_state", "")
+	if not valid_integer(data.get("chips", 0)):
+		return null
+	result.chips = int(data.get("chips", 0))
+	for key in ["hats", "tables"]:
+		if not data.get(key, []) is Array:
+			return null
+		for item in data.get(key, []):
+			if not item is String:
+				return null
+	for hat in data.get("hats", []):
+		if Cosmetics.HATS.has(hat) and not result.hats.has(hat):
+			result.hats.append(hat)
+	for table in data.get("tables", []):
+		if TableCatalog.TABLES.has(table) and not result.tables.has(table):
+			result.tables.append(table)
+	var crew: Variant = data.get("crew_hat", "")
+	var table_id: Variant = data.get("table_id", "felt")
+	if not crew is String or not table_id is String:
+		return null
+	result.crew_hat = crew if crew == "" or crew == "mix" or result.hats.has(crew) else ""
+	result.table_id = table_id if result.tables.has(table_id) else "felt"
 	return result

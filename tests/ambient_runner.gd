@@ -20,7 +20,7 @@ func run() -> void:
 	var ambience: Node2D = main.get_node("Tabletop/Ambience")
 	await create_timer(0.45).timeout
 	check(ambience.left_flame.frame != 0 and ambience.steam.frame != 0 and ambience.plant.frame != 0, "Ambient loops advance")
-	check(ambience.steam.visible, "Steam visible with motion enabled")
+	check(not ambience.steam.visible and not ambience.plant.visible, "Retired teapot steam and plant stay hidden")
 	var folder: String = OS.get_environment("DICE_TEST_OUTPUT")
 	await RenderingServer.frame_post_draw
 	if not folder.is_empty():
@@ -36,7 +36,7 @@ func run() -> void:
 	check(ambience.elapsed == before, "Developer pause freezes ambience")
 	manager.session.paused = false
 	await create_timer(0.4).timeout
-	check(ambience.elapsed > before and ambience.steam.visible, "Motion resumes")
+	check(ambience.elapsed > before , "Motion resumes")
 	check(manager.session.state.money == 0 and manager.session.pending.is_empty(), "Ambience never changes game economy")
 	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")), "Test audio remains silent")
 	print("AMBIENT RESULT: ", failures, " failures")

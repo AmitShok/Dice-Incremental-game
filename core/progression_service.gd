@@ -69,21 +69,11 @@ func buy_upgrade(id: String, permanent: bool = false) -> bool:
 	events.changed.emit()
 	return true
 
-func buy_automatic(id: String) -> bool:
-	if not registry.dice.has(id) or bool(state.automatic.get(id, false)) or int(state.counts.get(id, 0)) == 0:
-		return false
-	if not economy.spend(registry.dice[id].auto_cost):
-		return false
-	state.automatic[id] = true
-	events.purchased.emit("automatic", id)
-	events.changed.emit()
-	return true
-
 func helper_price() -> float:
 	return 250.0 * pow(2.8, state.helpers)
 
 func hire_helper() -> bool:
-	if state.helpers >= 8 or state.run_earned < 150 or not economy.spend(helper_price()):
+	if state.helpers >= GameState.MAX_HELPERS or state.run_earned < 150 or not economy.spend(helper_price()):
 		return false
 	state.helpers += 1
 	StatisticsService.increment(state, "helpers_hired")
@@ -116,8 +106,8 @@ func carryover_summary() -> String:
 		parts.append("%d extra D6" % _talent_count("starting_dice"))
 	if _talent_count("starting_helpers") > 0:
 		parts.append("%d helper%s" % [_talent_count("starting_helpers"), "" if _talent_count("starting_helpers") == 1 else "s"])
-	if _talent_count("keep_automation") > 0 and not state.automatic.is_empty():
-		parts.append("your automatic rolling")
+	if _talent_count("keep_helpers") > 0 and state.helpers > 0:
+		parts.append("all %d of your helpers" % state.helpers)
 	return "" if parts.is_empty() else "\nYour talents start the next run with " + ", ".join(parts) + "."
 
 func _talent_count(stat: String) -> int:
@@ -134,8 +124,7 @@ func prestige() -> bool:
 	state.dice.clear()
 	state.counts.clear()
 	state.upgrades.clear()
-	if _talent_count("keep_automation") == 0:
-		state.automatic.clear()
+	var kept_helpers: int = state.helpers if _talent_count("keep_helpers") > 0 else 0
 	state.helpers = 0
 	state.tutorial_step = 2
 	state.add_die("d6", Vector2(395, 310))
@@ -143,8 +132,38 @@ func prestige() -> bool:
 	state.money = starting_cash()
 	for index in _talent_count("starting_dice"):
 		state.add_die("d6", _open_position())
-	state.helpers = mini(8, _talent_count("starting_helpers"))
+	var kept: int = kept_helpers
+	state.helpers = mini(GameState.MAX_HELPERS, maxi(kept, _talent_count("starting_helpers")))
 	StatisticsService.increment(state, "prestiges")
 	events.prestige_completed.emit()
+	events.changed.emit()
+	return true
+
+# --- Capsule machine (cosmetic; never touches the payout RNG) ------------------
+var cosmetic_rng := RandomNumberGenerator.new()
+
+## Spends chips for a random hat. Returns the hat id, or "" if unaffordable.
+## Duplicates refund some chips; the first hat is worn automatically.
+func pull_capsule() -> String:
+	if state.chips < Cosmetics.CAPSULE_COST:
+		return ""
+	state.chips -= Cosmetics.CAPSULE_COST
+	var hat: String = Cosmetics.draw(cosmetic_rng)
+	if state.hats.has(hat):
+		state.chips += Cosmetics.DUPLICATE_REFUND
+	else:
+		state.hats.append(hat)
+		if state.crew_hat.is_empty():
+			state.crew_hat = hat
+	StatisticsService.increment(state, "capsules")
+	events.purchased.emit("capsule", hat)
+	events.changed.emit()
+	return hat
+
+## "" = no hats, "mix" = each helper wears a different owned hat, otherwise an owned hat id.
+func wear_hat(id: String) -> bool:
+	if not (id.is_empty() or id == "mix" or state.hats.has(id)):
+		return false
+	state.crew_hat = id
 	events.changed.emit()
 	return true

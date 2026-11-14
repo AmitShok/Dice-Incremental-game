@@ -17,7 +17,6 @@ func run() -> void:
 			count = clampi(argument.trim_prefix("--dice=").to_int(), 1, 100)
 	for index in count:
 		game.state.add_die("d6", Vector2(85 + index % 11 * 61, 170 + int(index / 11) * 34))
-	game.state.automatic.d6 = true
 	game.state.helpers = 8
 	var main: Control = load("res://scenes/main.tscn").instantiate()
 	root.add_child(main)

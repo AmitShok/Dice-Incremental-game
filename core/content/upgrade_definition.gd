@@ -19,7 +19,8 @@ extends Resource
 
 func valid() -> bool:
 	if not stat in ["payout", "luck", "combos", "helper_speed", "roll_speed", "chain", "critical",
-			"starting_cash", "starting_dice", "starting_helpers", "table_cooldown", "offline_hours", "keep_automation", "fate_gain"] or not operation in ["add", "multiply"]:
+			"starting_cash", "starting_dice", "starting_helpers", "table_cooldown", "offline_hours", "keep_helpers", "fate_gain",
+			"helper_payout", "helper_smart", "helper_hands", "streak_window"] or not operation in ["add", "multiply"]:
 		return false
 	if not condition in ["", "six", "maximum"] or value < 0 or (operation == "multiply" and value == 0):
 		return false

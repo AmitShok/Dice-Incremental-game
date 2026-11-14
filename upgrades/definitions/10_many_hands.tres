@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/content/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "many_hands"
+display_name = "Many hands"
+description = "Each helper grabs one more nearby die per level and throws them together, so combinations count. Two levels."
+cost = 5000.0
+growth = 4
+max_level = 2
+stat = "helper_hands"
+operation = "add"
+value = 1
+condition = ""
+target = ""
+unlock_earned = 4000.0
+permanent = false
+prerequisite = ""

@@ -12,7 +12,9 @@ var elapsed: float = 0.0
 
 func _process(delta: float) -> void:
 	var motion: bool = manager.session.state.settings.get("motion", true)
-	steam.visible = motion
+	# Steam and plant are hidden in the scene since the shelf became the sell tray; keep that choice.
+	if not motion:
+		steam.visible = false
 	if not motion:
 		left_flame.frame = 0
 		right_flame.frame = 0
