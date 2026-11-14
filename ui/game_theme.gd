@@ -14,7 +14,10 @@ static func skin(name: String, content: float = 9.0) -> StyleBoxTexture:
 
 static func build() -> Theme:
 	var result := Theme.new()
-	result.default_font_size = 16
+	# The game's own pixel font. It scales by whole steps of its 6 px base (size / 6, rounded):
+	# 12 is 2x for body text, 18 is 3x for headings, 24 is 4x for money and titles.
+	result.default_font = load("res://assets/fonts/d_infinity_pixel.fnt")
+	result.default_font_size = 12
 	result.set_color("font_color", "Label", Color("#e7deca"))
 	result.set_color("font_color", "Button", Color("#f3dfb4"))
 	result.set_color("font_hover_color", "Button", Color("#fff1cf"))

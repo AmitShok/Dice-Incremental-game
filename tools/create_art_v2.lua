@@ -1,7 +1,7 @@
--- D- infinity art pass 2: room backdrop, table surfaces, UI skin, sell tray and helper hats.
+-- D- infinity art pass 2: room backdrop, table surfaces, UI skin and sell tray (hats: create_helpers_hd.lua).
 -- Run: ASEPRITE -b --script-param root=PROJECT_PATH --script tools/create_art_v2.lua
 -- Writes layered .aseprite masters under assets/source/aseprite and PNGs under assets/exported.
--- WARNING: overwrites the masters it creates (room_base, tables/*, ui/*, helpers/hats).
+-- WARNING: overwrites the masters it creates (room_base, tables/*, ui/*).
 -- Hand-edit the .aseprite masters afterwards and export with tools/export_art.lua instead.
 local root = assert(app.params["root"], "Pass --script-param root=PROJECT_PATH")
 math.randomseed(38)
@@ -68,87 +68,162 @@ end
 local FELT = {x=22,y=66,w=346,h=184,r=10}
 
 -- 1. Room backdrop (560×320) ---------------------------------------------------------
+-- One lamp, up and to the left of the table, lights everything: top-left edges catch light,
+-- bottom-right edges fall into shade, exactly like the dice. Lamplight on the wall is banded
+-- (flat steps with a one-pixel checker seam) rather than dithered.
+local LIGHT={x=196,y=150}
+local function bevel_tone(nx,ny)
+  -- nx,ny: outward direction of a sloped surface; returns +1 lit, -1 shaded, 0 neutral
+  local f=-nx*0.55-ny*0.85
+  if f>0.35 then return 1 elseif f<-0.35 then return -1 end
+  return 0
+end
+-- Carved frame: a rounded-rectangle rail with an outer roll, a flat top with grain, a brass
+-- inlay and an inner slope. `tones` = {dark, shade, mid, lit, highlight}.
+local function carved_rail(im,x,y,w,h,r,width,tones,inlay)
+  local cx,cy=x+w/2,y+h/2
+  for yy=y,y+h-1 do for xx=x,x+w-1 do
+    if inround(xx,yy,x,y,w,h,r) then
+      local d=0
+      while d<width and inround(xx,yy,x+d+1,y+d+1,w-2*d-2,h-2*d-2,math.max(0,r-d-1)) do d=d+1 end
+      if d<width then
+        -- outward normal of a rounded rectangle: from the nearest point of its inner core, so
+        -- straight sides light evenly and only the corners turn
+        local qx=math.max(x+r,math.min(x+w-1-r,xx)); local qy=math.max(y+r,math.min(y+h-1-r,yy))
+        local nx,ny=xx-qx,yy-qy
+        if nx==0 and ny==0 then nx,ny=xx-cx,yy-cy end
+        local len=math.sqrt(nx*nx+ny*ny); if len>0 then nx,ny=nx/len,ny/len end
+        local c
+        if d==0 then c=P.ink
+        elseif d<=2 then local b=bevel_tone(nx,ny); c=b>0 and tones[5] or (b<0 and tones[1] or tones[3])
+        elseif d==width-1 then local b=bevel_tone(-nx,-ny); c=b>0 and tones[4] or (b<0 and tones[1] or tones[2])
+        elseif inlay and d==inlay then local b=bevel_tone(nx,ny); c=b>0 and P.brass3 or (b<0 and P.brass1 or P.brass2)
+        elseif inlay and d==inlay+1 then c=P.brass1
+        else
+          c=tones[3]
+          -- grain runs along the rail: wavy streaks keyed to the position along each side
+          local along=math.abs(ny)>math.abs(nx) and xx or yy
+          local wave=d+0.9*math.sin(along/11+d)+0.6*math.sin(along/29)
+          if math.floor(wave*1.3)%4==0 and (along+d*13)%37>4 then c=tones[2] end
+          if (along*7+d*11)%53==0 then c=tones[1] end
+          if d==3 and bevel_tone(nx,ny)>0 then c=tones[4] end
+        end
+        px(im,xx,yy,hex(c))
+      end
+    end
+  end end
+end
+-- Outlined brass rosette (rail corners, cabinet corners).
+local function rosette(im,cx,cy)
+  ellipse(im,cx,cy,5,5,hex(P.ink)); ellipse(im,cx,cy,4,4,hex(P.brass1)); ellipse(im,cx-1,cy-1,3,3,hex(P.brass2))
+  ellipse(im,cx-1,cy-1,2,2,hex(P.brass3)); px(im,cx-2,cy-3,hex(P.brass4)); px(im,cx-3,cy-2,hex(P.brass4))
+  rect(im,cx-1,cy-1,2,2,hex(P.brass1)); px(im,cx,cy,hex(P.ink))
+end
+local function rivet(im,x,y)
+  px(im,x,y,hex(P.brass3)); px(im,x+1,y,hex(P.brass2)); px(im,x,y+1,hex(P.brass2)); px(im,x+1,y+1,hex(P.ink))
+end
+-- Plaque: outlined plate with a lit top-left bevel, rivets and an inset screen.
+local function plaque(im,x,y,w,h,face,lit,shade,screen)
+  roundrect(im,x,y,w,h,3,hex(P.ink))
+  roundrect(im,x+1,y+1,w-2,h-2,3,hex(face))
+  rect(im,x+2,y+1,w-4,1,hex(lit)); rect(im,x+1,y+2,1,h-4,hex(lit))
+  rect(im,x+2,y+h-2,w-4,1,hex(shade)); rect(im,x+w-2,y+2,1,h-4,hex(shade))
+  roundrect(im,x+4,y+4,w-8,h-8,2,hex(P.ink))
+  roundrect(im,x+5,y+5,w-10,h-10,2,hex(screen))
+  rect(im,x+6,y+5,w-12,1,hex("0a080c")) -- inner shadow under the screen lip
+  for _,p in ipairs({{x+2,y+2},{x+w-4,y+2},{x+2,y+h-4},{x+w-4,y+h-4}}) do rivet(im,p[1],p[2]) end
+end
 do
   local s=Sprite(560,320); S=1
   layer(s,"Wallpaper and lamplight",function(im)
     local base,lat,dot,glow=rgb(P.wall),rgb(P.wall2),rgb(P.wall3),rgb(P.glow)
     for y=0,319 do for x=0,559 do
+      -- damask: a diamond lattice with a small lozenge at each centre
+      local u,v=x%24,y%24
+      local dist=math.abs(u-12)+math.abs(v-12)
       local c=base
-      if (x+y)%24==0 or (x-y+480)%24==0 then c=lat end
-      if (x+12)%24==0 and (y)%24==0 then c=dot end
-      local dx,dy=(x-196)/1.25,y-150
-      local light=math.max(0,1-math.sqrt(dx*dx+dy*dy)/270)
-      local level=math.floor(light*4)/4
-      if dither(x,y,(light*4)%1) then level=math.min(1,level+0.25) end
-      c=lerp(c,glow,level*0.55)
+      if dist==10 then c=lat elseif dist<=2 then c=dot elseif dist==5 and (u==12 or v==12) then c=lat end
+      -- lamplight in flat bands, seamed with a one-pixel checker
+      local dx,dy=(x-LIGHT.x)/1.25,y-LIGHT.y
+      local light=math.max(0,1-math.sqrt(dx*dx+dy*dy)/280)*3
+      local band=math.floor(light)
+      if light-band>0.85 and (x+y)%2==0 then band=band+1 end
+      c=lerp(c,glow,math.min(3,band)*0.2)
       im:drawPixel(x,y,col(c))
     end end
   end)
-  layer(s,"Header ledge",function(im)
-    rect(im,0,0,560,40,hex(P.night))
-    for x=0,559 do if (x*7)%23<2 then px(im,x,math.random(0,38),hex(P.wall,255)) end end
-    rect(im,0,40,560,2,hex(P.shelf3)); rect(im,0,42,560,3,hex(P.shelf1)); rect(im,0,45,560,1,hex(P.ink))
-    for x=0,559,32 do rect(im,x,41,1,4,hex(P.wood0)) end
+  layer(s,"Header cornice",function(im)
+    -- crown moulding along the top, with dentils
+    rect(im,0,0,560,3,hex(P.shelf1)); rect(im,0,3,560,1,hex(P.shelf3)); rect(im,0,4,560,1,hex(P.ink))
+    for x=0,559,6 do rect(im,x,5,4,2,hex(P.shelf2)); px(im,x,5,hex(P.shelf3)); rect(im,x,7,4,1,hex(P.ink)) end
+    -- picture rail under the header: lit top edge, dark underside
+    rect(im,0,39,560,1,hex(P.ink)); rect(im,0,40,560,1,hex(P.shelf4)); rect(im,0,41,560,2,hex(P.shelf3))
+    rect(im,0,43,560,2,hex(P.shelf1)); rect(im,0,45,560,1,hex(P.ink))
+    for x=16,559,48 do rivet(im,x,41) end
   end)
   layer(s,"Shop cabinet",function(im)
-    roundrect(im,388,44,170,258,4,hex(P.ink))
-    roundrect(im,389,45,168,256,4,hex(P.shelf1))
-    rect(im,390,46,166,1,hex(P.shelf3))
-    rect(im,393,49,160,248,hex(P.cab))
-    for x=393,552,20 do rect(im,x,49,1,248,hex(P.cab2)) end
-    for _,p in ipairs({{391,47},{553,47},{391,297},{553,297}}) do rect(im,p[1],p[2],3,3,hex(P.brass2)); px(im,p[1],p[2],hex(P.brass4)) end
+    -- soft shadow the cabinet throws on the wall (offset down-right, one flat tone)
+    roundrect(im,391,47,170,258,4,hex("120f17"))
+    carved_rail(im,388,44,170,258,5,6,{P.wood0,P.wood1,P.wood2,P.wood3,P.wood4},nil)
+    rect(im,394,50,158,246,hex(P.ink))
+    rect(im,395,51,156,244,hex(P.cab))
+    for x=395,550,13 do rect(im,x,51,1,244,hex(P.cab2)) end
+    rect(im,395,51,156,1,hex("0a080c"))
+    for _,p in ipairs({{392,48},{554,48},{392,298},{554,298}}) do rosette(im,p[1],p[2]) end
   end)
   layer(s,"Shelf",function(im)
-    rect(im,0,262,388,40,hex(P.shelf2))
-    rect(im,0,262,388,2,hex(P.shelf4)); rect(im,0,264,388,2,hex(P.shelf3))
-    for y=270,296,9 do for x=0,387 do if (x+y*3)%61>2 then else px(im,x,y,hex(P.shelf1)) end end end
-    for x=0,387 do if math.random()<0.18 then px(im,x,math.random(268,296),hex(P.shelf1)) end end
-    rect(im,0,298,388,3,hex(P.wood0)); rect(im,0,301,560,19,hex(P.ink))
+    -- shelf board: lit nosing, grain along the plank, deep shadow under the lip
+    rect(im,0,261,388,1,hex(P.ink))
+    rect(im,0,262,388,2,hex(P.shelf4)); rect(im,0,264,388,1,hex(P.shelf3))
+    for y=265,297 do for x=0,387 do
+      local c=P.shelf2
+      local wave=y+1.2*math.sin(x/23)+0.7*math.sin(x/7+y)
+      if math.floor(wave)%5==0 and (x+y*7)%41>5 then c=P.shelf1 end
+      if (x*3+y*13)%97==0 then c=P.shelf3 end
+      px(im,x,y,hex(c))
+    end end
+    for x=0,387,64 do rect(im,x,265,1,33,hex(P.shelf1)) end
+    rect(im,0,298,388,1,hex(P.shelf1)); rect(im,0,299,388,2,hex(P.wood0)); rect(im,0,301,560,19,hex(P.ink))
   end)
   layer(s,"Table",function(im)
-    -- drop shadow
-    for y=58,272 do for x=14,392 do
-      if inround(x,y,14,58,376,214,24) and dither(x,y,0.5) then px(im,x,y,hex(P.ink)) end
-    end end
-    roundrect(im,8,52,376,214,24,hex(P.ink))
-    local rings={P.wood1,P.wood2,P.wood3,P.wood4,P.wood3,P.wood2}
-    for i,c in ipairs(rings) do roundrect(im,8+i,52+i,376-2*i,214-2*i,24-i,hex(c)) end
-    -- lamplight on the near rail: brighten the upper band
-    for y=53,62 do for x=20,372 do if dither(x,y,0.35) then px(im,x,y,hex(P.wood5)) end end end
-    roundline(im,14,58,364,202,18,hex(P.brass1))
-    roundline(im,15,59,362,200,17,hex(P.brass2),6)
-    -- felt lip and default felt (table surfaces draw over this)
+    -- flat drop shadow on the wall and shelf
+    roundrect(im,12,57,376,214,24,hex("120f17"))
+    carved_rail(im,8,52,376,214,24,12,{P.wood1,P.wood2,P.wood3,P.wood4,P.wood5},6)
+    -- felt lip: the rail's inner edge throws a little shadow on the top and left of the felt
     roundrect(im,FELT.x-2,FELT.y-2,FELT.w+4,FELT.h+4,FELT.r+2,hex(P.wood0))
     roundrect(im,FELT.x,FELT.y,FELT.w,FELT.h,FELT.r,hex("24493f"))
-    -- brass studs along the rail
-    for x=40,352,26 do for _,y in ipairs({56,258}) do rect(im,x,y,2,2,hex(P.brass3)); px(im,x+1,y+1,hex(P.brass1)) end end
-    for y=88,232,24 do for _,x in ipairs({11,379}) do rect(im,x,y,2,2,hex(P.brass3)); px(im,x+1,y+1,hex(P.brass1)) end end
+    -- brass rosettes at the corners and studs along the rails
+    for _,p in ipairs({{20,64},{372,64},{20,254},{372,254}}) do rosette(im,p[1],p[2]) end
+    for x=44,348,26 do for _,y in ipairs({56,260}) do rivet(im,x,y) end end
+    for y=92,228,24 do for _,x in ipairs({12,378}) do rivet(im,x,y) end end
   end)
   layer(s,"Plaques",function(im)
-    -- wallet plaque behind the money counter
-    roundrect(im,214,3,136,34,3,hex(P.ink))
-    roundrect(im,215,4,134,32,3,hex(P.brass1))
-    rect(im,216,5,132,1,hex(P.brass3))
-    roundrect(im,218,7,128,27,2,hex("16131a"))
-    for _,p in ipairs({{217,6},{346,6},{217,33},{346,33}}) do px(im,p[1],p[2],hex(P.brass4)) end
-    -- fate plaque
-    roundrect(im,394,3,128,37,3,hex(P.ink))
-    roundrect(im,395,4,126,35,3,hex(P.lilac1))
-    rect(im,396,5,124,1,hex(P.lilac2))
-    roundrect(im,398,7,120,30,2,hex(P.lilac0))
+    plaque(im,214,3,136,34,P.brass2,P.brass3,P.brass1,"16131a")
+    plaque(im,394,3,128,37,P.lilac1,P.lilac2,"4a3f66",P.lilac0)
   end)
-  layer(s,"Candles and book",function(im)
+  layer(s,"Candles and props",function(im)
     for _,cx in ipairs({28,361}) do
-      ellipse(im,cx,48,7,2,hex(P.brass1)); ellipse(im,cx,47,6,2,hex(P.brass2)); rect(im,cx-4,46,9,1,hex(P.brass3))
+      -- brass dish
+      ellipse(im,cx,48,8,3,hex(P.ink)); ellipse(im,cx,48,7,2,hex(P.brass1)); ellipse(im,cx,47,6,2,hex(P.brass2))
+      rect(im,cx-4,46,9,1,hex(P.brass3)); px(im,cx-5,47,hex(P.brass4))
+      -- candle body: outline, lit left side, shaded right side, a wax drip
+      rect(im,cx-4,32,9,15,hex(P.ink))
       rect(im,cx-3,33,7,13,hex(P.wax)); rect(im,cx+2,33,2,13,hex(P.wax2)); rect(im,cx-3,33,1,13,hex("fff6dc"))
-      px(im,cx-1,34,hex(P.wax2)); px(im,cx,32,hex(P.ink))
-      rect(im,cx+3,36,1,3,hex(P.wax)) -- drip
+      rect(im,cx-3,33,7,1,hex(P.wax2)); px(im,cx,32,hex(P.ink)); px(im,cx,31,hex(P.ink))
+      rect(im,cx+3,35,1,4,hex(P.wax)); px(im,cx+3,39,hex(P.wax2))
     end
-    -- open ledger book and quill on the shelf
-    rect(im,26,270,40,22,hex(P.ink)); rect(im,27,271,38,20,hex("6a3a2a"))
-    rect(im,29,272,16,17,hex(P.paper)); rect(im,47,272,16,17,hex(P.paper)); rect(im,45,272,2,17,hex(P.paper2))
-    for y=275,286,3 do line(im,31,y,42,y,hex(P.paper2)); line(im,49,y,60,y,hex(P.paper2)) end
-    line(im,70,290,84,268,hex(P.cream)); line(im,71,290,85,268,hex(P.paper2)); px(im,70,291,hex(P.ink))
+    -- open ledger: outlined leather cover, two pages with ruled lines, a ribbon
+    rect(im,25,269,42,24,hex(P.ink)); rect(im,26,270,40,22,hex("6a3a2a")); rect(im,26,270,40,1,hex("8a4e38"))
+    rect(im,28,271,17,19,hex(P.paper)); rect(im,47,271,17,19,hex(P.paper)); rect(im,45,271,2,19,hex(P.paper2))
+    rect(im,28,271,1,19,hex("fff6e4")); rect(im,63,271,1,19,hex(P.paper2))
+    for y=274,287,3 do line(im,30,y,42,y,hex(P.paper2)); line(im,49,y,61,y,hex(P.paper2)) end
+    rect(im,52,290,2,5,hex("b8433f")); px(im,52,295,hex("6e2522"))
+    -- quill with a feather vane
+    line(im,70,291,86,267,hex(P.ink)); line(im,71,290,86,268,hex(P.cream)); line(im,72,290,87,268,hex(P.paper2))
+    for i=0,9 do px(im,80+i*0.7,276-i*1.0,hex(P.cream)); px(im,82+i*0.6,277-i*1.0,hex(P.paper2)) end
+    px(im,70,292,hex(P.ink))
+    -- (the house chip stack on the shelf is drawn live by effects/room_life.gd: it grows with
+    -- the chips you hold)
   end)
   finish(s,"ambient","room_base")
 end
@@ -165,18 +240,33 @@ local function surface(name,draw)
   end)
   finish(s,"tables",name)
 end
+-- Edge darkening in one flat step with a one-pixel checker seam (no dithered gradient), plus
+-- a slightly deeper band along the top and left where the rail shades the felt.
 local function vignette(x,y,base,dark,amount)
   local ex=math.min(x,FELT.w-1-x)/40; local ey=math.min(y,FELT.h-1-y)/30
   local e=math.max(0,1-math.min(ex,ey)); local t=e*amount
-  return dither(x,y,t) and dark or base
+  if t>0.5 or (t>0.42 and (x+y)%2==0) then return dark end
+  if (y<=2 or x<=2) then return dark end
+  return base
 end
 local function stitch(im,inset,c,step)
   roundline(im,inset,inset,FELT.w-2*inset,FELT.h-2*inset,math.max(2,FELT.r-inset+6),c,step)
 end
+-- Corner brackets: outlined metal L-plates with a lit outer edge and a rivet, set into
+-- each corner of the playing surface.
 local function brackets(im,c,hi)
-  for _,p in ipairs({{10,10,1,1},{FELT.w-11,10,-1,1},{10,FELT.h-11,1,-1},{FELT.w-11,FELT.h-11,-1,-1}}) do
-    for i=0,9 do px(im,p[1]+i*p[3],p[2],c); px(im,p[1],p[2]+i*p[4],c) end
-    px(im,p[1],p[2],hi); px(im,p[1]+p[3],p[2]+p[4],c)
+  local ink=hex(P.ink)
+  for _,p in ipairs({{9,9,1,1},{FELT.w-10,9,-1,1},{9,FELT.h-10,1,-1},{FELT.w-10,FELT.h-10,-1,-1}}) do
+    local x,y,sx,sy=p[1],p[2],p[3],p[4]
+    -- outline first (one pixel larger), then the plate
+    for i=-1,14 do for j=-1,4 do px(im,x+i*sx,y+j*sy,ink); px(im,x+j*sx,y+i*sy,ink) end end
+    for i=0,13 do for j=0,3 do px(im,x+i*sx,y+j*sy,c); px(im,x+j*sx,y+i*sy,c) end end
+    -- lit outer edges (the edges facing the table rim)
+    for i=0,13 do px(im,x+i*sx,y,hi); px(im,x,y+i*sy,hi) end
+    -- rivet in the elbow
+    px(im,x+1*sx,y+1*sy,ink); px(im,x+2*sx,y+2*sy,hi)
+    -- end caps cut on a slant
+    px(im,x+13*sx,y+3*sy,ink); px(im,x+3*sx,y+13*sy,ink)
   end
 end
 local function emblem(im,cx,cy,c)
@@ -310,35 +400,6 @@ do
   finish(s,"ui","sell_tray")
 end
 
--- 5. Helper hats: 8 frames of 16×12, worn on Moss (frame order matches Cosmetics.HATS)
-do
-  local s=Sprite(16*8,12); S=1
-  layer(s,"Hats",function(im)
-    local function at(f,x,y,c) px(im,f*16+x,y,c) end
-    local function fill(f,x,y,w,h,c) for yy=y,y+h-1 do for xx=x,x+w-1 do at(f,xx,yy,c) end end end
-    -- 0 party cone
-    for i=0,8 do fill(0,8-math.floor(i/2),2+i,1+math.floor(i/2)*2,1,hex(i%3==0 and "f5db9f" or "d86f8a")) end
-    at(0,8,1,hex("fff3c4")); at(0,8,0,hex("ffffff"))
-    -- 1 beret
-    fill(1,3,7,10,3,hex("b8433f")); fill(1,4,6,8,1,hex("d65a52")); at(1,8,5,hex("6e2522")); fill(1,3,10,10,1,hex("6e2522"))
-    -- 2 felt cap
-    fill(2,4,5,8,5,hex("3f6a8a")); fill(2,5,4,6,1,hex("5683a6")); fill(2,8,9,7,2,hex("2b4a63")); at(2,8,3,hex("f0dfbd"))
-    -- 3 daisy
-    for _,p in ipairs({{8,6},{6,7},{10,7},{7,9},{9,9}}) do fill(3,p[1]-1,p[2]-1,2,2,hex("ffffff")) end
-    fill(3,7,7,2,2,hex("f2c14e")); at(3,5,10,hex("6aa86a")); at(3,4,11,hex("6aa86a"))
-    -- 4 top hat
-    fill(4,5,1,6,8,hex("23202a")); fill(4,5,7,6,1,hex("b8433f")); fill(4,3,9,10,2,hex("23202a")); fill(4,6,1,1,6,hex("3a3542"))
-    -- 5 star hat
-    for i=0,9 do fill(5,8-math.floor(i/2),1+i,1+math.floor(i/2)*2,1,hex("3c3a8a")) end
-    fill(5,3,10,10,1,hex("2a2866")); at(5,7,6,hex("f5db9f")); at(5,9,8,hex("f5db9f")); at(5,8,1,hex("f5db9f"))
-    -- 6 tiny crown
-    fill(6,4,6,8,4,hex("d8b874")); fill(6,4,9,8,1,hex("8a6a40"))
-    for _,x in ipairs({4,7,8,11}) do fill(6,x,4,1,2,hex("d8b874")) end
-    at(6,6,7,hex("d65a52")); at(6,9,7,hex("5ab0d6")); at(6,4,3,hex("f5db9f")); at(6,11,3,hex("f5db9f"))
-    -- 7 halo
-    for t=0,31 do local a=t/32*math.pi*2; at(7,8+6*math.cos(a),5+2*math.sin(a),hex(t%4==0 and "ffffff" or "f5db9f")) end
-  end)
-  finish(s,"helpers","hats")
-end
+-- 5. Helper hats now come from tools/create_helpers_hd.lua, alongside Moss.
 
-print("ART V2: room, five table surfaces, UI skin, sell tray and hats exported")
+print("ART V2: room, five table surfaces, UI skin and sell tray exported")

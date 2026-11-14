@@ -28,7 +28,7 @@ theme_override_constants/separation = 0
 [node name="Title" type="Label" parent="Line/Text"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 12
 text = "Item"
 text_overrun_behavior = 3
 
@@ -54,5 +54,5 @@ custom_minimum_size = Vector2(88, 44)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 1
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "$0"

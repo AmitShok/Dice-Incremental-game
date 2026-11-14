@@ -5,7 +5,8 @@ size_flags_horizontal = 3
 
 [node name="Title" type="Label" parent="."]
 layout_mode = 2
-theme_override_font_sizes/font_size = 19
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
 text = "Make yourself comfortable."
 
 [node name="DeveloperTools" type="Button" parent="."]
@@ -68,7 +69,7 @@ text = "Save now"
 
 [node name="Help" type="Label" parent="."]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Autosaves every 30 seconds and on exit. Offline earnings: 50% of estimated production, up to four hours."
 autowrap_mode = 3
 

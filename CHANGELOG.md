@@ -1,5 +1,120 @@
 # Changelog
 
+## 2026-11-14 — Pixel font
+
+- All text now uses the game's own pixel font, D-infinity Pixel, built by `tools/create_pixel_font.gd`. Every glyph was designed by hand for readability:
+  - capitals and digits 6 px tall,
+  - a 4 px lowercase x-height with true descenders (g, j, p, q, y),
+  - proportional widths with a 1 px gap between letters,
+  - a slashed zero,
+  - plus the × · – — − → • symbols the game uses.
+- Two versions ship in `assets/fonts/`: a plain one for the UI, and one with a 1 px dark outline baked in for text over the table. That covers payout pops, dice tags, the hint line, combo text and the streak label. Bitmap fonts can't use Godot's `outline_size`.
+- The font scales only in whole steps (size ÷ 6, rounded), so text pixels are always square, matching the art:
+  - body text is 12 (2×, 12 px capitals),
+  - headings are 18 (3×),
+  - money and Fate are 24 (4×),
+  - payout pops step from 2× under $1K up to 5×, one step bigger for max and critical rolls.
+- Every text size in the scenes and code was mapped onto those tiers. The theme default is now 12.
+- **Layout fixes for the wider pixel letters:**
+  - The game title is 3× with the tagline on two lines, so it no longer runs into the money plaque.
+  - The money amount sits lower, inside its plaque.
+  - The Settings heading is normal size and wraps.
+  - The reset dialog uses the game theme, so its text and buttons are cream instead of dim grey.
+
+## 2026-11-14 — Art consistency pass
+
+- **One outline colour:** the dice and Moss now use the same near-black outline (`0e0b10`) as the room, UI and icons.
+- **One pixel size for every icon:** every 16 px icon now draws at exactly 2×, the same grid as the room, dice and helpers. This covers shop cards, tabs, the Ledger and Settings buttons, hat tiles, the info boxes and talent nodes.
+  - Before, tabs drew icons at 1.6×, cards at 2.25× and the talent info box at 2.5×.
+  - Use `ShopIcons.set_button_picture` instead of stretching an icon to fill a button.
+- **Dice icons:** `tools/create_dice_hd.lua` now also renders a 16 px icon per die (its highest face) into `assets/exported/icons/dice_icons.png`. Shop cards and die-devotion talents now match the other icons, instead of showing a crop of the 32 px dice art at half the pixel size.
+- **Talent tree links** draw in 2 px blocks on the art grid, like the effects.
+
+## 2026-11-14 — Art upgrade, phase 4: effects
+
+- New `tools/create_effects_hd.lua` redraws the dice contact shadow and the payout spark on the 2× art grid:
+  - The shadow is a 22×6 felt-green oval with a darker core, matching the shadows painted under Moss and the table. It now draws at an even 2× instead of 1.5×, and shrinks a little while the die is airborne.
+  - The spark is a 9×9 four-point sparkle with a white heart, drawn at 2× instead of being shrunk to 0.6×.
+- Arc, blast, gild and reroll effects now draw in pixel blocks snapped to the 2-pixel art grid, instead of smooth anti-aliased lines. They fade in three flat steps.
+  - **Arc:** a jagged bolt with a white core.
+  - **Blast:** a shock ring that thins as it spreads, with a white inner ring at first.
+  - **Gild:** a gold ring, with a sparkle on each gilded die.
+  - **Reroll:** a pixel line.
+- This completes the art upgrade. Dice, room, tables, helpers, hats, icons, room life and effects now share one pixel grid, one lamp direction, one outline colour and one palette.
+
+## 2026-11-14 — Art upgrade, phase 3: helpers, hats and icons
+
+- New `tools/create_helpers_hd.lua` redraws Moss (12 frames of 24×32) and the eight hats in the dice style: the shared outline, one lamp to the upper left, cel-shaded face, ears, apron and hands, eye highlights, blush and a painted floor shadow.
+- Every pose now reads distinctly:
+  - a breathing idle,
+  - a real 4-frame walk with alternating feet and a body bob (the game now plays all four frames),
+  - reaching out for a die,
+  - winding up with the die held high, then releasing it with motion pixels,
+  - a celebration jump with both arms up, an open mouth and sparkles.
+- Hats are outlined and shaded, and follow the head through every frame, including the jump (`HELPER_HEAD_DY` in `main.gd`).
+- `tools/create_art_v2.lua` no longer writes the hats.
+- Shop and talent icons get a finishing pass in `tools/create_icons.lua`: every shape gets the shared one-pixel outline, and solid areas get a lit top-left edge and a shaded bottom-right edge, so all 53 icons read as one set. The Helper icon is redrawn as the new Moss.
+- 18 more icons are redrawn so each shows what it does:
+  - Heavy dice: a kettlebell.
+  - Table harmony: a pair of matching dice.
+  - Quick hands: a mitten with speed lines.
+  - Rolling rhythm: a metronome.
+  - Strong arms: a flexed arm.
+  - Many hands: two hands.
+  - Fortune: a four-leaf clover.
+  - Fleet of foot: a winged boot.
+  - Head start: a coin with a go arrow.
+  - Loyal crew: two Moss faces.
+  - Golden touch: a shining gold die.
+  - Well-paid crew: Moss with a coin.
+  - Haggler: a % tag.
+  - Bargain hunter: a die with a slashed price tag.
+  - House edge: a house with a Fate star over the door.
+  - Chip collector: a chip stack with a plus.
+  - Chip hoard: a chip pyramid.
+  - Divine intervention: a die with a halo.
+  - Old friends: a bigger heart.
+
+## 2026-11-14 — A living room
+
+- New `effects/room_life.gd` (RoomLife) animates the room on the same 2-pixel art grid as the art.
+- **Idle:**
+  - Dust motes drift and twinkle in the lamplight, brighter near the lamp.
+  - Each candle casts a banded, flickering glow on the wall. It's drawn additively, so it brightens the wall rather than covering it.
+- **Reactive:**
+  - **Candles:** the flames lean in a gust when three or more dice are in the air (a table roll or a many-hands throw). They also burn taller and hotter as the hot streak climbs, turning blue-white at INFINITE, and cool back down when the streak ends.
+  - **Felt dust** puffs up where each die lands.
+  - **The shelf chip stack** shows the chips you hold (one chip per 4, up to 10), and a chip drops onto it with a bounce on every natural 1. It replaces the stack that used to be painted into the room.
+  - **Brass glints** sweep along the table rail on combos and across the money plaque on max or critical rolls.
+  - **Combos** thump the table by one art pixel.
+  - **The ledger** turns a page when you unlock a milestone.
+- **Settings:** reduced motion stills the flames and skips gusts, puffs, thumps, chip drops and page turns. Flashes off removes glints, and particles off removes dust and puffs. Everything freezes while the session is paused, and room life never touches game state.
+- New `tests/room_life_runner.gd` covers every reaction and settings rule. The 100-die stress test is unchanged at about 143 fps.
+
+## 2026-11-14 — Art upgrade, phase 2: room and tables
+
+- The room is redrawn by `tools/create_art_v2.lua` under the dice's lighting rule: one lamp to the upper left, so top-left edges catch light and bottom-right edges fall into shade.
+  - **Walls:** damask wallpaper, with lamplight in flat bands seamed by a one-pixel checker instead of dithering. A crown moulding with dentils runs along the top, and a riveted picture rail sits under the header.
+  - **Table:** the rail is carved mahogany with an outer roll, a grain-streaked top, a brass inlay and an inner slope, each side lit evenly from its nearest edge. Brass rosettes sit at the corners, studs line the rails, and the table throws a flat shadow on the wall.
+  - **Shop cabinet:** framed in the same carved wood, with rosettes and an inset slatted panel.
+  - **Plaques:** the money and Fate plaques get bevelled edges, corner rivets and an inset screen with a shadowed lip.
+  - **Props:** outlined candles with wax drips, an outlined ledger with a ribbon, a feathered quill, and a new stack of house chips on the shelf.
+- The table surfaces' edge shading is now one flat step instead of a dithered gradient. Their corner marks are now outlined metal L-brackets with a lit edge and a rivet.
+- Layout and positions are unchanged. The UI buttons, panels and sell tray keep their existing brass-and-felt skin, which already matched.
+
+## 2026-11-14 — Art upgrade, phase 1: HD dice
+
+- The art direction is now **HD pixel art in the style of Gamblers Table and What the Buck?!**: one fixed pixel grid, a near-black outline, flat cel-shaded tone bands and bright bevel and rim highlights. Colours come from the game's existing palette (the original soft dice colours plus the outline, cream highlight and shade shared with the helpers and table), so the new dice match the rest of the art.
+- Every die is redrawn by `tools/create_dice_hd.lua`. It renders each die as a real 3D solid and flattens it into that style:
+  - a 3/4 top-down resting view; the d6 family uses a classic cube view (result face forward, lit top lid, shaded right side) with pips inked in a deep shade of each variant's own colour,
+  - softly rounded corners on every shape,
+  - crisp pixel-font numerals (only the result is shown, so the d12 and d20 stay readable),
+  - pips on every d6 face turned towards the viewer,
+  - gold glints on the Golden D6 and Gild D12.
+- The tumble animation is now 32 frames (was 24). It is a seamless two-axis roll, and the die keeps the same size in every frame.
+- Dice now draw at an exact 2× pixel scale (one art pixel on two screen pixels, matching the room) on tables of up to 16 dice, about 46 px across, close to the old size; previously they drew at an uneven 1.3×. Crowded tables step down to 1.5× and 1×.
+- Removed `tools/recolor_dice.gd` and `tools/create_roll_art.lua`, which the new script replaces.
+
 ## 2026-11-14 — Hold or spend: held Fate and a 39-talent tree
 
 - Removed the hidden +10% income per lifetime Fate. Instead, every Fate you hold unspent adds +1% income, so spending is a visible trade.

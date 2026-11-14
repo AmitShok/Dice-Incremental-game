@@ -63,7 +63,7 @@ icon_alignment = 1
 [node name="Title" type="Label" parent="."]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.956, 0.807, 0.513, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "DICE"
 horizontal_alignment = 1
 
@@ -107,7 +107,7 @@ theme_override_constants/separation = 0
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.956, 0.807, 0.513, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 text = "Shop"
 
 [node name="Summary" type="Label" parent="Info/Line/Text"]

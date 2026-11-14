@@ -54,9 +54,8 @@ func setup(game: GameSession) -> void:
 		"Fate": ShopIcons.icon("prestige"), "Ledger": ShopIcons.icon("book"), "Settings": ShopIcons.icon("gear")}
 	for container in [$Tabs, $Footer]:
 		for button in container.get_children():
-			button.icon = icons.get(String(button.name))
-			button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			button.add_theme_constant_override("icon_max_width", 26)
+			# Icons draw at exactly 2x, the same pixel size as the rest of the art.
+			ShopIcons.set_button_picture(button, icons.get(String(button.name)))
 			button.toggle_mode = true
 			button.button_group = group
 			button.pressed.connect(func(): show_page(button.name))
@@ -64,7 +63,7 @@ func setup(game: GameSession) -> void:
 
 # --- Building blocks ----------------------------------------------------------------
 
-func label_text(text: String, font_size: int = 14, color: Color = Color.WHITE) -> Label:
+func label_text(text: String, font_size: int = 12, color: Color = Color.WHITE) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.add_theme_font_size_override("font_size", font_size)
@@ -113,14 +112,18 @@ func item(icon: Texture2D, title: String, info: String, callback: Callable, kind
 func tile(icon: Texture2D, text: String, info_title: String, info: String, size: Vector2, kind: String, id: String, on_press: Callable) -> Button:
 	var button := Button.new()
 	button.custom_minimum_size = size
-	button.icon = icon
-	button.expand_icon = true
+# Small icons (hats, hat options) draw at exactly 2x; big thumbnails (tables) fill the tile.
+	if icon != null and icon.get_width() <= 16:
+		ShopIcons.set_button_picture(button, icon, 4.0 if text.is_empty() else 2.0)
+	else:
+		button.icon = icon
+		button.expand_icon = true
 	button.text = text
 	button.toggle_mode = true
 	button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	button.add_theme_font_size_override("font_size", 11)
+	button.add_theme_font_size_override("font_size", 12)
 	button.mouse_filter = Control.MOUSE_FILTER_PASS
 	var explain: Callable = func(): show_info(icon, info_title if not info_title.is_empty() else button.tooltip_text, info)
 	button.mouse_entered.connect(explain)
@@ -167,7 +170,7 @@ func show_page(which: String) -> void:
 		"Tables": _tables_page()
 		"Fate": _fate_page()
 		"Ledger":
-			stats_label = label_text("", 14)
+			stats_label = label_text("", 12)
 			body.add_child(stats_label)
 		"Settings": _settings_page()
 	update_rows()
@@ -227,7 +230,7 @@ func _capsule_card() -> void:
 	prize.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	prize.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	reveal.add_child(prize)
-	var name_label := label_text("", 14)
+	var name_label := label_text("", 12)
 	name_label.name = "Name"
 	# A wrapping label inside a shrink-centred row gets zero width and wraps every letter.
 	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -390,7 +393,9 @@ func _update_tiles() -> void:
 				button.disabled = not owned or (id == "mix" and state.hats.size() < 2)
 				button.set_pressed_no_signal(state.crew_hat == id)
 				# Unfound hats show as dark silhouettes, so the collection is visible at a glance.
-				button.add_theme_color_override("icon_disabled_color", Color(0, 0, 0, 0.55))
+				var picture: Node = button.get_node_or_null("Picture")
+				if picture != null:
+					picture.modulate = Color(0, 0, 0, 0.55) if button.disabled else Color.WHITE
 				if Cosmetics.HATS.has(id):
 					button.tooltip_text = Cosmetics.HATS[id].name if owned else "Not found yet"
 			"table":

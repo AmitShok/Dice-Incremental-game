@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://c1hbqefl8rxw1"
+path="res://.godot/imported/d_infinity_pixel_outline.fnt-4ddbc48adf76aa1bd1b0480981fa4ec2.fontdata"
+
+[deps]
+
+source_file="res://assets/fonts/d_infinity_pixel_outline.fnt"
+dest_files=["res://.godot/imported/d_infinity_pixel_outline.fnt-4ddbc48adf76aa1bd1b0480981fa4ec2.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=1

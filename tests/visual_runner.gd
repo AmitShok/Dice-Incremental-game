@@ -36,7 +36,8 @@ func run() -> void:
 	main.wallet.position.x -= 3
 	confirm_not_reset(main.shop.position.is_equal_approx(Vector2(792, 94)))
 	var first: DiceVisual = main.visuals[game.state.dice[0].id]
-	confirm_not_reset(first.scale.is_equal_approx(Vector2(0.65, 0.65)))
+	# Ten dice draw at full size: one art pixel on two screen pixels.
+	confirm_not_reset(first.scale.is_equal_approx(Vector2.ONE))
 	var start: Vector2 = game.state.dice[0].position
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT

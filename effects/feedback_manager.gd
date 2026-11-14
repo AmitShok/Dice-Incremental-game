@@ -8,6 +8,10 @@ var spark_cursor: int = 0
 var active: Array[Dictionary] = []
 var aggregate: float = 0.0
 var aggregate_clock: float = 0.0
+## Text over the table uses the pixel font with its outline baked in (bitmap fonts cannot use
+## outline_size). Sizes are whole multiples of the font's 6 px base so pixels stay square.
+const TABLE_FONT: FontFile = preload("res://assets/fonts/d_infinity_pixel_outline.fnt")
+const FONT_STEP: int = 6
 
 func accumulate(amount: float) -> void:
 	aggregate += amount
@@ -26,10 +30,9 @@ func _ready() -> void:
 		var label := Label.new()
 		label.visible = false
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		label.add_theme_font_size_override("font_size", 20)
+		label.add_theme_font_override("font", TABLE_FONT)
+		label.add_theme_font_size_override("font_size", FONT_STEP * 2)
 		label.add_theme_color_override("font_color", Color("#fff4dc"))
-		label.add_theme_color_override("font_outline_color", Color("#120d10"))
-		label.add_theme_constant_override("outline_size", 6)
 		label.add_theme_color_override("font_shadow_color", Color("#172c2b"))
 		label.add_theme_constant_override("shadow_offset_x", 2)
 		label.add_theme_constant_override("shadow_offset_y", 2)
@@ -39,7 +42,7 @@ func _ready() -> void:
 		var spark := Sprite2D.new()
 		spark.texture = preload("res://assets/exported/effects/spark.png")
 		spark.visible = false
-		spark.scale = Vector2(0.6, 0.6)
+		spark.scale = Vector2(2, 2) # 9x9 sparkle on the 2x art grid
 		add_child(spark)
 		sparks.append(spark)
 
@@ -49,9 +52,10 @@ func payout(amount: float, at: Vector2, exceptional: bool = false) -> void:
 		cursor = (cursor + 1) % labels.size()
 		_remove_existing(label)
 		label.text = "+$" + NumberFormat.compact(amount)
-		# Bigger wins get bigger numbers, so jackpots read at a glance.
-		var size: int = int(clampf(16.0 + log(maxf(1.0, amount)) / log(10.0) * 3.0, 16.0, 34.0))
-		label.add_theme_font_size_override("font_size", size + (6 if exceptional else 0))
+		# Bigger wins get bigger numbers in whole pixel steps: 2x under $1K, 3x under $1M, 4x
+		# under $1B, 5x beyond; max and critical rolls go one step up.
+		var tier: int = clampi(2 + int(floor(log(maxf(1.0, amount)) / log(1000.0))), 2, 5) + (1 if exceptional else 0)
+		label.add_theme_font_size_override("font_size", FONT_STEP * mini(tier, 6))
 		label.modulate = Color("#ffd86b") if exceptional else Color.WHITE
 		label.position = at + Vector2(-25, -25)
 		label.visible = true
@@ -111,40 +115,72 @@ func payout_text(text: String, at: Vector2, color: Color) -> void:
 	cursor = (cursor + 1) % labels.size()
 	_remove_existing(label)
 	label.text = text
-	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_font_size_override("font_size", FONT_STEP * 2)
 	label.position = at + Vector2(-28, -40)
 	label.modulate = color
 	label.visible = true
 	active.append({"node": label, "age": 0.0, "velocity": Vector2(0, -28), "duration": 0.9})
 
+## Effects draw on the room's 2-screen-pixel art grid in flat blocks, and fade in three steps,
+## so they read as pixel art like everything else rather than smooth vector lines.
+const PX := 2.0
+
+func _block(at: Vector2, color: Color, size: int = 1) -> void:
+	draw_rect(Rect2((at / PX).floor() * PX, Vector2.ONE * PX * size), color)
+
+func _pixel_line(from: Vector2, to: Vector2, color: Color, size: int = 1) -> void:
+	var steps: int = maxi(1, int(ceil(maxf(absf(to.x - from.x), absf(to.y - from.y)) / PX)))
+	for index in steps + 1:
+		_block(from.lerp(to, float(index) / steps), color, size)
+
+func _pixel_ring(centre: Vector2, radius: float, color: Color, size: int = 1) -> void:
+	var count: int = maxi(8, int(ceil(TAU * radius / PX)))
+	for index in count:
+		_block(centre + Vector2.from_angle(TAU * index / count) * radius, color, size)
+
+## A small four-point sparkle centred on `at`.
+func _pixel_sparkle(at: Vector2, color: Color, arm: int) -> void:
+	_block(at, Color(1, 1, 1, color.a))
+	for step in range(1, arm + 1):
+		for direction in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
+			_block(at + direction * step * PX, color)
+
 func _draw() -> void:
 	for burst in bursts:
 		var t: float = burst.age / burst.duration
 		var color: Color = EFFECT_COLORS.get(burst.action, Color.WHITE)
-		color.a = 1.0 - t
+		color.a = ceilf((1.0 - t) * 3.0) / 3.0
+		var core := Color(1, 1, 1, color.a)
 		match burst.action:
 			"arc":
 				for target in burst.targets:
-					# A jagged bolt: deterministic zig-zag between source and target.
-					var points := PackedVector2Array()
+					# A jagged bolt: deterministic zig-zag between source and target, a coloured
+					# body two art pixels wide with a white core.
 					var from: Vector2 = burst.from
 					var to: Vector2 = target
 					var normal: Vector2 = (to - from).orthogonal().normalized()
+					var points: Array[Vector2] = []
 					for step in 7:
 						var k: float = step / 6.0
-						var jitter: float = 0.0 if step == 0 or step == 6 else (7.0 if step % 2 == 0 else -7.0)
+						var jitter: float = 0.0 if step == 0 or step == 6 else (8.0 if step % 2 == 0 else -8.0)
 						points.append(from.lerp(to, k) + normal * jitter)
-					draw_polyline(points, color, 3.0)
-					draw_polyline(points, Color(1, 1, 1, color.a), 1.0)
+					for index in points.size() - 1:
+						_pixel_line(points[index] - Vector2(PX, PX) * 0.5, points[index + 1] - Vector2(PX, PX) * 0.5, color, 2)
+					for index in points.size() - 1:
+						_pixel_line(points[index], points[index + 1], core)
 			"blast":
-				draw_arc(burst.from, 20.0 + 120.0 * t, 0, TAU, 40, color, 4.0 * (1.0 - t) + 1.0)
+				# An expanding shock ring: thick at first, thinning as it spreads.
+				var radius: float = 20.0 + 120.0 * t
+				_pixel_ring(burst.from, radius, color, 2 if t < 0.5 else 1)
+				if t < 0.35:
+					_pixel_ring(burst.from, radius * 0.6, core)
 			"gild":
-				draw_arc(burst.from, 15.0 + 105.0 * t, 0, TAU, 32, color, 2.0)
+				_pixel_ring(burst.from, 15.0 + 105.0 * t, color)
 				for target in burst.targets:
-					draw_circle(target, 18.0 * (1.0 - t) + 4.0, Color(color.r, color.g, color.b, color.a * 0.35))
+					_pixel_sparkle(target, color, 1 + int((1.0 - t) * 3.0))
 			"reroll":
 				for target in burst.targets:
-					draw_line(burst.from, target, color, 2.0)
+					_pixel_line(burst.from, target, color)
 
 func _tick_bursts(delta: float) -> void:
 	if bursts.is_empty():

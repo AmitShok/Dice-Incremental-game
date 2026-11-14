@@ -31,29 +31,30 @@ mouse_filter = 2
 
 [node name="Title" type="Label" parent="."]
 offset_left = 84.0
-offset_top = 12.0
+offset_top = 6.0
 offset_right = 84.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.95686, 0.87059, 0.68627, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 18
 text = "D- infinity"
 
 [node name="Subtitle" type="Label" parent="."]
 offset_left = 85.0
-offset_top = 49.0
+offset_top = 36.0
 offset_right = 85.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.69804, 0.6, 0.47451, 1)
-theme_override_font_sizes/font_size = 11
-text = "A SMALL TABLE.  IMPOSSIBLE POSSIBILITIES."
+theme_override_font_sizes/font_size = 12
+text = "A SMALL TABLE.
+IMPOSSIBLE POSSIBILITIES."
 
 [node name="Wallet" type="Label" parent="."]
 offset_left = 454.0
-offset_top = 9.0
+offset_top = 14.0
 offset_right = 454.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.96471, 0.83922, 0.56078, 1)
-theme_override_font_sizes/font_size = 29
+theme_override_font_sizes/font_size = 24
 text = "$0"
 
 [node name="Income" type="Label" parent="."]
@@ -71,7 +72,7 @@ offset_top = 17.0
 offset_right = 797.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.77255, 0.70588, 0.87451, 1)
-theme_override_font_sizes/font_size = 25
+theme_override_font_sizes/font_size = 24
 text = "FATE  0"
 
 [node name="House" type="Label" parent="."]
@@ -80,7 +81,7 @@ offset_top = 54.0
 offset_right = 798.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.66667, 0.61569, 0.56471, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 12
 text = "CHIPS 0  ·  HATS 0/8"
 
 [node name="Hint" type="Label" parent="."]
@@ -89,7 +90,7 @@ offset_top = 96.0
 offset_right = 90.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.9451, 0.83922, 0.64314, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 text = "Click your die to begin."
 
 [node name="Combo" type="Label" parent="."]
@@ -98,7 +99,7 @@ offset_top = 430.0
 offset_right = 620.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.97255, 0.82745, 0.51373, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 24
 text = ""
 horizontal_alignment = 1
 
@@ -108,7 +109,7 @@ offset_top = 589.0
 offset_right = 198.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.71373, 0.72157, 0.6549, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Click to roll · Drag to arrange · Hover to inspect"
 
 [node name="Toast" type="Label" parent="."]
@@ -117,7 +118,7 @@ offset_top = 615.0
 offset_right = 1092.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.83922, 0.76863, 0.61176, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = ""
 
 [node name="RollButton" type="Button" parent="."]
@@ -169,7 +170,7 @@ offset_right = 230.0
 offset_bottom = 18.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.72, 0.42, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "HOT STREAK 12  ·  ×1.25"
 horizontal_alignment = 2
 

@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://bwp1roc7vnbgs"
+path="res://.godot/imported/d_infinity_pixel.fnt-06b1dd80250d4a0370501027aa5f6e38.fontdata"
+
+[deps]
+
+source_file="res://assets/fonts/d_infinity_pixel.fnt"
+dest_files=["res://.godot/imported/d_infinity_pixel.fnt-06b1dd80250d4a0370501027aa5f6e38.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=1

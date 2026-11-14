@@ -17,7 +17,7 @@ var definition: DiceDefinition
 @onready var shadow: Sprite2D = $Shadow
 @onready var marker: Label = $Marker
 @onready var game_manager: Node = get_node("/root/GameManager")
-@export var tumble_frames: int = 24
+@export var tumble_frames: int = 32
 @export var tumble_cycles: float = 1.5
 @export var bounce_height: float = 30.0
 var roll_duration: float = 1.0
@@ -37,9 +37,13 @@ var rolling: bool = false
 
 func _ready() -> void:
 	set_process(false)
+	# The "D6" tag sits on the felt, so it uses the outlined pixel font.
+	marker.add_theme_font_override("font", preload("res://assets/fonts/d_infinity_pixel_outline.fnt"))
 
 func set_density(count: int) -> void:
-	var factor: float = 0.5 if count > 30 else 0.65
+	# Dice art is 32 px drawn at 2x (Face scale 2), so a factor of 1 puts one art pixel on two screen
+	# pixels, the same grid as the room. Crowded tables step down to 1.5x and then 1x.
+	var factor: float = 1.0 if count <= 16 else (0.75 if count <= 30 else 0.5)
 	dense = count > 30
 	scale = Vector2.ONE * factor
 	# Faces already carry a contact shadow; dense tables do not need a second shadow or tiny labels.
@@ -151,7 +155,8 @@ func _update_roll_pose(t: float) -> void:
 			sprite.hframes = definition.sides
 		sprite.frame = result_face
 	shadow.position = Vector2(32, 46)
-	shadow.scale = Vector2.ONE * (1.35 - lift * 0.012)
+	# The shadow art is 22x6 at 2x; it shrinks a little while the die is airborne.
+	shadow.scale = Vector2.ONE * (2.0 - lift * 0.016)
 	shadow.modulate.a = 0.85 - lift * 0.013
 
 func land(outcome: Dictionary, settings: Dictionary) -> void:
@@ -166,8 +171,8 @@ func land(outcome: Dictionary, settings: Dictionary) -> void:
 	sprite.scale = Vector2(2, 2)
 	sprite.modulate = Color.WHITE
 	shadow.modulate.a = 1.0
-	shadow.position = Vector2(32, 55)
-	shadow.scale = Vector2(1.5, 1.5)
+	shadow.position = Vector2(32, 53)
+	shadow.scale = Vector2(2, 2)
 	shadow.visible = not dense
 	marker.text = "CRIT!" if outcome.critical else ("MAX!" if outcome.face == outcome.sides else "D%d" % definition.sides)
 	tooltip_text = "%s\n%s\nLast roll: %d → $%s%s\nClick to roll · drag to arrange" % [definition.display_name, definition.description, outcome.face, NumberFormat.compact(outcome.payout), " (includes bonuses)" if not is_equal_approx(outcome.payout, float(outcome.face)) else ""]

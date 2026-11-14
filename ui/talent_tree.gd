@@ -69,7 +69,7 @@ func _header() -> HBoxContainer:
 	held_label = Label.new()
 	held_label.name = "Held"
 	held_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	held_label.add_theme_font_size_override("font_size", 17)
+	held_label.add_theme_font_size_override("font_size", 18)
 	held_label.add_theme_color_override("font_color", LILAC)
 	middle.add_child(held_label)
 	total_label = Label.new()
@@ -95,7 +95,7 @@ func _info_box() -> PanelContainer:
 	line.add_theme_constant_override("separation", 10)
 	box.add_child(line)
 	info_icon = TextureRect.new()
-	info_icon.custom_minimum_size = Vector2(40, 40)
+	info_icon.custom_minimum_size = Vector2(32, 32) # 16 px icons at exactly 2x
 	info_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	info_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	info_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -107,11 +107,11 @@ func _info_box() -> PanelContainer:
 	line.add_child(text)
 	info_name = Label.new()
 	info_name.add_theme_color_override("font_color", GOLD)
-	info_name.add_theme_font_size_override("font_size", 15)
+	info_name.add_theme_font_size_override("font_size", 12)
 	text.add_child(info_name)
 	info_text = Label.new()
 	info_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	info_text.add_theme_font_size_override("font_size", 13)
+	info_text.add_theme_font_size_override("font_size", 12)
 	text.add_child(info_text)
 	info_trade = Label.new()
 	info_trade.add_theme_font_size_override("font_size", 12)
@@ -161,7 +161,7 @@ func _node_button(id: String, at: Vector2) -> Button:
 	rank.position = Vector2(0, 38)
 	rank.size = Vector2(NODE_SIZE.x, 16)
 	rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	rank.add_theme_font_size_override("font_size", 11)
+	rank.add_theme_font_size_override("font_size", 12)
 	rank.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(rank)
 	button.mouse_entered.connect(func(): explain(id))
@@ -211,6 +211,13 @@ func explain(id: String) -> void:
 		var after: int = held - _price(definition)
 		info_trade.text = ("Costs %d Fate: your rolls would pay %d%% less until you earn it back." % [held - after, held - after]) if after >= 0 else "You need %d more Fate." % -after
 
+## Links draw in 2 px blocks on the art grid: a dark 6 px bed with a 2 px gold or grey thread.
+func _pixel_line(from: Vector2, to: Vector2, color: Color, size: int) -> void:
+	var steps: int = maxi(1, int(ceil(maxf(absf(to.x - from.x), absf(to.y - from.y)) / 2.0)))
+	for index in steps + 1:
+		var at: Vector2 = (from.lerp(to, float(index) / steps) / 2.0).floor() * 2.0 - Vector2.ONE * (size - 1)
+		canvas.draw_rect(Rect2(at, Vector2.ONE * 2.0 * size), color)
+
 func _draw_links() -> void:
 	for id in nodes:
 		var definition: UpgradeDefinition = session.registry.talents[id]
@@ -219,8 +226,8 @@ func _draw_links() -> void:
 		var from: Vector2 = nodes[definition.prerequisite].position + NODE_SIZE * 0.5
 		var to: Vector2 = nodes[id].position + NODE_SIZE * 0.5
 		var owned: bool = _level(definition.prerequisite) > 0
-		canvas.draw_line(from, to, Color(0, 0, 0, 0.45), 6.0)
-		canvas.draw_line(from, to, GOLD if owned else Color(0.36, 0.34, 0.42), 3.0)
+		_pixel_line(from, to, Color(0, 0, 0, 0.45), 3)
+		_pixel_line(from, to, GOLD if owned else Color(0.36, 0.34, 0.42), 1)
 
 ## Drags anywhere on the map pan it, even when they start on a node.
 func _input(event: InputEvent) -> void:

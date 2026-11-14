@@ -53,6 +53,8 @@ Swipe vertically anywhere on shop cards or buttons to scroll with momentum. A sw
 
 `tests/capsule_runner.gd` opens a dozen hat capsules from the Helpers page and checks that each one spends chips, shows the reveal, and keeps the reveal row short.
 
+`tests/room_life_runner.gd` drives every idle and reactive room animation (dust, candle gust and streak flare, felt puffs, chip stack, glints, table thump, ledger page) and checks the motion, flashes, particles and pause rules.
+
 ## Artwork
 Normal export: `ASEPRITE -b --script-param root=PROJECT_PATH --script tools/export_art.lua`. This reads .aseprite masters and exports PNG/JSON; it never regenerates originals. tools/create_art.lua is the initial artwork construction script and may overwrite original art: do not run it on edited masters without a backup.
 

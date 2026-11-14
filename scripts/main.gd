@@ -35,9 +35,17 @@ var debug_panel: PanelContainer
 var talents: TalentTree
 var hud_dirty: bool = false
 var wallet_tween: Tween
+## Idle and reactive room animation (dust, candle glow, chip stack, glints, ledger page).
+var room_life: RoomLife
 
 func _ready() -> void:
 	session = GameManager.session
+	# Labels drawn over the table and rail use the outlined pixel font so they stay readable.
+	var table_font: FontFile = preload("res://assets/fonts/d_infinity_pixel_outline.fnt")
+	for label in [hint, combo, streak_label]:
+		label.add_theme_font_override("font", table_font)
+	# Dialogs are separate windows and do not inherit the HUD theme; give them the game theme.
+	confirm.theme = theme if theme != null else preload("res://ui/game_theme.tres")
 	$HUD/RollButton.pressed.connect(GameManager.roll_all_dice)
 	feedback.settings = session.state.settings
 	audio.settings = session.state.settings
@@ -56,13 +64,23 @@ func _ready() -> void:
 	talents.on_notice = notify
 	shop.on_fate = talents.open
 	_add_fate_plaque_button()
+	# Room life sits above the room and surface but under the candle flames and the dice.
+	var ambience: Node2D = $Tabletop/Ambience
+	room_life = RoomLife.new()
+	room_life.name = "RoomLife"
+	$Tabletop.add_child(room_life)
+	$Tabletop.move_child(room_life, ambience.get_index())
+	room_life.setup(session, ambience.get_node("LeftFlame"), ambience.get_node("RightFlame"))
 	shop.setup(session)
 	session.events.changed.connect(func(): hud_dirty = true)
 	session.events.die_roll_started.connect(on_roll)
 	session.events.die_landed.connect(on_land)
 	session.events.combo_triggered.connect(on_combo)
 	session.events.purchased.connect(on_purchase)
-	session.events.achievement_unlocked.connect(func(id: String): notify("Milestone unlocked · " + id))
+	session.events.achievement_unlocked.connect(func(id: String):
+		notify("Milestone unlocked · " + id)
+		room_life.on_milestone()
+	)
 	session.events.prestige_completed.connect(on_prestige)
 	session.events.effect_triggered.connect(on_effect)
 	session.events.die_sold.connect(on_sold)
@@ -115,6 +133,9 @@ func on_roll(outcome: Dictionary) -> void:
 		visuals[outcome.die_id].start(outcome, session.state.settings)
 	if outcome.die_id % 4 == 0 or session.pending.size() < 4:
 		audio.play("roll")
+	# Three or more dice in the air at once (a table roll or a many-hands throw) gusts the candles.
+	if session.pending.size() >= 3:
+		room_life.on_table_roll()
 
 func on_land(outcome: Dictionary) -> void:
 	if visuals.has(outcome.die_id):
@@ -129,6 +150,10 @@ func on_land(outcome: Dictionary) -> void:
 			notify("25 chips! Open a hat capsule on the Helpers page.")
 	if outcome.die_id % 4 == 0 or session.pending.size() < 4:
 		audio.play("max" if outcome.face == outcome.sides or outcome.critical else "land")
+	if session.state.dice.size() <= 30:
+		room_life.on_land(outcome.position, outcome.face == 1)
+	if outcome.face == outcome.sides or outcome.critical:
+		room_life.on_big_roll()
 	if session.state.settings.flashes and (wallet_tween == null or not wallet_tween.is_running()):
 		wallet.modulate = Color(1.2, 1.1, 0.8)
 		wallet_tween = create_tween()
@@ -138,6 +163,7 @@ func on_combo(label: String, multiplier: float) -> void:
 	combo.text = "%s  ×%d" % [label, int(multiplier)]
 	combo_time = 2
 	audio.play("combo")
+	room_life.on_combo()
 
 func on_purchase(kind: String, _id: String) -> void:
 	if kind == "capsule":
@@ -191,8 +217,15 @@ func _update_helpers() -> void:
 		var worker: Dictionary = session.automation.workers[index]
 		workers[index].position = (worker.position as Vector2).round()
 		var base: int = {"idle": 0, "walk": 2, "interact": 6, "roll": 8, "celebrate": 10}.get(worker.phase, 0)
-		workers[index].frame = base + int(Time.get_ticks_msec() / 160) % 2
+		# The walk is a four-frame cycle (frames 2-5); every other pose alternates two frames.
+		var count: int = 4 if worker.phase == "walk" else 2
+		var tick: int = int(Time.get_ticks_msec() / (130 if worker.phase == "walk" else 160))
+		workers[index].frame = base + tick % count
 		_dress_helper(workers[index], index)
+
+## How far Moss's head sits from its resting height in each frame (art pixels), so hats ride
+## along through breathing, the walk bob and the celebration jump. Matches create_helpers_hd.lua.
+const HELPER_HEAD_DY: Array[int] = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, -3, 0]
 
 ## Hats are an optional child sprite; frames follow Cosmetics.HATS[id].frame.
 func _dress_helper(sprite: Sprite2D, index: int) -> void:
@@ -210,8 +243,7 @@ func _dress_helper(sprite: Sprite2D, index: int) -> void:
 	hat.visible = not id.is_empty()
 	if hat.visible:
 		hat.frame = Cosmetics.HATS[id].frame
-		# Bob with the helper's two-frame idle/walk cycle.
-		hat.position = Vector2(0, -10 - (sprite.frame % 2))
+		hat.position = Vector2(0, -12 + HELPER_HEAD_DY[sprite.frame % HELPER_HEAD_DY.size()])
 
 func _update_streak() -> void:
 	var active: bool = session.streak >= 3
@@ -224,6 +256,7 @@ func _update_streak() -> void:
 	streak_bar.value = clampf(session.streak_timer / maxf(0.01, session.streak_window()), 0.0, 1.0)
 
 func on_streak_stage(stage: int) -> void:
+	room_life.on_streak(stage)
 	if stage > 0:
 		combo.text = "%s STREAK  ×%s" % [GameSession.STREAK_STAGES[stage][2], str(GameSession.STREAK_STAGES[stage][1])]
 		combo_time = 1.5

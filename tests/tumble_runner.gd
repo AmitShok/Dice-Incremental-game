@@ -34,7 +34,7 @@ func run() -> void:
 		var rest_image: Image = definition.texture.get_image()
 		var roll_image: Image = definition.rolling_texture.get_image()
 		var rest_extent: int = body_extent(rest_image.get_region(Rect2i(0,0,32,32)))
-		for frame in 24:
+		for frame in roll_image.get_width() / 32:
 			var extent: int = body_extent(roll_image.get_region(Rect2i(frame*32,0,32,32)))
 			check(absi(extent - rest_extent) <= 1, "Rest/roll body size matches: " + id)
 		var index: int = ids.size()
@@ -54,7 +54,7 @@ func run() -> void:
 			visual._update_roll_pose(progress)
 			check(absf(visual.sprite.rotation) < 0.11, "No flat full-circle spin")
 			if progress < 0.86:
-				check(visual.sprite.texture == visual.definition.rolling_texture and visual.sprite.hframes == 24, "Uses shaded tumble frames")
+				check(visual.sprite.texture == visual.definition.rolling_texture and visual.sprite.hframes == visual.tumble_frames, "Uses shaded tumble frames")
 			else:
 				check(visual.sprite.texture == visual.definition.texture and visual.sprite.frame == visual.result_face, "Reveals reserved face")
 		await RenderingServer.frame_post_draw
