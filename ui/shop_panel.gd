@@ -229,6 +229,8 @@ func _capsule_card() -> void:
 	reveal.add_child(prize)
 	var name_label := label_text("", 14)
 	name_label.name = "Name"
+	# A wrapping label inside a shrink-centred row gets zero width and wraps every letter.
+	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	name_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	reveal.add_child(name_label)
 	body.add_child(reveal)
@@ -245,10 +247,15 @@ func _pull_capsule() -> void:
 	name_label.text = "%s!\n%s%s" % [info.name, info.rarity.capitalize(), "" if not before.has(hat) else " · duplicate, +%d chips" % Cosmetics.DUPLICATE_REFUND]
 	name_label.modulate = ShopIcons.RARITY_COLORS[info.rarity]
 	reveal.visible = true
-	reveal.pivot_offset = reveal.size * 0.5
-	reveal.scale = Vector2(0.6, 0.6)
-	create_tween().tween_property(reveal, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	update_rows()
+	# Wait one frame so the row has its real size before popping it from the centre.
+	var shown: HBoxContainer = reveal
+	await get_tree().process_frame
+	if not is_instance_valid(shown):
+		return
+	shown.pivot_offset = shown.size * 0.5
+	shown.scale = Vector2(0.6, 0.6)
+	create_tween().tween_property(shown, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _tables_page() -> void:
 	var tables: GridContainer = grid(2)

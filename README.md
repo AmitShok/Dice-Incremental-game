@@ -51,6 +51,8 @@ Swipe vertically anywhere on shop cards or buttons to scroll with momentum. A sw
 
 `tests/touch_runner.gd` injects screen-touch events through Godot's input pipeline, checking swipes across four shop pages, purchase cancellation, taps, settings, mouse-wheel compatibility, dice jitter/drag and touch cancellation. Export verification runs it at desktop and phone landscape sizes against both packages. Physical-device browser behavior still merits testing on the target phones.
 
+`tests/capsule_runner.gd` opens a dozen hat capsules from the Helpers page and checks that each one spends chips, shows the reveal, and keeps the reveal row short.
+
 ## Artwork
 Normal export: `ASEPRITE -b --script-param root=PROJECT_PATH --script tools/export_art.lua`. This reads .aseprite masters and exports PNG/JSON; it never regenerates originals. tools/create_art.lua is the initial artwork construction script and may overwrite original art: do not run it on edited masters without a backup.
 
