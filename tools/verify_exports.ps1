@@ -1,6 +1,9 @@
 param(
     [Parameter(Mandatory=$true)][string]$Godot,
     [Parameter(Mandatory=$true)][string]$OutputDirectory
+,
+    # Which presets to export and test; defaults to both. Each needs its export templates installed.
+    [string[]]$Targets = @('Windows Desktop', 'Web')
 )
 $ErrorActionPreference = 'Stop'
 $projectDirectory = Split-Path $PSScriptRoot -Parent
@@ -10,6 +13,8 @@ function Invoke-GodotCheck([string]$Name, [string[]]$Arguments) {
     $stdout = Join-Path $OutputDirectory "$Name.log"
     $stderr = Join-Path $OutputDirectory "$Name-errors.log"
     $process = Start-Process -FilePath $Godot -ArgumentList $Arguments -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+    # Touch the handle now: without it, PowerShell reports an empty ExitCode once the process ends.
+    $null = $process.Handle
     if (-not $process.WaitForExit(60000)) {
         Stop-Process -Id $process.Id
         throw "$Name timed out. See $stdout and $stderr"
@@ -21,6 +26,7 @@ function Invoke-GodotCheck([string]$Name, [string[]]$Arguments) {
 }
 Invoke-GodotCheck 'source-checks' @('--headless','--audio-driver','Dummy','--path',('"'+$projectDirectory+'"'),'--script','res://tests/test_runner.gd','--','--test')
 foreach ($target in @(@('Windows Desktop','windows','D-infinity.exe','D-infinity.pck'), @('Web','web','index.html','index.pck'))) {
+    if ($Targets -notcontains $target[0]) { continue }
     $folder = Join-Path $OutputDirectory $target[1]
     New-Item -ItemType Directory -Force -Path $folder | Out-Null
     $binary = Join-Path $folder $target[2]

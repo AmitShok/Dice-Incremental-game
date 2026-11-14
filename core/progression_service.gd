@@ -35,7 +35,9 @@ func _open_position() -> Vector2:
 	var best := Vector2(135, 210)
 	var widest: float = -1.0
 	for index in 110:
-		var candidate := Vector2(85 + index % 11 * 61, 170 + int(index / 11) * 34)
+		# Kept clear of the felt's corner brackets and rails so new dice (and their name tags)
+		# always land on open felt.
+		var candidate := Vector2(115 + index % 11 * 57, 185 + int(index / 11) * 30)
 		var distance: float = INF
 		for die in state.dice:
 			distance = minf(distance, candidate.distance_squared_to(die.position))

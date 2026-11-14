@@ -78,6 +78,7 @@ func _gui_input(event: InputEvent) -> void:
 			original_position = position
 		elif not event.pressed and dragging:
 			dragging = false
+			z_index = 0
 			if event.canceled:
 				position = original_position
 			elif not drag_started:
@@ -89,6 +90,8 @@ func _gui_input(event: InputEvent) -> void:
 		if not drag_started and press_position.distance_to(event.global_position) < drag_threshold:
 			return
 		drag_started = true
+		# Float above the HUD (sell tray, labels) while held, so the die never hides under them.
+		z_index = 50
 		var center: Vector2 = original_position + event.global_position - press_position + Vector2(32, 32) * scale
 		position = center.clamp(DRAG_MIN, DRAG_MAX) - Vector2(32, 32) * scale
 		drag_moved.emit(die.id, center.clamp(DRAG_MIN, DRAG_MAX))
@@ -96,6 +99,7 @@ func _gui_input(event: InputEvent) -> void:
 func start(outcome: Dictionary, settings: Dictionary) -> void:
 	rolling = true
 	dragging = false
+	z_index = 0
 	age = 0.0
 	roll_duration = maxf(0.01, outcome.duration)
 	roll_origin = die.position

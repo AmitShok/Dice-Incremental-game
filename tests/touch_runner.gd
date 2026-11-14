@@ -113,4 +113,6 @@ func run() -> void:
  await touch(origin + Vector2(30, 20), false, true)
  check(not die.busy and die.position == origin, "Canceled touch does not roll or commit movement")
  print("TOUCH RESULT: ", failures, " failures")
+ # Let the last purchase sound finish so no audio stream is still in use at exit.
+ await create_timer(0.8).timeout
  quit(1 if failures else 0)

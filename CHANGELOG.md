@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-11-15 — Web export checked on desktop and touch phones
+
+- Exported the Web build to `../d-infinity web/`. It passes the full Web verification against the exported package: gameplay, visual, resize, desktop touch and phone touch.
+- Played the export in a browser on desktop (click to roll, Space to roll the table, buying, mouse drag, wheel scrolling, sound) and on an emulated 740×360 touch phone (tap to roll, finger drag, swipe-scrolling the shop without buying, tab taps, dragging a die into the sell tray). All worked.
+- **Fixes found while testing:**
+  - New dice could spawn in a felt corner under the gold bracket. The spawn grid now stays clear of the corners and rails.
+  - A dragged die passed under the sell tray. It now floats above the HUD while held.
+- **`tools/verify_exports.ps1`:**
+  - It no longer reports passing checks as failures (PowerShell returned an empty exit code without reading the process handle).
+  - A new `-Targets` option runs only the presets whose export templates are installed.
+- `tests/touch_runner.gd` now lets the last purchase sound finish before quitting, so no audio stream is left in use at exit.
+- **Known engine limitation:** the Web build treats an interrupted touch (`touchcancel`) like a release, so a system gesture during a drag drops the die where the finger was.
+
 ## 2026-11-14 — Pixel font
 
 - All text now uses the game's own pixel font, D-infinity Pixel, built by `tools/create_pixel_font.gd`. Every glyph was designed by hand for readability:
