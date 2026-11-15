@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-15 — Talent tree fits on one screen (fixes the empty tree on iPhone)
+
+- On iPhone browsers (Chrome and Safari both use Apple's WebKit), the talent tree popup showed its frame with an empty middle. The map sat inside a clipped, scrolled area, and that area drew nothing there.
+- The tree is now a full-screen panel with every talent laid out at once: no scroll area, no clipping and no drag-to-pan. All 39 talents fit (9 columns by 7 rows), centred between the header and the info box.
+- New touch check: when the tree opens, it has no scroll area and every talent node is visible inside the popup, at desktop and phone size.
+- The talent tree is now a real scene: `scenes/ui/talent_tree.tscn` for the popup and `scenes/ui/talent_node.tscn` for each talent. All 39 talents are instances you can see and move in the Godot editor, and their links redraw live. `tools/build_talent_tree_scene.gd` rebuilds the scene from the talents' `tree_position` values. A new check confirms the scene has a node for every talent.
+
 ## 2026-11-15 — Talent tree stays open on phones
 
 - On phones, tapping the Fate tab could show the Fate page with no talent tree. The tree opened with its Close button right under your finger, so a second tap, or the follow-up mouse click some phone browsers send after a tap, closed it at once.

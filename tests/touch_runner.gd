@@ -121,6 +121,14 @@ func run() -> void:
  await touch(fate_at, true)
  await touch(fate_at, false)
  check(main.talents.visible, "Tapping the Fate tab opens the talent tree")
+ # Every talent is laid out on screen at once, with no scroll area (clipped scroll areas drew
+ # nothing on iPhone browsers).
+ await process_frame
+ var panel: Rect2 = main.talents.get_global_rect()
+ var all_inside: bool = main.talents.find_children("*", "ScrollContainer", true, false).is_empty()
+ for node in main.talents.nodes.values():
+  all_inside = all_inside and panel.encloses(node.get_global_rect()) and node.is_visible_in_tree()
+ check(all_inside and main.talents.nodes.size() == main.session.registry.talents.size(), "All talents are visible on screen without scrolling")
  await touch(fate_at, true)
  await touch(fate_at, false)
  check(main.talents.visible, "A second tap on the Fate tab spot keeps the talent tree open")

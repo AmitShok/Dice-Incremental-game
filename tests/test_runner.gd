@@ -198,6 +198,16 @@ func _talent_tree_checks() -> void:
 		layout_ok = layout_ok and (not definition.target.is_empty() or ShopIcons.icon(definition.icon if not definition.icon.is_empty() else id) != null)
 		cells[definition.tree_position] = id
 	check(layout_ok, "Talents have unique cells, real prerequisites and icons")
+	# The talent tree scene holds a real TalentNode for every talent (rebuild it with
+	# tools/build_talent_tree_scene.gd after adding talents).
+	var tree_scene: Node = load("res://scenes/ui/talent_tree.tscn").instantiate()
+	var links: Node = tree_scene.get_node("Column/Map/Links")
+	var scene_ok: bool = true
+	for id in registry.talents:
+		var placed: Node = links.get_node_or_null(id)
+		scene_ok = scene_ok and placed is TalentNode and placed.prerequisite == registry.talents[id].prerequisite
+	check(scene_ok, "talent_tree.tscn has a node for every talent with its prerequisite")
+	tree_scene.free()
 
 	# Old saves (no fate_version) get every spent Fate back once.
 	var old: Dictionary = fresh().state.snapshot()

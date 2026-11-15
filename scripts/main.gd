@@ -56,7 +56,9 @@ func _ready() -> void:
 	shop.on_reset = ask_reset
 	shop.on_developer_tools = open_developer_tools
 	shop.developer_tools_enabled = developer_tools_enabled and OS.is_debug_build()
-	talents = TalentTree.new()
+	# The talent tree is a real scene (scenes/ui/talent_tree.tscn): open it in Godot to see or
+	# arrange the talents.
+	talents = preload("res://scenes/ui/talent_tree.tscn").instantiate()
 	add_child(talents)
 	move_child(talents, confirm.get_index())
 	talents.setup(session)
