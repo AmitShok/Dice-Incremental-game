@@ -112,6 +112,24 @@ func run() -> void:
  await drag(origin, origin + Vector2(30, 20))
  await touch(origin + Vector2(30, 20), false, true)
  check(not die.busy and die.position == origin, "Canceled touch does not roll or commit movement")
+ # Fate tab on a phone: the tree opens, and a second tap or a browser's follow-up click on the
+ # same spot must not close it (Close used to sit right under the Fate tab).
+ main.shop.show_page("Dice")
+ await process_frame
+ var fate_tab: Button = main.shop.get_node("Tabs/Fate")
+ var fate_at: Vector2 = fate_tab.get_global_rect().get_center()
+ await touch(fate_at, true)
+ await touch(fate_at, false)
+ check(main.talents.visible, "Tapping the Fate tab opens the talent tree")
+ await touch(fate_at, true)
+ await touch(fate_at, false)
+ check(main.talents.visible, "A second tap on the Fate tab spot keeps the talent tree open")
+ var close: Button = main.talents.find_child("Close", true, false)
+ check(close != null and not close.get_global_rect().has_point(fate_at), "Close is not under the Fate tab")
+ await create_timer(0.5).timeout
+ await touch(close.get_global_rect().get_center(), true)
+ await touch(close.get_global_rect().get_center(), false)
+ check(not main.talents.visible, "Close works once the tree has settled")
  print("TOUCH RESULT: ", failures, " failures")
  # Let the last purchase sound finish so no audio stream is still in use at exit.
  await create_timer(0.8).timeout

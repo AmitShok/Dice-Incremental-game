@@ -23,6 +23,9 @@ var info_trade: Label
 var dragging: bool = false
 var dragged: float = 0.0
 var shown_id: String = ""
+## When the tree last opened, and how long it ignores taps afterwards (see settled()).
+var opened_msec: int = -100000
+const OPEN_GRACE_MSEC: int = 400
 const NODE_SIZE := Vector2(58, 58)
 const CELL := Vector2(92, 84)
 const MARGIN := Vector2(40, 30)
@@ -57,6 +60,17 @@ func setup(game: GameSession) -> void:
 func _header() -> HBoxContainer:
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 12)
+	# Close sits at the left end: the right end of the header lies exactly under the shop's
+	# Fate tab, so a second tap there (or a phone's follow-up click) would close the tree at once.
+	var close := Button.new()
+	close.name = "Close"
+	close.text = "Close"
+	close.custom_minimum_size = Vector2(70, 40)
+	close.pressed.connect(func():
+		if settled():
+			hide()
+	)
+	top.add_child(close)
 	var title := Label.new()
 	title.text = "FATE TALENTS"
 	title.add_theme_font_size_override("font_size", 18)
@@ -79,14 +93,17 @@ func _header() -> HBoxContainer:
 	middle.add_child(total_label)
 	begin_button = Button.new()
 	begin_button.custom_minimum_size = Vector2(200, 40)
-	begin_button.pressed.connect(func(): on_prestige.call())
+	begin_button.pressed.connect(func():
+		if settled():
+			on_prestige.call()
+	)
 	top.add_child(begin_button)
-	var close := Button.new()
-	close.text = "Close"
-	close.custom_minimum_size = Vector2(70, 40)
-	close.pressed.connect(hide)
-	top.add_child(close)
 	return top
+
+## True once the tree has been open long enough that a tap is meant for it, not a leftover
+## of the tap that opened it (a double tap, or a touch browser's follow-up mouse click).
+func settled() -> bool:
+	return Time.get_ticks_msec() - opened_msec >= OPEN_GRACE_MSEC
 
 func _info_box() -> PanelContainer:
 	var box := PanelContainer.new()
@@ -170,6 +187,8 @@ func _node_button(id: String, at: Vector2) -> Button:
 	return button
 
 func _buy(id: String) -> void:
+	if not settled():
+		return
 	# A drag that started on a node pans the map instead of buying.
 	if dragged > 8.0:
 		refresh()
@@ -234,7 +253,7 @@ func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and scroll.get_global_rect().has_point(event.position):
+		if event.pressed and settled() and scroll.get_global_rect().has_point(event.position):
 			dragging = true
 			dragged = 0.0
 		elif not event.pressed:
@@ -249,6 +268,8 @@ func _pan(relative: Vector2) -> void:
 		scroll.scroll_vertical -= int(relative.y)
 
 func open() -> void:
+	opened_msec = Time.get_ticks_msec()
+	dragging = false
 	refresh()
 	explain("fortune")
 	shown_id = ""

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-11-15 — Talent tree stays open on phones
+
+- On phones, tapping the Fate tab could show the Fate page with no talent tree. The tree opened with its Close button right under your finger, so a second tap, or the follow-up mouse click some phone browsers send after a tap, closed it at once.
+- **Fixes:**
+  - The talent tree ignores taps on Close, Begin again and the talents themselves for 0.4 s after it opens.
+  - Close moved to the left end of the tree's header, away from the Fate tab.
+- New checks in `tests/touch_runner.gd`, at desktop and phone size:
+  - tapping the Fate tab opens the tree,
+  - a second tap on the same spot keeps it open,
+  - Close is not under the Fate tab,
+  - Close works once the tree has settled.
+
 ## 2026-11-15 — Web saves survive closing the tab
 
 - Progress now survives closing the tab or the browser straight after playing, and loads in a new tab.
