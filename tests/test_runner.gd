@@ -249,6 +249,28 @@ func _talent_tree_checks() -> void:
 	# A fair D6 lands 1 about 500 times in 3000; with 30% rescued it is about 350.
 	check(ones < 420, "Divine intervention turns some 1s into maximums")
 
+func _web_save_checks() -> void:
+	# The newer of two saves wins (file vs the Web localStorage mirror); either may be missing.
+	var older := GameState.new()
+	older.last_saved = 100.0
+	older.money = 1.0
+	var newer := GameState.new()
+	newer.last_saved = 200.0
+	newer.money = 2.0
+	check(SaveStore.newest(older, newer) == newer and SaveStore.newest(newer, older) == newer, "Newest save wins")
+	check(SaveStore.newest(null, older) == older and SaveStore.newest(older, null) == older and SaveStore.newest(null, null) == null, "A missing copy falls back to the other")
+	# A successful write records the exact JSON, which decodes back to the same progress.
+	var path: String = "user://web_mirror_test.json"
+	var store := SaveStore.new(registry, path)
+	var game: GameSession = fresh()
+	game.state.money = 4321.0
+	check(store.write(game.state) and not store.last_serialized.is_empty(), "Write records the saved JSON")
+	var mirrored: GameState = store.decode(store.last_serialized)
+	check(mirrored != null and mirrored.money == 4321.0 and is_equal_approx(mirrored.last_saved, game.state.last_saved), "Mirrored JSON restores the same progress")
+	for suffix in ["", ".bak", ".tmp"]:
+		if FileAccess.file_exists(path + suffix):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(path + suffix))
+
 func _fate_endgame_checks() -> void:
 	var game: GameSession = fresh()
 	game.state.run_earned = ProgressionService.PRESTIGE_THRESHOLD - 1
@@ -491,6 +513,7 @@ func run() -> void:
 	check(game.state.prestige_points == 4 and game.state.talents.fortune == 1 and not game.state.settings.sound, "Prestige retains permanent state")
 	_fate_endgame_checks()
 	_talent_tree_checks()
+	_web_save_checks()
 	game = fresh()
 	check(not game.prestige(), "Early prestige rejected")
 	check(game.offline(-100) == 0, "Backward clock earns nothing")

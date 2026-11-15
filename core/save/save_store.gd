@@ -7,6 +7,9 @@ var error_message: String = ""
 var recovered: bool = false
 var protected: bool = false
 var registry: ContentRegistry
+## The exact JSON of the last save that was written and verified (mirrored to browser storage on
+## the Web so a closing tab cannot lose it).
+var last_serialized: String = ""
 
 func _init(content: ContentRegistry, save_path: String = "user://progress.json") -> void:
 	registry = content
@@ -35,6 +38,14 @@ func decode(text: String) -> GameState:
 	if int(parsed.save_version) != VERSION or not parsed.get("state") is Dictionary:
 		return null
 	return GameState.restore(parsed.state, registry)
+
+## Of two saves, the one written most recently (either may be null).
+static func newest(a: GameState, b: GameState) -> GameState:
+	if a == null:
+		return b
+	if b == null:
+		return a
+	return b if b.last_saved > a.last_saved else a
 
 func load_state() -> GameState:
 	error_message = ""
@@ -105,4 +116,5 @@ func write(state: GameState) -> bool:
 		error_message = "Could not replace save; temporary file retained."
 		return false
 	error_message = ""
+	last_serialized = serialized
 	return true

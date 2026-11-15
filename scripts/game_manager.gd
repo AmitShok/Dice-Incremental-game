@@ -25,6 +25,12 @@ func roll_all_dice() -> void:
 	session.roll_table()
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST and not testing:
+	if testing:
+		return
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		SaveManager.save_game()
 		get_tree().quit()
+	# Losing focus or being paused by the OS (alt-tab, a phone backgrounding the browser) is often
+	# the last chance to save before the game is closed.
+	elif what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
+		SaveManager.save_game()

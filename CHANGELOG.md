@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-15 — Web saves survive closing the tab
+
+- Progress now survives closing the tab or the browser straight after playing, and loads in a new tab.
+  - On the Web the game autosaves every 5 seconds (it was every 30).
+  - It saves the moment the page is hidden or closed (the browser's `visibilitychange` and `pagehide` events), and whenever the game loses focus or the app is paused.
+  - Every save is also mirrored to `localStorage`, which is written instantly. On load, the newer of the two copies wins.
+- Tested in a browser: buying a die and closing the last tab within a second kept it, the purchase included. Progress also loaded from the `localStorage` copy alone after the IndexedDB storage was deleted.
+- New save checks: the newer save wins, a missing copy falls back to the other, and the mirrored JSON restores the same progress.
+
 ## 2026-11-15 — Web export checked on desktop and touch phones
 
 - Exported the Web build to `../d-infinity web/`. It passes the full Web verification against the exported package: gameplay, visual, resize, desktop touch and phone touch.
