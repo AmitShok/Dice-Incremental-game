@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = "sharp_crew"
 display_name = "Sharp crew"
-description = "Helpers always walk to your most valuable ready die, every run."
-summary = "Helpers pick the best die"
+description = "Every run starts with Sharp eyes already bought: helpers always walk to your most valuable ready die."
+summary = "Start runs with Sharp eyes"
 cost = 6.0
 growth = 1
 max_level = 1

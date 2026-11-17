@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-11-17 — No more duplicate upgrades; slower, steadier upgrade progress
+
+- **Duplicate audit.** Two more pairs behaved like Chain reaction and Resonance, where a talent made a shop upgrade useless:
+  - Born in harmony and Table harmony both just switch combos on.
+  - Sharp crew and Sharp eyes both just make helpers pick the best die.
+  These talents now *grant* their upgrade: every run starts with it already bought, the shop shows it as owned, and buying the talent gives it at once (`ProgressionService.TALENT_GRANTS`). The fresh-start dialog lists granted upgrades.
+- **Old friends now adds to Loyal crew.** A fresh start kept the larger of your kept helpers and your starting helpers, so Old friends was useless once Loyal crew kept your crew. Old friends' helpers are now added on top.
+- **Renamed the talent "Quick hands" to "Swift dice".** It made dice land faster, but shared its name with the helper-speed upgrade.
+- New audit checks fail if a future talent duplicates an on/off upgrade without granting it, or if an upgrade and a talent share an effect.
+- **Upgrade prices rebalanced.** They had a combined price of only about $45K, so everything was bought in about 4 minutes. They now have more levels and steeper prices, about $16M in total; see the table in `ECONOMY.md`.
+- **Measured with the new `tools/pacing_probe.gd`** (a steady player clicking about 3 times a second):
+  - The first Fate moved from 4.0 to 15.8 minutes.
+  - Owning every upgrade moved from 4.4 minutes to 61.7.
+  - Upgrades are now bought at a steady rate through the first hour.
+
+## 2026-11-17 — Chain reaction retired (Resonance does the same thing)
+
+- Verified first: the Chain reaction upgrade and the Resonance talent attached the same effect resource (`synergies/definitions/chain.tres`: a maximum roll re-rolls the nearest ready die within 140 px) and the same unused `chain` stat. Owning both only added a second neighbour.
+- Removed Chain reaction from the upgrades. To make up for it, Resonance has a second rank (3 Fate, then 6). Rank 1 throws the nearest die on a maximum roll, and rank 2 throws the two nearest. Effects from upgrades and talents now apply once per rank (Resonance is the only one with an effect).
+- Saves that bought Chain reaction still load: it is dropped and its $2,200 is refunded as money (`GameState.RETIRED_UPGRADES`).
+- New checks: such a save loads with the refund, Chain reaction is gone from the shop, Resonance rank 1 throws the nearest die, rank 2 throws the two nearest, and rank 2 costs 6 Fate.
+
+## 2026-11-17 — Each Fate needs more than the last
+
+- The run earnings needed to begin again for Fate now rise with every fresh start: $100K the first time, then $200K, $300K and so on (`ProgressionService.prestige_threshold()`, counted from the lifetime "Fresh starts" statistic).
+- Fate earned still follows run earnings (√(earnings ÷ 25,000) × House edge), so the higher thresholds also pay more Fate: 2 at $200K, 3 at $300K.
+- The Fate shop card ("Earn $X more"), the talent tree's "Fate at $X" button and the Fate plaque's progress bar all use the current threshold.
+- Existing saves count the fresh starts already taken, so a save with two fresh starts next needs $300K.
+- New checks walk through three fresh starts.
+
 ## 2026-11-17 — Dice stay big for longer and full tables fill evenly
 
 - Dice used to shrink to 75% at 17 dice and to 50% at 31. Now they stay full size up to 40 dice, then shrink gently in 5% steps to 70% at the 100-die cap (`DiceVisual.size_for`).

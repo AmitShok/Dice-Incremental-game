@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = "old_friend"
 display_name = "Old friends"
-description = "Begin each new run with one helper per level."
-summary = "Start runs with +1 helper"
+description = "Begin each new run with one extra helper per level, on top of any helpers Loyal crew keeps."
+summary = "Start runs with +1 extra helper"
 cost = 4.0
 growth = 3
 max_level = 2

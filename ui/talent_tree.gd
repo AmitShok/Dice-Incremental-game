@@ -155,7 +155,7 @@ func refresh() -> void:
 	total_label.text = "Each Fate you hold makes every roll pay 1%% more.  Earned in total: %d" % state.prestige_total
 	var reward: int = session.progression.fate_reward()
 	begin_button.disabled = reward <= 0
-	begin_button.text = "Begin again · +%d Fate" % reward if reward > 0 else "Fate at $%s" % NumberFormat.compact(ProgressionService.PRESTIGE_THRESHOLD)
+	begin_button.text = "Begin again · +%d Fate" % reward if reward > 0 else "Fate at $%s" % NumberFormat.compact(session.progression.prestige_threshold())
 	var owned: Dictionary = {}
 	for id in nodes:
 		var definition: UpgradeDefinition = session.registry.talents[id]

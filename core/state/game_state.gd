@@ -5,6 +5,10 @@ const MAX_AMOUNT: float = 1e100
 const MAX_DICE: int = 100
 const TABLE_ROLL_COOLDOWN: float = 60.0
 const MAX_HELPERS: int = 12
+## Upgrades removed from the game, with the price each level cost. Saves that still own one load
+## normally: the upgrade is dropped and its price refunded as money.
+##   chain: Chain reaction did exactly what the Resonance talent does (same effect resource).
+const RETIRED_UPGRADES: Dictionary = {"chain": 2200.0}
 var table_roll_remaining: float = 0.0
 var money: float = 0.0
 var run_earned: float = 0.0
@@ -110,6 +114,9 @@ static func restore(data: Dictionary, registry: ContentRegistry) -> GameState:
 			return null
 	for pair in [["upgrades", registry.upgrades], ["talents", registry.talents]]:
 		for id in data.get(pair[0], {}):
+			if pair[0] == "upgrades" and RETIRED_UPGRADES.has(id) and valid_integer(data.upgrades[id], 0, 1000):
+				result.money = minf(MAX_AMOUNT, result.money + float(RETIRED_UPGRADES[id]) * int(data.upgrades[id]))
+				continue
 			if not pair[1].has(id) or not valid_integer(data[pair[0]][id], 0, pair[1][id].max_level):
 				return null
 			result.get(pair[0])[id] = int(data[pair[0]][id])

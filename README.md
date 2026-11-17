@@ -3,7 +3,7 @@
 A cozy tabletop incremental about turning a handful of dice into a probability engine.
 
 ## Run
-Open this existing project in Godot 4.7.2 and press F6 on main.tscn or F5. The renderer is Compatibility. No external runtime packages are required. Start with one Ivory D6; click it or press Space to roll, drag to arrange, and use the right-hand shop. Buy helpers after earning $150 in the run. Fate becomes available after $100,000 earned.
+Open this existing project in Godot 4.7.2 and press F6 on main.tscn or F5. The renderer is Compatibility. No external runtime packages are required. Start with one Ivory D6; click it or press Space to roll, drag to arrange, and use the right-hand shop. Buy helpers after earning $150 in the run. Fate becomes available after $100,000 earned in a run; each fresh start raises the requirement by $100,000 ($200,000, then $300,000, and so on).
 
 ## Current playable release
 

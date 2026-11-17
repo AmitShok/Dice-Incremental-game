@@ -68,10 +68,24 @@ func buy_upgrade(id: String, permanent: bool = false) -> bool:
 	elif not economy.spend(price):
 		return false
 	levels[id] = int(levels.get(id, 0)) + 1
+	if permanent:
+		apply_talent_grants()
 	StatisticsService.increment(state, "upgrades_purchased")
 	events.purchased.emit("talent" if permanent else "upgrade", id)
 	events.changed.emit()
 	return true
+
+## Talents that make a shop upgrade permanent: owning the talent gives the upgrade for free in
+## every run (the shop shows it as owned), instead of leaving a now-useless purchase on offer.
+const TALENT_GRANTS: Dictionary = {"born_harmony": "combos", "sharp_crew": "sharp_eyes"}
+
+## Gives the upgrades granted by owned talents. Called when a talent is bought, after a fresh
+## start clears the run's upgrades, and when a session loads.
+func apply_talent_grants() -> void:
+	for talent in TALENT_GRANTS:
+		var upgrade: String = TALENT_GRANTS[talent]
+		if int(state.talents.get(talent, 0)) > 0 and registry.upgrades.has(upgrade):
+			state.upgrades[upgrade] = maxi(int(state.upgrades.get(upgrade, 0)), registry.upgrades[upgrade].max_level)
 
 func helper_price() -> float:
 	return 250.0 * pow(2.8, state.helpers)
@@ -85,8 +99,17 @@ func hire_helper() -> bool:
 	events.changed.emit()
 	return true
 
+## Run earnings needed to begin again for Fate. It rises with every fresh start: $100K for the
+## first, $200K for the second, $300K for the third and so on (PRESTIGE_THRESHOLD x starts + 1).
+func prestige_threshold() -> float:
+	return minf(GameState.MAX_AMOUNT, PRESTIGE_THRESHOLD * (1.0 + fresh_starts()))
+
+## Fresh starts taken so far (lifetime statistic; survives every reset except a full wipe).
+func fresh_starts() -> int:
+	return int(state.statistics.get("prestiges", 0.0))
+
 func fate_reward() -> int:
-	if state.run_earned < PRESTIGE_THRESHOLD:
+	if state.run_earned < prestige_threshold():
 		return 0
 	var raw: float = floor(sqrt(state.run_earned / FATE_SCALE) * economy.modifier("fate_gain") + 1e-9)
 	return int(minf(MAX_FATE - state.prestige_total, raw))
@@ -94,7 +117,7 @@ func fate_reward() -> int:
 ## Run earnings needed for one more Fate than fate_reward() currently gives.
 func next_fate_at() -> float:
 	var target: float = fate_reward() + 1
-	return minf(GameState.MAX_AMOUNT, maxf(PRESTIGE_THRESHOLD, FATE_SCALE * pow(target / economy.modifier("fate_gain"), 2)))
+	return minf(GameState.MAX_AMOUNT, maxf(prestige_threshold(), FATE_SCALE * pow(target / economy.modifier("fate_gain"), 2)))
 
 ## Head start: $500 × 10^(level − 1); nothing without the talent.
 func starting_cash() -> float:
@@ -108,10 +131,15 @@ func carryover_summary() -> String:
 		parts.append("$" + NumberFormat.compact(starting_cash()))
 	if _talent_count("starting_dice") > 0:
 		parts.append("%d extra D6" % _talent_count("starting_dice"))
-	if _talent_count("starting_helpers") > 0:
-		parts.append("%d helper%s" % [_talent_count("starting_helpers"), "" if _talent_count("starting_helpers") == 1 else "s"])
-	if _talent_count("keep_helpers") > 0 and state.helpers > 0:
-		parts.append("all %d of your helpers" % state.helpers)
+	var kept: int = state.helpers if _talent_count("keep_helpers") > 0 else 0
+	var extra: int = _talent_count("starting_helpers")
+	if kept > 0:
+		parts.append(("all %d of your helpers" % kept) + (" plus %d more" % extra if extra > 0 else ""))
+	elif extra > 0:
+		parts.append("%d helper%s" % [extra, "" if extra == 1 else "s"])
+	for talent in TALENT_GRANTS:
+		if int(state.talents.get(talent, 0)) > 0 and registry.upgrades.has(TALENT_GRANTS[talent]):
+			parts.append(registry.upgrades[TALENT_GRANTS[talent]].display_name)
 	return "" if parts.is_empty() else "\nYour talents start the next run with " + ", ".join(parts) + "."
 
 func _talent_count(stat: String) -> int:
@@ -128,6 +156,7 @@ func prestige() -> bool:
 	state.dice.clear()
 	state.counts.clear()
 	state.upgrades.clear()
+	apply_talent_grants()
 	var kept_helpers: int = state.helpers if _talent_count("keep_helpers") > 0 else 0
 	state.helpers = 0
 	state.tutorial_step = 2
@@ -137,7 +166,8 @@ func prestige() -> bool:
 	for index in _talent_count("starting_dice"):
 		state.add_die("d6", _open_position())
 	var kept: int = kept_helpers
-	state.helpers = mini(GameState.MAX_HELPERS, maxi(kept, _talent_count("starting_helpers")))
+	# Old friends adds its helpers on top of the crew Loyal crew keeps.
+	state.helpers = mini(GameState.MAX_HELPERS, kept + _talent_count("starting_helpers"))
 	StatisticsService.increment(state, "prestiges")
 	events.prestige_completed.emit()
 	events.changed.emit()

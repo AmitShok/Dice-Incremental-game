@@ -170,7 +170,7 @@ region = Rect2(816, 0, 16, 16)
 atlas = ExtResource("6_gchh2")
 region = Rect2(832, 0, 16, 16)
 
-[node name="TalentTree" type="PanelContainer" unique_id=977577623]
+[node name="TalentTree" type="PanelContainer" unique_id=1461494001]
 z_index = 30
 custom_minimum_size = Vector2(1104, 624)
 offset_left = 8.0
@@ -180,61 +180,61 @@ offset_bottom = 632.0
 theme = ExtResource("1_muv82")
 script = ExtResource("2_h1853")
 
-[node name="Column" type="VBoxContainer" parent="." unique_id=1773240728]
+[node name="Column" type="VBoxContainer" parent="." unique_id=1236099537]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Header" type="HBoxContainer" parent="Column" unique_id=76930392]
+[node name="Header" type="HBoxContainer" parent="Column" unique_id=594017630]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Close" type="Button" parent="Column/Header" unique_id=1058838172]
+[node name="Close" type="Button" parent="Column/Header" unique_id=1170006633]
 custom_minimum_size = Vector2(70, 40)
 layout_mode = 2
 text = "Close"
 
-[node name="Title" type="Label" parent="Column/Header" unique_id=493393252]
+[node name="Title" type="Label" parent="Column/Header" unique_id=420922738]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.95686275, 0.80784315, 0.5137255, 1)
 text = "FATE TALENTS"
 
-[node name="Middle" type="VBoxContainer" parent="Column/Header" unique_id=1220201952]
+[node name="Middle" type="VBoxContainer" parent="Column/Header" unique_id=1416871584]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="Held" type="Label" parent="Column/Header/Middle" unique_id=1827319078]
+[node name="Held" type="Label" parent="Column/Header/Middle" unique_id=435443756]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.77254903, 0.7058824, 0.8745098, 1)
 text = "0 Fate held"
 horizontal_alignment = 1
 
-[node name="Total" type="Label" parent="Column/Header/Middle" unique_id=432329735]
+[node name="Total" type="Label" parent="Column/Header/Middle" unique_id=478189555]
 modulate = Color(1, 1, 1, 0.75)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Each Fate you hold makes every roll pay 1% more."
 horizontal_alignment = 1
 
-[node name="Begin" type="Button" parent="Column/Header" unique_id=746505556]
+[node name="Begin" type="Button" parent="Column/Header" unique_id=2001378126]
 custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 text = "Begin again"
 
-[node name="Map" type="CenterContainer" parent="Column" unique_id=720539453]
+[node name="Map" type="CenterContainer" parent="Column" unique_id=315175874]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="Links" type="Control" parent="Column/Map" unique_id=327431022]
+[node name="Links" type="Control" parent="Column/Map" unique_id=400620625]
 custom_minimum_size = Vector2(810, 462)
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("3_r632u")
 
-[node name="fortune" type="Button" parent="Column/Map/Links" unique_id=1522259239 instance=ExtResource("4_04ia8")]
+[node name="fortune" type="Button" parent="Column/Map/Links" unique_id=1621941153 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 284.0
@@ -248,7 +248,7 @@ script = ExtResource("5_j3v2k")
 talent_id = "fortune"
 icon_texture = SubResource("AtlasTexture_h750b")
 
-[node name="crit" type="Button" parent="Column/Map/Links" unique_id=1511991506 instance=ExtResource("4_04ia8")]
+[node name="crit" type="Button" parent="Column/Map/Links" unique_id=228157791 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 468.0
@@ -263,7 +263,7 @@ talent_id = "crit"
 prerequisite = "golden_touch"
 icon_texture = SubResource("AtlasTexture_2apav")
 
-[node name="stride" type="Button" parent="Column/Map/Links" unique_id=1368976482 instance=ExtResource("4_04ia8")]
+[node name="stride" type="Button" parent="Column/Map/Links" unique_id=952549072 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 284.0
@@ -278,7 +278,7 @@ talent_id = "stride"
 prerequisite = "fortune"
 icon_texture = SubResource("AtlasTexture_0apep")
 
-[node name="echo" type="Button" parent="Column/Map/Links" unique_id=1210894384 instance=ExtResource("4_04ia8")]
+[node name="echo" type="Button" parent="Column/Map/Links" unique_id=25480905 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 376.0
@@ -293,7 +293,7 @@ talent_id = "echo"
 prerequisite = "fortune"
 icon_texture = SubResource("AtlasTexture_15cj3")
 
-[node name="head_start" type="Button" parent="Column/Map/Links" unique_id=1161592750 instance=ExtResource("4_04ia8")]
+[node name="head_start" type="Button" parent="Column/Map/Links" unique_id=661436006 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 192.0
@@ -308,7 +308,7 @@ talent_id = "head_start"
 prerequisite = "fortune"
 icon_texture = SubResource("AtlasTexture_ujma3")
 
-[node name="heirloom" type="Button" parent="Column/Map/Links" unique_id=925567928 instance=ExtResource("4_04ia8")]
+[node name="heirloom" type="Button" parent="Column/Map/Links" unique_id=2398989 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 100.0
@@ -323,7 +323,7 @@ talent_id = "heirloom"
 prerequisite = "head_start"
 icon_texture = SubResource("AtlasTexture_ne5q5")
 
-[node name="patience" type="Button" parent="Column/Map/Links" unique_id=1101144372 instance=ExtResource("4_04ia8")]
+[node name="patience" type="Button" parent="Column/Map/Links" unique_id=346239306 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 284.0
@@ -338,7 +338,7 @@ talent_id = "patience"
 prerequisite = "fortune"
 icon_texture = SubResource("AtlasTexture_x1ovu")
 
-[node name="long_nights" type="Button" parent="Column/Map/Links" unique_id=732224783 instance=ExtResource("4_04ia8")]
+[node name="long_nights" type="Button" parent="Column/Map/Links" unique_id=869239109 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 192.0
@@ -353,7 +353,7 @@ talent_id = "long_nights"
 prerequisite = "patience"
 icon_texture = SubResource("AtlasTexture_lhayd")
 
-[node name="old_friend" type="Button" parent="Column/Map/Links" unique_id=1070914806 instance=ExtResource("4_04ia8")]
+[node name="old_friend" type="Button" parent="Column/Map/Links" unique_id=703833509 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 284.0
@@ -368,7 +368,7 @@ talent_id = "old_friend"
 prerequisite = "stride"
 icon_texture = SubResource("AtlasTexture_6diya")
 
-[node name="muscle_memory" type="Button" parent="Column/Map/Links" unique_id=1170798894 instance=ExtResource("4_04ia8")]
+[node name="muscle_memory" type="Button" parent="Column/Map/Links" unique_id=1177775385 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 284.0
@@ -383,7 +383,7 @@ talent_id = "muscle_memory"
 prerequisite = "old_friend"
 icon_texture = SubResource("AtlasTexture_4m2rr")
 
-[node name="house_edge" type="Button" parent="Column/Map/Links" unique_id=1594562637 instance=ExtResource("4_04ia8")]
+[node name="house_edge" type="Button" parent="Column/Map/Links" unique_id=870530375 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 376.0
@@ -398,7 +398,7 @@ talent_id = "house_edge"
 prerequisite = "crit"
 icon_texture = SubResource("AtlasTexture_f1g2d")
 
-[node name="golden_touch" type="Button" parent="Column/Map/Links" unique_id=259410563 instance=ExtResource("4_04ia8")]
+[node name="golden_touch" type="Button" parent="Column/Map/Links" unique_id=1568475768 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 376.0
@@ -413,7 +413,7 @@ talent_id = "golden_touch"
 prerequisite = "fortune"
 icon_texture = SubResource("AtlasTexture_83cs8")
 
-[node name="crit_chance" type="Button" parent="Column/Map/Links" unique_id=1226767120 instance=ExtResource("4_04ia8")]
+[node name="crit_chance" type="Button" parent="Column/Map/Links" unique_id=1114952455 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 560.0
@@ -428,7 +428,7 @@ talent_id = "crit_chance"
 prerequisite = "crit"
 icon_texture = SubResource("AtlasTexture_bgdd5")
 
-[node name="crit_power" type="Button" parent="Column/Map/Links" unique_id=1745781857 instance=ExtResource("4_04ia8")]
+[node name="crit_power" type="Button" parent="Column/Map/Links" unique_id=1270873032 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 560.0
@@ -443,7 +443,7 @@ talent_id = "crit_power"
 prerequisite = "crit"
 icon_texture = SubResource("AtlasTexture_fuqbv")
 
-[node name="deep_fortune" type="Button" parent="Column/Map/Links" unique_id=622467762 instance=ExtResource("4_04ia8")]
+[node name="deep_fortune" type="Button" parent="Column/Map/Links" unique_id=1496816163 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 652.0
@@ -458,7 +458,7 @@ talent_id = "deep_fortune"
 prerequisite = "crit"
 icon_texture = SubResource("AtlasTexture_ok0cw")
 
-[node name="endless_favor" type="Button" parent="Column/Map/Links" unique_id=677574557 instance=ExtResource("4_04ia8")]
+[node name="endless_favor" type="Button" parent="Column/Map/Links" unique_id=1069265732 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 744.0
@@ -473,7 +473,7 @@ talent_id = "endless_favor"
 prerequisite = "deep_fortune"
 icon_texture = SubResource("AtlasTexture_eatpl")
 
-[node name="destiny" type="Button" parent="Column/Map/Links" unique_id=561777302 instance=ExtResource("4_04ia8")]
+[node name="destiny" type="Button" parent="Column/Map/Links" unique_id=1256228048 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 376.0
@@ -488,7 +488,7 @@ talent_id = "destiny"
 prerequisite = "house_edge"
 icon_texture = SubResource("AtlasTexture_ja6at")
 
-[node name="well_paid" type="Button" parent="Column/Map/Links" unique_id=485664099 instance=ExtResource("4_04ia8")]
+[node name="well_paid" type="Button" parent="Column/Map/Links" unique_id=14079759 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 192.0
@@ -503,7 +503,7 @@ talent_id = "well_paid"
 prerequisite = "stride"
 icon_texture = SubResource("AtlasTexture_pfe74")
 
-[node name="sharp_crew" type="Button" parent="Column/Map/Links" unique_id=1241271020 instance=ExtResource("4_04ia8")]
+[node name="sharp_crew" type="Button" parent="Column/Map/Links" unique_id=378141292 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 192.0
@@ -518,7 +518,7 @@ talent_id = "sharp_crew"
 prerequisite = "well_paid"
 icon_texture = SubResource("AtlasTexture_c0oi5")
 
-[node name="extra_hands" type="Button" parent="Column/Map/Links" unique_id=866808283 instance=ExtResource("4_04ia8")]
+[node name="extra_hands" type="Button" parent="Column/Map/Links" unique_id=752844346 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 376.0
@@ -533,7 +533,7 @@ talent_id = "extra_hands"
 prerequisite = "old_friend"
 icon_texture = SubResource("AtlasTexture_3sqcy")
 
-[node name="bargain" type="Button" parent="Column/Map/Links" unique_id=647228948 instance=ExtResource("4_04ia8")]
+[node name="bargain" type="Button" parent="Column/Map/Links" unique_id=1871654494 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 100.0
@@ -548,7 +548,7 @@ talent_id = "bargain"
 prerequisite = "head_start"
 icon_texture = SubResource("AtlasTexture_c2fnv")
 
-[node name="haggler" type="Button" parent="Column/Map/Links" unique_id=1793033225 instance=ExtResource("4_04ia8")]
+[node name="haggler" type="Button" parent="Column/Map/Links" unique_id=1341971341 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 8.0
@@ -563,7 +563,7 @@ talent_id = "haggler"
 prerequisite = "bargain"
 icon_texture = SubResource("AtlasTexture_uhxwn")
 
-[node name="born_harmony" type="Button" parent="Column/Map/Links" unique_id=1976041118 instance=ExtResource("4_04ia8")]
+[node name="born_harmony" type="Button" parent="Column/Map/Links" unique_id=598860740 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 100.0
@@ -578,7 +578,7 @@ talent_id = "born_harmony"
 prerequisite = "head_start"
 icon_texture = SubResource("AtlasTexture_xby10")
 
-[node name="perfect_harmony" type="Button" parent="Column/Map/Links" unique_id=103694662 instance=ExtResource("4_04ia8")]
+[node name="perfect_harmony" type="Button" parent="Column/Map/Links" unique_id=1754058950 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 8.0
@@ -593,7 +593,7 @@ talent_id = "perfect_harmony"
 prerequisite = "born_harmony"
 icon_texture = SubResource("AtlasTexture_5lxyh")
 
-[node name="chip_collector" type="Button" parent="Column/Map/Links" unique_id=148968547 instance=ExtResource("4_04ia8")]
+[node name="chip_collector" type="Button" parent="Column/Map/Links" unique_id=794576026 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 8.0
@@ -608,7 +608,7 @@ talent_id = "chip_collector"
 prerequisite = "heirloom"
 icon_texture = SubResource("AtlasTexture_feo36")
 
-[node name="hot_hands" type="Button" parent="Column/Map/Links" unique_id=960203520 instance=ExtResource("4_04ia8")]
+[node name="hot_hands" type="Button" parent="Column/Map/Links" unique_id=1204347298 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 284.0
@@ -623,7 +623,7 @@ talent_id = "hot_hands"
 prerequisite = "patience"
 icon_texture = SubResource("AtlasTexture_6p038")
 
-[node name="fire_within" type="Button" parent="Column/Map/Links" unique_id=2101122780 instance=ExtResource("4_04ia8")]
+[node name="fire_within" type="Button" parent="Column/Map/Links" unique_id=589382646 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 284.0
@@ -638,14 +638,14 @@ talent_id = "fire_within"
 prerequisite = "hot_hands"
 icon_texture = SubResource("AtlasTexture_npd24")
 
-[node name="quick_hands" type="Button" parent="Column/Map/Links" unique_id=1094555482 instance=ExtResource("4_04ia8")]
+[node name="quick_hands" type="Button" parent="Column/Map/Links" unique_id=1257802259 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 376.0
 offset_top = 334.0
 offset_right = 434.0
 offset_bottom = 392.0
-tooltip_text = "Quick hands"
+tooltip_text = "Swift dice"
 focus_mode = 0
 toggle_mode = true
 script = ExtResource("5_j3v2k")
@@ -653,7 +653,7 @@ talent_id = "quick_hands"
 prerequisite = "patience"
 icon_texture = SubResource("AtlasTexture_3s8j2")
 
-[node name="night_shift" type="Button" parent="Column/Map/Links" unique_id=1672859478 instance=ExtResource("4_04ia8")]
+[node name="night_shift" type="Button" parent="Column/Map/Links" unique_id=416078896 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 100.0
@@ -668,7 +668,7 @@ talent_id = "night_shift"
 prerequisite = "long_nights"
 icon_texture = SubResource("AtlasTexture_wy7dw")
 
-[node name="weighted_fate" type="Button" parent="Column/Map/Links" unique_id=938734591 instance=ExtResource("4_04ia8")]
+[node name="weighted_fate" type="Button" parent="Column/Map/Links" unique_id=1795268097 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 468.0
@@ -683,7 +683,7 @@ talent_id = "weighted_fate"
 prerequisite = "golden_touch"
 icon_texture = SubResource("AtlasTexture_hy5no")
 
-[node name="d4_devotion" type="Button" parent="Column/Map/Links" unique_id=76337214 instance=ExtResource("4_04ia8")]
+[node name="d4_devotion" type="Button" parent="Column/Map/Links" unique_id=1530121777 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 468.0
@@ -698,7 +698,7 @@ talent_id = "d4_devotion"
 prerequisite = "weighted_fate"
 icon_texture = SubResource("AtlasTexture_nm7nb")
 
-[node name="d6_devotion" type="Button" parent="Column/Map/Links" unique_id=41649118 instance=ExtResource("4_04ia8")]
+[node name="d6_devotion" type="Button" parent="Column/Map/Links" unique_id=1974429443 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 560.0
@@ -713,7 +713,7 @@ talent_id = "d6_devotion"
 prerequisite = "d4_devotion"
 icon_texture = SubResource("AtlasTexture_cn4ic")
 
-[node name="d8_devotion" type="Button" parent="Column/Map/Links" unique_id=1337369491 instance=ExtResource("4_04ia8")]
+[node name="d8_devotion" type="Button" parent="Column/Map/Links" unique_id=1415488633 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 652.0
@@ -728,7 +728,7 @@ talent_id = "d8_devotion"
 prerequisite = "d6_devotion"
 icon_texture = SubResource("AtlasTexture_kv2lm")
 
-[node name="d10_devotion" type="Button" parent="Column/Map/Links" unique_id=1179224863 instance=ExtResource("4_04ia8")]
+[node name="d10_devotion" type="Button" parent="Column/Map/Links" unique_id=1149268387 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 744.0
@@ -743,7 +743,7 @@ talent_id = "d10_devotion"
 prerequisite = "d8_devotion"
 icon_texture = SubResource("AtlasTexture_5b6ns")
 
-[node name="d12_devotion" type="Button" parent="Column/Map/Links" unique_id=1528831971 instance=ExtResource("4_04ia8")]
+[node name="d12_devotion" type="Button" parent="Column/Map/Links" unique_id=1417136080 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 744.0
@@ -758,7 +758,7 @@ talent_id = "d12_devotion"
 prerequisite = "d10_devotion"
 icon_texture = SubResource("AtlasTexture_cagoc")
 
-[node name="d20_devotion" type="Button" parent="Column/Map/Links" unique_id=2018829922 instance=ExtResource("4_04ia8")]
+[node name="d20_devotion" type="Button" parent="Column/Map/Links" unique_id=717220067 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 652.0
@@ -773,7 +773,7 @@ talent_id = "d20_devotion"
 prerequisite = "d12_devotion"
 icon_texture = SubResource("AtlasTexture_v5qfn")
 
-[node name="chip_hoard" type="Button" parent="Column/Map/Links" unique_id=862411624 instance=ExtResource("4_04ia8")]
+[node name="chip_hoard" type="Button" parent="Column/Map/Links" unique_id=308031097 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 8.0
@@ -788,7 +788,7 @@ talent_id = "chip_hoard"
 prerequisite = "chip_collector"
 icon_texture = SubResource("AtlasTexture_r77ua")
 
-[node name="hat_trick" type="Button" parent="Column/Map/Links" unique_id=469908904 instance=ExtResource("4_04ia8")]
+[node name="hat_trick" type="Button" parent="Column/Map/Links" unique_id=1996901598 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 100.0
@@ -803,7 +803,7 @@ talent_id = "hat_trick"
 prerequisite = "chip_hoard"
 icon_texture = SubResource("AtlasTexture_cntey")
 
-[node name="divine" type="Button" parent="Column/Map/Links" unique_id=1125966283 instance=ExtResource("4_04ia8")]
+[node name="divine" type="Button" parent="Column/Map/Links" unique_id=1250673932 instance=ExtResource("4_04ia8")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 468.0
@@ -818,15 +818,15 @@ talent_id = "divine"
 prerequisite = "crit"
 icon_texture = SubResource("AtlasTexture_o34pc")
 
-[node name="Info" type="PanelContainer" parent="Column" unique_id=1636280080]
+[node name="Info" type="PanelContainer" parent="Column" unique_id=1974845400]
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 
-[node name="Line" type="HBoxContainer" parent="Column/Info" unique_id=1745982532]
+[node name="Line" type="HBoxContainer" parent="Column/Info" unique_id=238544683]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Icon" type="TextureRect" parent="Column/Info/Line" unique_id=1310382105]
+[node name="Icon" type="TextureRect" parent="Column/Info/Line" unique_id=229497893]
 texture_filter = 1
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
@@ -834,24 +834,24 @@ size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Text" type="VBoxContainer" parent="Column/Info/Line" unique_id=1225334922]
+[node name="Text" type="VBoxContainer" parent="Column/Info/Line" unique_id=1793203126]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="Name" type="Label" parent="Column/Info/Line/Text" unique_id=1280657484]
+[node name="Name" type="Label" parent="Column/Info/Line/Text" unique_id=1727671170]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.95686275, 0.80784315, 0.5137255, 1)
 text = "Tap or click a talent to buy a rank."
 
-[node name="Body" type="Label" parent="Column/Info/Line/Text" unique_id=603417876]
+[node name="Body" type="Label" parent="Column/Info/Line/Text" unique_id=1466464531]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Talents are permanent."
 autowrap_mode = 3
 
-[node name="Trade" type="Label" parent="Column/Info/Line/Text" unique_id=103704957]
+[node name="Trade" type="Label" parent="Column/Info/Line/Text" unique_id=1452803589]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.77254903, 0.7058824, 0.8745098, 1)

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = "quick_hands"
-display_name = "Quick hands"
+display_name = "Swift dice"
 description = "Dice tumble 15% faster per level, so you and your helpers roll more."
 summary = "Dice land 15% faster"
 cost = 2.0

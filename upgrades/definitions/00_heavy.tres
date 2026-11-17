@@ -6,11 +6,11 @@
 script = ExtResource("1")
 id = "heavy"
 display_name = "Heavy dice"
-description = "+25% to every payout. Five levels."
+description = "+25% to every payout. Ten levels."
 summary = "+25% all payouts"
-cost = 50.0
-growth = 2
-max_level = 5
+cost = 150.0
+growth = 2.8
+max_level = 10
 stat = "payout"
 operation = "multiply"
 value = 1.25

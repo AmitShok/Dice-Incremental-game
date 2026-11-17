@@ -8,11 +8,11 @@
 script = ExtResource("1")
 id = "echo"
 display_name = "Resonance"
-description = "Rolling a die's highest face also throws the nearest die."
-summary = "Max rolls trigger a neighbour"
+description = "Rolling a die's highest face also throws the nearest die. Rank 2 throws the two nearest."
+summary = "Max rolls throw nearby dice"
 cost = 3.0
-growth = 1
-max_level = 1
+growth = 2
+max_level = 2
 stat = "chain"
 operation = "add"
 value = 1

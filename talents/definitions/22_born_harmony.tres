@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = "born_harmony"
 display_name = "Born in harmony"
-description = "Doubles, triples and straights pay from the start of every run."
-summary = "Combos from the first roll"
+description = "Every run starts with Table harmony already bought: doubles, triples and straights pay from the first roll."
+summary = "Start runs with Table harmony"
 cost = 3.0
 growth = 1
 max_level = 1

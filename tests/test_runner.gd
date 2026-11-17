@@ -269,6 +269,90 @@ func _dice_size_checks() -> void:
 		steady = steady and DiceVisual.size_for(count + 1) <= DiceVisual.size_for(count) and DiceVisual.size_for(count) - DiceVisual.size_for(count + 1) <= 0.051
 	check(steady, "Each extra die shrinks the table by at most one 5% step")
 
+func _rising_fate_checks() -> void:
+	# The Fate requirement rises with every fresh start: $100K, $200K, $300K...
+	var game: GameSession = fresh()
+	check(is_equal_approx(game.progression.prestige_threshold(), 100000.0), "First Fate needs $100K")
+	game.state.run_earned = 100000.0
+	check(game.progression.fate_reward() == 2 and game.prestige(), "First fresh start at $100K")
+	check(is_equal_approx(game.progression.prestige_threshold(), 200000.0), "Second Fate needs $200K")
+	game.state.run_earned = 199999.0
+	check(game.progression.fate_reward() == 0, "Just under $200K gives no Fate after one fresh start")
+	game.state.run_earned = 200000.0
+	check(game.progression.fate_reward() == 2 and is_equal_approx(game.progression.next_fate_at(), 225000.0), "At $200K Fate is ready and the next one is shown")
+	check(game.prestige() and is_equal_approx(game.progression.prestige_threshold(), 300000.0), "Third Fate needs $300K")
+	game.state.run_earned = 150000.0
+	check(game.progression.fate_reward() == 0 and is_equal_approx(game.progression.next_fate_at(), 300000.0), "Before the threshold the next target is the threshold")
+
+func _retired_chain_checks() -> void:
+	# Chain reaction was removed: it duplicated Resonance. Old saves that own it still load, the
+	# upgrade is dropped and its $2,200 is refunded.
+	var old: Dictionary = fresh().state.snapshot()
+	old.money = 500.0
+	old.upgrades = {"chain": 1, "heavy": 2}
+	var restored: GameState = GameState.restore(old, registry)
+	check(restored != null and not restored.upgrades.has("chain") and restored.upgrades.get("heavy", 0) == 2 and is_equal_approx(restored.money, 2700.0), "A save with Chain reaction loads and is refunded")
+	check(not registry.upgrades.has("chain"), "Chain reaction is gone from the shop")
+	# Resonance alone still makes a maximum roll throw the nearest die.
+	var game: GameSession = table_of(["d6", "d6"], [Vector2(300, 300), Vector2(360, 300)])
+	game.state.talents.echo = 1
+	game.forced_face = -1
+	game.request_roll([game.state.dice[0].id])
+	game.forced_face = 0
+	# Land it the way play does (chains on); settle() deliberately skips chains.
+	for id in game.pending.keys():
+		game.finish_roll(id, true)
+	check(game.state.dice[1].busy, "Resonance makes a max roll throw the nearest die")
+	game.settle()
+	# Rank 2 throws the two nearest dice, not just one; a far die stays put.
+	var ranked: GameSession = table_of(["d6", "d6", "d6", "d6"], [Vector2(300, 300), Vector2(360, 300), Vector2(240, 300), Vector2(700, 480)])
+	ranked.state.talents.echo = 2
+	ranked.forced_face = -1
+	ranked.request_roll([ranked.state.dice[0].id])
+	ranked.forced_face = 0
+	for id in ranked.pending.keys():
+		ranked.finish_roll(id, true)
+	check(ranked.state.dice[1].busy and ranked.state.dice[2].busy and not ranked.state.dice[3].busy, "Resonance rank 2 throws the two nearest dice")
+	ranked.settle()
+	ranked.state.talents.echo = 1
+	check(registry.talents.echo.max_level == 2 and ranked.economy.upgrade_price(registry.talents.echo) == 6.0, "Resonance rank 2 costs 6 Fate")
+
+func _duplicate_audit_checks() -> void:
+	# On/off abilities only check "is it switched on", so a second source adds nothing. If both an
+	# upgrade and a talent switch one on, the talent must grant the upgrade (so the shop never
+	# offers a purchase the talent already made useless).
+	var on_off: Array[String] = ["combos", "helper_smart", "critical", "keep_helpers"]
+	var clean: bool = true
+	for stat in on_off:
+		var upgrades: Array = registry.upgrades.values().filter(func(d): return d.stat == stat)
+		for talent in registry.talents.values().filter(func(d): return d.stat == stat):
+			if not upgrades.is_empty():
+				var granted: String = ProgressionService.TALENT_GRANTS.get(talent.id, "")
+				clean = clean and upgrades.any(func(d): return d.id == granted)
+	check(clean, "Every talent that duplicates an on/off upgrade grants that upgrade")
+	# No upgrade and talent attach the same effect (the Chain reaction / Resonance case).
+	var talent_effects: Array = []
+	for talent in registry.talents.values():
+		talent_effects.append_array(talent.effects)
+	var shared: bool = false
+	for upgrade in registry.upgrades.values():
+		for effect in upgrade.effects:
+			shared = shared or talent_effects.has(effect)
+	check(not shared, "No upgrade shares an effect with a talent")
+	# The grants: owned talents give their upgrades every run and right when bought.
+	var game: GameSession = fresh()
+	game.state.prestige_points = 50
+	game.state.talents.merge({"fortune": 1, "head_start": 1, "stride": 1, "well_paid": 1})
+	check(game.progression.buy_upgrade("born_harmony", true) and game.state.upgrades.get("combos", 0) == 1, "Born in harmony grants Table harmony at once")
+	check(game.progression.buy_upgrade("sharp_crew", true) and game.state.upgrades.get("sharp_eyes", 0) == 1, "Sharp crew grants Sharp eyes at once")
+	game.state.run_earned = game.progression.prestige_threshold()
+	check(game.progression.carryover_summary().contains("Table harmony") and game.progression.carryover_summary().contains("Sharp eyes"), "The fresh-start dialog lists granted upgrades")
+	check(game.prestige() and game.state.upgrades.get("combos", 0) == 1 and game.state.upgrades.get("sharp_eyes", 0) == 1, "Granted upgrades come back after a fresh start")
+	var loaded := GameSession.new(registry, GameState.restore(game.state.snapshot(), registry))
+	loaded.state.upgrades.clear()
+	loaded.progression.apply_talent_grants()
+	check(loaded.state.upgrades.get("combos", 0) == 1, "Grants are reapplied for a loaded save")
+
 func _web_save_checks() -> void:
 	# The newer of two saves wins (file vs the Web localStorage mirror); either may be missing.
 	var older := GameState.new()
@@ -316,7 +400,7 @@ func _fate_endgame_checks() -> void:
 	check(game.state.dice.size() == 3 and game.state.counts.d6 == 3, "Heirloom dice add starter D6s")
 	var spread: bool = game.state.dice[0].position.distance_to(game.state.dice[1].position) > 30 and game.state.dice[1].position.distance_to(game.state.dice[2].position) > 30
 	check(spread, "Heirloom dice do not overlap")
-	check(game.state.helpers == 5, "Loyal crew keeps every hired helper")
+	check(game.state.helpers == 6, "Loyal crew keeps every hired helper and Old friends adds one more")
 	var restored: GameState = GameState.restore(game.state.snapshot(), registry)
 	check(restored != null and restored.talents.muscle_memory == 1 and restored.talents.heirloom == 2, "New talents survive save round trip")
 	game = fresh()
@@ -345,7 +429,7 @@ func _fate_endgame_checks() -> void:
 func run() -> void:
 	registry = ContentRegistry.new()
 	check(registry.errors.is_empty() and registry.dice.size() == 13, "All dice content validates")
-	check(registry.upgrades.size() == 11 and registry.talents.size() == 39, "Upgrades and talents load")
+	check(registry.upgrades.size() == 10 and registry.talents.size() == 39, "Upgrades and talents load")
 	var definition: DiceDefinition = registry.dice.d6
 	var invalid := DiceDefinition.new()
 	invalid.id = "invalid"
@@ -534,6 +618,9 @@ func run() -> void:
 	_fate_endgame_checks()
 	_talent_tree_checks()
 	_web_save_checks()
+	_duplicate_audit_checks()
+	_retired_chain_checks()
+	_rising_fate_checks()
 	_dice_size_checks()
 	game = fresh()
 	check(not game.prestige(), "Early prestige rejected")

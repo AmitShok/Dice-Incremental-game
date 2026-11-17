@@ -357,7 +357,7 @@ func update_rows() -> void:
 			"prestige":
 				var reward: int = session.progression.fate_reward()
 				button.disabled = reward <= 0
-				price.text = ("+%d Fate now" % reward) if reward > 0 else "Earn $%s more" % NumberFormat.compact(maxf(0.0, ProgressionService.PRESTIGE_THRESHOLD - state.run_earned))
+				price.text = ("+%d Fate now" % reward) if reward > 0 else "Earn $%s more" % NumberFormat.compact(maxf(0.0, session.progression.prestige_threshold() - state.run_earned))
 				price.modulate = GOLD if reward > 0 else MUTED
 				count.text = ""
 				continue

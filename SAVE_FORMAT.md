@@ -24,3 +24,5 @@ The Settings confirmation explicitly warns that all progression, Fate and talent
 --test bypasses the production SaveManager. Disk fixtures use unique test-only filenames and clean up only their own paths. Headless tests and rendered test runners must always use -- --test.
 
 On the Web, user:// is the browser's IndexedDB, which Godot syncs asynchronously. SaveManager therefore also autosaves every 5 seconds (30 on desktop), saves on the page's visibilitychange (hidden) and pagehide events and on focus loss or app pause, and mirrors every verified save to localStorage under the key "d-infinity/progress.json". On load the newer of the file and the mirror (by state.last_saved) is used, so progress survives a tab or browser being closed straight after an action, and survives losing the IndexedDB copy.
+
+Upgrades removed from the game are listed in GameState.RETIRED_UPGRADES with their price. A save that still owns one loads normally: the upgrade is dropped and its price per level is added to money. Chain reaction ("chain", $2,200) was retired because it duplicated the Resonance talent.

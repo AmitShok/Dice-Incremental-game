@@ -3,9 +3,9 @@
 ## Contracts
 Amounts use double-precision floats capped at 1e100. This is a defined finite range, not arbitrary precision. Purchases reject nonfinite, nonpositive and unaffordable prices. UI formatting uses K/M/B/T and scientific notation beyond named suffixes. A future mantissa/exponent money type can replace this boundary if design exceeds the range.
 
-Per-family die cost = base_cost × cost_growth ^ owned_count; default growth 2. Starter D6 counts as owned. Ordinary upgrade cost = base × growth ^ current_level. Helpers cost 250 × 2.8 ^ hired, up to eight. Talents cost Fate with the same base × growth ^ level rule.
+Per-family die cost = base_cost × cost_growth ^ owned_count; default growth 2. Starter D6 counts as owned. Ordinary upgrade cost = base × growth ^ current_level. Helpers cost 250 × 2.8 ^ hired, up to twelve. Talents cost Fate with the same base × growth ^ level rule.
 
-Fate reward = 0 below $100K run earnings, otherwise floor(sqrt(run earnings / 25000) × 1.25 ^ House edge level). ProgressionService.next_fate_at() inverts this for the "+1 more Fate at" hint. Head start cash is not counted as run earnings, so it cannot shorten the path to Fate by itself. Heirloom D6s and Old friends helpers count toward their cost curves, as owned dice and hired helpers always do.
+Fate reward = 0 below the Fate threshold ($100K × (fresh starts + 1): $100K, $200K, $300K...), otherwise floor(sqrt(run earnings / 25000) × 1.25 ^ House edge level). ProgressionService.next_fate_at() inverts this for the "+1 more Fate at" hint. Head start cash is not counted as run earnings, so it cannot shorten the path to Fate by itself. Heirloom D6s and Old friends helpers count toward their cost curves, as owned dice and hired helpers always do.
 
 Payout = (natural face + flat bonus) × die base payout × matching upgrade modifiers × (1 + lifetime Fate × 0.1) × batch combination × spatial aura × critical. Additive modifier contributions are summed before multiplicative factors. Conditions inspect natural face. Values are fixed when the roll is reserved, so mid-animation purchases cannot retroactively change payout.
 
@@ -35,3 +35,28 @@ First roll immediately; second basic die after a few manual rolls; first helper 
 A seeded automated buyer throwing every 1.2 seconds reached its first helper at 37.8s and combinations at 72.9s. The original $25K prestige gate arrived at 119.8s, too early for the intended engine-building stage. The gate was raised to $100K and centralized in ProgressionService.PRESTIGE_THRESHOLD. These are scripted probes, not human playtest results.
 
 With the $100K gate, the same automated probe reached first Fate at 231.4s with 18 dice. Helper behavior subsequently gained explicit interaction/celebration delays; this remains an indicative probe rather than a fixed timing guarantee.
+
+## Upgrade prices and pacing (2026-11-17)
+
+Upgrades were re-priced so a run has something worth saving for throughout, rather than everything being bought in the first few minutes. Each upgrade keeps a cheap first level and grows steeply after it:
+
+| Upgrade | Levels | First level | Growth | Last level | All levels | Unlocks at |
+|---|---|---|---|---|---|---|
+| Heavy dice | 10 | $150 | ×2.8 | $1.59M | $2.47M | $0 |
+| Lucky sixes | 1 | $2K | | | $2K | $300 |
+| Loaded corners | 1 | $5K | | | $5K | $2K |
+| Table harmony | 1 | $10K | | | $10K | $4K |
+| Quick hands (helper speed) | 6 | $4K | ×3.5 | $2.10M | $2.94M | $1K |
+| Rolling rhythm | 4 | $3K | ×4 | $192K | $255K | $1K |
+| Momentum | 4 | $600 | ×3 | $16.2K | $24K | $100 |
+| Strong arms (helper pay) | 5 | $10K | ×5 | $6.25M | $7.81M | $5K |
+| Sharp eyes | 1 | $100K | | | $100K | $40K |
+| Many hands | 2 | $250K | ×10 | $2.5M | $2.75M | $120K |
+
+`tools/pacing_probe.gd` plays a steady, greedy player in one run with no talents: one die click every 0.35 s, the table roll whenever ready, helpers on their own, always buying the cheapest affordable die, upgrade or helper. It is a balancing aid, not a measurement of human play.
+
+| | Before | After |
+|---|---|---|
+| First Fate threshold ($100K) | 4.0 min | 15.8 min |
+| Every upgrade maxed | 4.4 min | 61.7 min |
+| Upgrade levels owned at 2 / 5 / 10 / 20 / 30 / 60 min | 24 of 24 by 5 min | 2 / 4 / 9 / 17 / 23 / 34 of 35 |

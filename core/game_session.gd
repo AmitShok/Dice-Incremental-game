@@ -39,6 +39,7 @@ func _init(content: ContentRegistry, existing: GameState = null) -> void:
 	progression.cosmetic_rng.randomize()
 	_refund_legacy_automation()
 	_refund_old_talents()
+	progression.apply_talent_grants()
 
 func _refund_legacy_automation() -> void:
 	for id in state.automatic:

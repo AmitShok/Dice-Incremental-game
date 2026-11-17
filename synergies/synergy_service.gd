@@ -67,7 +67,9 @@ static func followups(state: GameState, registry: ContentRegistry, outcome: Dict
 	var rules: Array = registry.dice[source.definition_id].effects.duplicate()
 	for upgrade in registry.all_modifiers():
 		var levels: Dictionary = state.talents if upgrade.permanent else state.upgrades
-		if int(levels.get(upgrade.id, 0)) > 0:
+		# Each rank adds the effect again; each copy picks a different die (see `used`), so
+		# Resonance rank 2 throws the two nearest dice.
+		for rank in int(levels.get(upgrade.id, 0)):
 			rules.append_array(upgrade.effects)
 	var used: Array = []
 	var actions: Array[Dictionary] = []
