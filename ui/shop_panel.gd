@@ -318,9 +318,11 @@ func _upgrade_icon(definition: UpgradeDefinition) -> Texture2D:
 
 # --- Live state ---------------------------------------------------------------------
 
+## Kinds of card that are sorted by price (dice, upgrades, the helper hire card).
+const PRICED_KINDS: Array[String] = ["die", "upgrade", "helper"]
+
 func update_rows() -> void:
 	var state: GameState = session.state
-	var shown_locked: Dictionary = {}
 	for entry in rows:
 		var button: Button = entry.button
 		var price: Label = entry.price
@@ -329,13 +331,15 @@ func update_rows() -> void:
 		var cost: float = 0.0
 		var locked: bool = false
 		var owned: bool = false
+		var unlock_at: float = 0.0
 		var lock_note: String = ""
 		match entry.kind:
 			"die":
 				var definition: DiceDefinition = session.registry.dice[id]
 				cost = session.economy.die_price(id)
-				locked = state.run_earned < definition.unlock_earned
-				lock_note = "Earn $" + NumberFormat.compact(definition.unlock_earned) + " to unlock"
+				unlock_at = definition.unlock_earned
+				locked = state.run_earned < unlock_at
+				lock_note = "Earn $" + NumberFormat.compact(unlock_at) + " to unlock"
 				if state.dice.size() >= GameState.MAX_DICE:
 					locked = true
 					lock_note = "Table full"
@@ -345,13 +349,15 @@ func update_rows() -> void:
 				var level: int = int(state.upgrades.get(id, 0))
 				cost = session.economy.upgrade_price(definition)
 				owned = level >= definition.max_level
-				locked = state.run_earned < definition.unlock_earned
-				lock_note = "Earn $" + NumberFormat.compact(definition.unlock_earned) + " to unlock"
+				unlock_at = definition.unlock_earned
+				locked = state.run_earned < unlock_at
+				lock_note = "Earn $" + NumberFormat.compact(unlock_at) + " to unlock"
 				count.text = "%d/%d" % [level, definition.max_level]
 			"helper":
 				cost = session.progression.helper_price()
 				owned = state.helpers >= GameState.MAX_HELPERS
-				locked = state.run_earned < 150
+				unlock_at = 150.0
+				locked = state.run_earned < unlock_at
 				lock_note = "Earn $150 to unlock"
 				count.text = "%d/%d" % [state.helpers, GameState.MAX_HELPERS]
 			"prestige":
@@ -361,11 +367,10 @@ func update_rows() -> void:
 				price.modulate = GOLD if reward > 0 else MUTED
 				count.text = ""
 				continue
-		# Show every unlocked card, but only the next locked one in each group as a teaser.
-		var hide: bool = locked and shown_locked.has(entry.kind)
-		if locked:
-			shown_locked[entry.kind] = true
-		button.visible = not hide
+		# Sort key: what you can buy, cheapest first; then locked cards, soonest unlock first;
+		# maxed cards last.
+		entry.order = [2 if owned else (1 if locked else 0), unlock_at if locked and not owned else cost]
+		entry.locked = locked and not owned
 		button.modulate = Color(1, 1, 1, 0.6) if locked else Color.WHITE
 		var affordable: bool = state.money >= cost
 		# Unaffordable cards stay lit with a red price; only locked or maxed cards are disabled.
@@ -379,8 +384,40 @@ func update_rows() -> void:
 		else:
 			price.text = "$" + NumberFormat.compact(cost)
 			price.modulate = AFFORD if affordable else SHORT
+	_sort_priced_rows()
 	_update_tiles()
 	_update_ledger()
+
+## Orders the priced cards on this page by their sort key, reusing the slots they already occupy
+## (so section labels and the hats below stay put). Only moves cards when the order changes, so
+## a purchase keeps the scroll position and focus. Shows every unlocked card but only the next
+## locked one per kind, as a teaser.
+func _sort_priced_rows() -> void:
+	var priced: Array = rows.filter(func(entry): return PRICED_KINDS.has(entry.kind))
+	if priced.is_empty():
+		return
+	var slots: Array[int] = []
+	for entry in priced:
+		slots.append(entry.button.get_index())
+	slots.sort()
+	var sorted: Array = priced.duplicate()
+	sorted.sort_custom(func(a, b):
+		if a.order[0] != b.order[0]:
+			return a.order[0] < b.order[0]
+		if a.order[1] != b.order[1]:
+			return a.order[1] < b.order[1]
+		return a.button.get_index() < b.button.get_index()
+	)
+	for index in sorted.size():
+		var button: Button = sorted[index].button
+		if button.get_index() != slots[index]:
+			body.move_child(button, slots[index])
+	var shown_locked: Dictionary = {}
+	for entry in sorted:
+		var hide: bool = entry.locked and shown_locked.has(entry.kind)
+		if entry.locked:
+			shown_locked[entry.kind] = true
+		entry.button.visible = not hide
 
 func _update_tiles() -> void:
 	var state: GameState = session.state

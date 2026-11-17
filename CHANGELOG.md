@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-11-17 — Shop lists sorted by price
+
+- The Dice, Upgrades and Helpers lists are now ordered by current price.
+  - Cards you can buy come first, cheapest at the top.
+  - Next comes the single locked "teaser" card that unlocks soonest.
+  - Maxed cards (and a full crew) go at the bottom.
+- Prices include levels already bought, so a card moves down after you buy a level.
+- Cards only move when the order actually changes, and they reuse their existing slots, so buying something keeps your scroll position and focus. The Hats section on the Helpers page stays where it is.
+- `tests/shop_scroll_runner.gd` checks that each page is sorted before and after a purchase.
+
 ## 2026-11-17 — No more duplicate upgrades; slower, steadier upgrade progress
 
 - **Duplicate audit.** Two more pairs behaved like Chain reaction and Resonance, where a talent made a shop upgrade useless:

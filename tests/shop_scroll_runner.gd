@@ -3,6 +3,18 @@ extends SceneTree
 func _initialize() -> void:
 	call_deferred("run")
 
+## True when the visible priced cards on the current page run from cheapest to dearest
+## (buyable first, then the locked teaser, then maxed).
+func sorted_by_price(shop) -> bool:
+	var previous: Array = [-1, -1.0]
+	for child in shop.body.get_children():
+		for entry in shop.rows:
+			if entry.button == child and child.visible and entry.has("order"):
+				if entry.order[0] < previous[0] or (entry.order[0] == previous[0] and entry.order[1] < previous[1]):
+					return false
+				previous = entry.order
+	return true
+
 func run() -> void:
 	if not OS.get_cmdline_user_args().has("--test"):
 		quit(1)
@@ -30,6 +42,9 @@ func run() -> void:
 		var button: Button = row.button
 		var old_text: String = row.price.text
 		var old_scroll: int = main.shop.scroll.scroll_vertical
+		if not sorted_by_price(main.shop):
+			push_error("Shop cards are not sorted by price: " + page)
+			failures += 1
 		button.grab_focus()
 		if button.disabled or old_scroll <= 0:
 			push_error("Invalid purchase test fixture: " + page)
@@ -37,6 +52,9 @@ func run() -> void:
 		button.pressed.emit()
 		await process_frame
 		await process_frame
+		if not sorted_by_price(main.shop):
+			push_error("Shop cards are not re-sorted after a purchase: " + page)
+			failures += 1
 		if not is_instance_valid(button) or main.shop.scroll.scroll_vertical != old_scroll or row.price.text == old_text or not button.has_focus():
 			push_error("Purchase lost scroll/focus or failed to refresh: " + page)
 			failures += 1
