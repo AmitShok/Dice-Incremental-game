@@ -34,10 +34,12 @@ func buy_die(id: String) -> bool:
 func _open_position() -> Vector2:
 	var best := Vector2(135, 210)
 	var widest: float = -1.0
-	for index in 110:
-		# Kept clear of the felt's corner brackets and rails so new dice (and their name tags)
-		# always land on open felt.
-		var candidate := Vector2(115 + index % 11 * 57, 185 + int(index / 11) * 30)
+	# A staggered (honeycomb) grid of 14 x 9 = 126 spots, evenly spaced in both directions so a
+	# full table packs evenly instead of stacking dice in columns. Kept clear of the felt's corner
+	# brackets and rails so new dice (and their name tags) always land on open felt.
+	for index in 126:
+		var row: int = int(index / 14)
+		var candidate := Vector2(100 + index % 14 * 43 + (21 if row % 2 == 1 else 0), 180 + row * 35)
 		var distance: float = INF
 		for die in state.dice:
 			distance = minf(distance, candidate.distance_squared_to(die.position))

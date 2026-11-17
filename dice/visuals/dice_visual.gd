@@ -40,15 +40,25 @@ func _ready() -> void:
 	# The "D6" tag sits on the felt, so it uses the outlined pixel font.
 	marker.add_theme_font_override("font", preload("res://assets/fonts/d_infinity_pixel_outline.fnt"))
 
+## Dice stay full size (one art pixel on two screen pixels, the room's grid) until the table holds
+## FULL_SIZE_UNTIL dice, then shrink gently in 5% steps to SMALLEST_SIZE at the 100-die cap, so a
+## busy table looks full rather than sparse with tiny dice.
+const FULL_SIZE_UNTIL: int = 40
+const SMALLEST_SIZE: float = 0.7
+## Name tags show while dice are full size; the extra contact shadow stays until the table is
+## crowded enough that dropping it keeps draw batching cheap.
+const TAGS_UNTIL: int = 40
+const SHADOWS_UNTIL: int = 60
+
+static func size_for(count: int) -> float:
+	var crowding: float = clampf(float(count - FULL_SIZE_UNTIL) / float(GameState.MAX_DICE - FULL_SIZE_UNTIL), 0.0, 1.0)
+	return snappedf(lerpf(1.0, SMALLEST_SIZE, crowding), 0.05)
+
 func set_density(count: int) -> void:
-	# Dice art is 32 px drawn at 2x (Face scale 2), so a factor of 1 puts one art pixel on two screen
-	# pixels, the same grid as the room. Crowded tables step down to 1.5x and then 1x.
-	var factor: float = 1.0 if count <= 16 else (0.75 if count <= 30 else 0.5)
-	dense = count > 30
-	scale = Vector2.ONE * factor
-	# Faces already carry a contact shadow; dense tables do not need a second shadow or tiny labels.
+	scale = Vector2.ONE * size_for(count)
+	dense = count > SHADOWS_UNTIL
 	shadow.visible = not dense
-	marker.visible = count <= 30
+	marker.visible = count <= TAGS_UNTIL
 	if not dragging and not rolling:
 		position = die.position - Vector2(32, 32) * scale
 

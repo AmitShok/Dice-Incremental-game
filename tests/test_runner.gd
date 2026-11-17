@@ -259,6 +259,16 @@ func _talent_tree_checks() -> void:
 	# A fair D6 lands 1 about 500 times in 3000; with 30% rescued it is about 350.
 	check(ones < 420, "Divine intervention turns some 1s into maximums")
 
+func _dice_size_checks() -> void:
+	# Dice keep full size until 40, then shrink gently to 70% at the 100-die cap, never below.
+	check(DiceVisual.size_for(1) == 1.0 and DiceVisual.size_for(40) == 1.0, "Dice stay full size up to 40")
+	check(DiceVisual.size_for(70) < 1.0 and DiceVisual.size_for(70) > 0.7, "Dice shrink gradually past 40")
+	check(is_equal_approx(DiceVisual.size_for(100), 0.7) and is_equal_approx(DiceVisual.size_for(150), 0.7), "Dice never get smaller than 70%")
+	var steady: bool = true
+	for count in range(40, 101):
+		steady = steady and DiceVisual.size_for(count + 1) <= DiceVisual.size_for(count) and DiceVisual.size_for(count) - DiceVisual.size_for(count + 1) <= 0.051
+	check(steady, "Each extra die shrinks the table by at most one 5% step")
+
 func _web_save_checks() -> void:
 	# The newer of two saves wins (file vs the Web localStorage mirror); either may be missing.
 	var older := GameState.new()
@@ -524,6 +534,7 @@ func run() -> void:
 	_fate_endgame_checks()
 	_talent_tree_checks()
 	_web_save_checks()
+	_dice_size_checks()
 	game = fresh()
 	check(not game.prestige(), "Early prestige rejected")
 	check(game.offline(-100) == 0, "Backward clock earns nothing")

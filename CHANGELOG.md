@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-17 — Dice stay big for longer and full tables fill evenly
+
+- Dice used to shrink to 75% at 17 dice and to 50% at 31. Now they stay full size up to 40 dice, then shrink gently in 5% steps to 70% at the 100-die cap (`DiceVisual.size_for`).
+- Name tags show up to 40 dice. Contact shadows now stay up to 60 dice; they used to disappear at 31.
+- New dice spawn on an evenly staggered honeycomb of 126 spots (14 × 9), always the spot farthest from other dice. The old grid's rows were half as far apart as its columns, so busy tables stacked dice into columns with empty stripes between.
+- The 100-die stress test still runs at about 143 fps. New checks cover the size rule: full size to 40, gradual shrinking after, never below 70%, at most one 5% step per extra die.
+
 ## 2026-11-15 — Talent tree fits on one screen (fixes the empty tree on iPhone)
 
 - On iPhone browsers (Chrome and Safari both use Apple's WebKit), the talent tree popup showed its frame with an empty middle. The map sat inside a clipped, scrolled area, and that area drew nothing there.
